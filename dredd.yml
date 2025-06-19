@@ -1,0 +1,52 @@
+# Dredd configuration for API contract testing
+reporter: apiary
+custom:
+  # Email Service Configuration
+  email-service:
+    server: http://localhost:8083
+    blueprint: docs/email-service-api-v1.yaml
+    language: nodejs
+    hookfiles: tests/dredd/email-service-hooks.js
+    
+  # Goal & Strategy Service Configuration  
+  goal-strategy-service:
+    server: http://localhost:8085
+    blueprint: docs/goal-strategy-service-api-v1.yaml
+    language: nodejs
+    hookfiles: tests/dredd/goal-strategy-hooks.js
+    
+  # Calendar Service Configuration
+  calendar-service:
+    server: http://localhost:8086
+    blueprint: docs/calendar-service-api-v1.yaml
+    language: nodejs
+    hookfiles: tests/dredd/calendar-hooks.js
+
+# Global Dredd settings
+dry-run: false
+names: false
+only: []
+reporter: []
+output: []
+header: []
+sorted: false
+user: null
+inline-errors: false
+details: false
+method: []
+color: true
+level: info
+timestamp: false
+silent: false
+path: []
+hooks-worker-timeout: 5000
+hooks-worker-connect-timeout: 1500
+hooks-worker-connect-retry: 500
+hooks-worker-after-connect-wait: 100
+hooks-worker-term-timeout: 5000
+hooks-worker-term-retry: 500
+hooks-worker-handler-host: 127.0.0.1
+hooks-worker-handler-port: 61321
+config: ./dredd.yml
+blueprint: docs/email-service-api-v1.yaml
+endpoint: http://localhost:8083

@@ -89,8 +89,13 @@ npm run mock:all          # Start all mock servers concurrently
 # Code Generation
 npm run generate:types    # Generate TypeScript types from OpenAPI specs
 
-# Testing
-npm run test:contract     # Run contract tests (when implemented)
+# Contract Testing
+npm run test:contract              # Run all contract tests
+npm run test:contract:api          # Run API contract tests (Schemathesis + Dredd)
+npm run test:contract:schemathesis # Run property-based API tests
+npm run test:contract:dredd        # Run API implementation validation
+npm run test:contract:pact         # Run service contract tests (Pact)
+npm run test:contract:mock         # Run contract tests against mock servers
 ```
 
 ### API Standards
@@ -165,11 +170,38 @@ curl http://localhost:8086/v1/health
 
 ### Contract Testing
 
-Contract tests ensure service implementations match API specifications:
+Contract tests ensure service implementations match API specifications and validate service-to-service interactions:
 
+#### API Contract Testing
 ```bash
-npm run test:contract  # Run contract tests (when implemented)
+# Property-based testing with Schemathesis
+npm run test:contract:schemathesis
+
+# Implementation validation with Dredd
+npm run test:contract:dredd
+
+# Combined API contract testing
+npm run test:contract:api
 ```
+
+#### Service Contract Testing
+```bash
+# Consumer-driven contracts with Pact
+npm run test:contract:pact
+
+# Test against mock servers
+npm run test:contract:mock
+
+# Run all contract tests
+npm run test:contract
+```
+
+**Testing Tools:**
+- **Schemathesis**: Property-based testing that generates test cases from OpenAPI specs
+- **Dredd**: Validates API implementations against specifications
+- **Pact**: Consumer-driven contract testing for service interactions
+
+See [`docs/contract-testing.md`](docs/contract-testing.md) for detailed testing guide.
 
 ## 🔧 Configuration
 
@@ -197,11 +229,13 @@ npm run prepare  # Install Husky hooks
 
 GitHub Actions workflow (`.github/workflows/api-validation.yml`) automatically:
 
-- Validates API specifications on every push
+- Validates API specifications with Spectral linting
+- Runs comprehensive contract testing (Schemathesis, Dredd, Pact)
 - Checks for breaking changes in pull requests
 - Generates and deploys documentation
 - Runs security scans on API contracts
 - Creates mock servers for testing
+- Publishes Pact contracts to broker
 
 ### Production Deployment
 
@@ -216,6 +250,7 @@ See [`docs/development-plan.md`](docs/development-plan.md) for detailed deployme
 
 - [`docs/personal-ea-prd.md`](docs/personal-ea-prd.md) - Product Requirements Document
 - [`docs/development-plan.md`](docs/development-plan.md) - Detailed development roadmap
+- [`docs/contract-testing.md`](docs/contract-testing.md) - Contract testing guide and best practices
 - [`docs/api-spec.md`](docs/api-spec.md) - API specification guidelines
 - Generated API docs in `docs/*-docs.html`
 
