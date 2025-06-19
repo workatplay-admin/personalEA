@@ -1,0 +1,579 @@
+openapi: 3.1.0
+info:
+  title: Email Processing Service API
+  version: 1.0.0
+  description: |
+    API for fetching, parsing, categorizing, and summarizing user emails from Google Suite.
+    
+    **Semantic Versioning Rules:**
+    - MAJOR: Breaking changes to existing endpoints or response formats
+    - MINOR: New endpoints or optional fields added
+    - PATCH: Bug fixes, documentation updates, or internal improvements
+    
+    **Rate Limits:**
+    - 100 requests per minute per user for most endpoints
+    - 10 requests per minute for sync operations
+    
+    **Authentication:**
+    - Requires JWT with `email.read` scope for read operations
+    - Requires JWT with `email.write` scope for sync operations
+
+servers:
+  - url: http://email-service:8084
+    description: Internal service endpoint
+
+security:
+  - bearerAuth: []
+
+paths:
+  /v1/emails/sync:
+    post:
+      summary: Initiate email synchronization from Google Suite
+      operationId: syncEmails
+      security:
+        - bearerAuth: [email.write]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailSyncRequest'
+            example:
+              user_id: "user_123"
+              access_token: "ya29.a0AfH6SMC..."
+              sync_options:
+                labels: ["INBOX", "IMPORTANT"]
+                since: "2025-06-19T00:00:00Z"
+                max_results: 1000
+      responses:
+        '202':
+          $ref: '../components/common.yaml#/components/responses/JobAccepted'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+        '503':
+          $ref: '../components/common.yaml#/components/responses/ServiceUnavailable'
+
+  /v1/emails/digest:
+    post:
+      summary: Generate email digest for specified time window and labels
+      operationId: generateEmailDigest
+      security:
+        - bearerAuth: [email.read]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailDigestRequest'
+            example:
+              user_id: "user_123"
+              time_window:
+                start: "2025-06-19T00:00:00Z"
+                end: "2025-06-19T23:59:59Z"
+              labels: ["INBOX", "IMPORTANT"]
+              categories: ["urgent", "actionable"]
+      responses:
+        '200':
+          description: Email digest generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailDigestResponse'
+              example:
+                digest_id: "digest_456"
+                generated_at: "2025-06-19T22:15:00Z"
+                summary: "You have 5 urgent emails requiring immediate attention and 12 informational updates."
+                emails:
+                  - email_id: "email_789"
+                    subject: "Urgent: Client meeting moved to tomorrow"
+                    sender: "client@example.com"
+                    category: "urgent"
+                    summary: "Client has moved the meeting from Friday to tomorrow at 2 PM"
+                    action_items: ["Update calendar", "Prepare presentation"]
+                    received_at: "2025-06-19T14:30:00Z"
+                pagination:
+                  limit: 20
+                  cursor: "eyJpZCI6MTIzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTE5VDIyOjE1OjAwWiJ9"
+                  has_more: true
+                  total_count: 17
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/emails/{email_id}/summary:
+    get:
+      summary: Get summary of a specific email
+      operationId: getEmailSummary
+      security:
+        - bearerAuth: [email.read]
+      parameters:
+        - name: email_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the email
+          example: "email_789"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      responses:
+        '200':
+          description: Email summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailSummaryResponse'
+              example:
+                email_id: "email_789"
+                subject: "Urgent: Client meeting moved to tomorrow"
+                sender: "client@example.com"
+                summary: "Client has moved the meeting from Friday to tomorrow at 2 PM due to scheduling conflict"
+                category: "urgent"
+                confidence_score: 0.95
+                key_points:
+                  - "Meeting rescheduled from Friday to tomorrow"
+                  - "New time: 2 PM"
+                  - "Reason: scheduling conflict"
+                received_at: "2025-06-19T14:30:00Z"
+        '404':
+          description: Email not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/emails/{email_id}/action-items:
+    get:
+      summary: Get actionable items from a specific email
+      operationId: getEmailActionItems
+      security:
+        - bearerAuth: [email.read]
+      parameters:
+        - name: email_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the email
+          example: "email_789"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of items to skip (for offset-based pagination)
+          example: 0
+      responses:
+        '200':
+          description: Action items retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionItemsResponse'
+              example:
+                email_id: "email_789"
+                action_items:
+                  - text: "Update calendar with new meeting time"
+                    confidence_score: 0.92
+                    priority: "high"
+                    deadline: "2025-06-20T14:00:00Z"
+                  - text: "Prepare presentation for client meeting"
+                    confidence_score: 0.87
+                    priority: "medium"
+                    deadline: "2025-06-20T14:00:00Z"
+                pagination:
+                  limit: 20
+                  offset: 0
+                  has_more: false
+                  total_count: 2
+        '404':
+          description: Email not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/events/email-ingested:
+    post:
+      summary: Webhook endpoint for email ingestion events
+      operationId: handleEmailIngestedEvent
+      security:
+        - bearerAuth: [email.write]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailIngestedEvent'
+            example:
+              event_type: "email-ingested"
+              user_id: "user_123"
+              email_id: "email_789"
+              timestamp: "2025-06-19T22:15:00Z"
+              metadata:
+                subject: "Urgent: Client meeting moved to tomorrow"
+                sender: "client@example.com"
+                category: "urgent"
+      responses:
+        '200':
+          description: Event processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "processed"
+                  event_id:
+                    type: string
+                    example: "event_456"
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/jobs/{job_id}:
+    get:
+      summary: Get status of an asynchronous job
+      operationId: getJobStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the job
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      responses:
+        '200':
+          description: Job status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+              example:
+                job_id: "550e8400-e29b-41d4-a716-446655440001"
+                state: "completed"
+                percent_complete: 100
+                result_location: "/v1/emails/sync/results/550e8400-e29b-41d4-a716-446655440001"
+                created_at: "2025-06-19T22:10:00Z"
+                updated_at: "2025-06-19T22:15:00Z"
+                metadata:
+                  user_id: "user_123"
+                  operation: "email_sync"
+                  emails_processed: 150
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+
+components:
+  schemas:
+    EmailSyncRequest:
+      type: object
+      required: [user_id, access_token]
+      properties:
+        user_id:
+          type: string
+          description: Unique identifier for the user
+          example: "user_123"
+        access_token:
+          type: string
+          description: Google OAuth access token
+          example: "ya29.a0AfH6SMC..."
+        sync_options:
+          type: object
+          properties:
+            labels:
+              type: array
+              items:
+                type: string
+              description: Gmail labels to sync (default: all)
+              example: ["INBOX", "IMPORTANT"]
+            since:
+              type: string
+              format: date-time
+              description: Only sync emails after this timestamp
+              example: "2025-06-19T00:00:00Z"
+            max_results:
+              type: integer
+              minimum: 1
+              maximum: 10000
+              default: 1000
+              description: Maximum number of emails to sync
+              example: 1000
+
+    EmailDigestRequest:
+      type: object
+      required: [user_id, time_window]
+      properties:
+        user_id:
+          type: string
+          description: Unique identifier for the user
+          example: "user_123"
+        time_window:
+          type: object
+          required: [start, end]
+          properties:
+            start:
+              type: string
+              format: date-time
+              description: Start of time window (ISO 8601)
+              example: "2025-06-19T00:00:00Z"
+            end:
+              type: string
+              format: date-time
+              description: End of time window (ISO 8601)
+              example: "2025-06-19T23:59:59Z"
+        labels:
+          type: array
+          items:
+            type: string
+          description: Gmail labels to include in digest
+          example: ["INBOX", "IMPORTANT"]
+        categories:
+          type: array
+          items:
+            type: string
+            enum: [urgent, important, informational, actionable, follow-up]
+          description: Email categories to include
+          example: ["urgent", "actionable"]
+
+    EmailDigestResponse:
+      type: object
+      required: [digest_id, generated_at, summary, emails, pagination]
+      properties:
+        digest_id:
+          type: string
+          description: Unique identifier for this digest
+          example: "digest_456"
+        generated_at:
+          type: string
+          format: date-time
+          description: When the digest was generated
+          example: "2025-06-19T22:15:00Z"
+        summary:
+          type: string
+          description: High-level summary of the digest
+          example: "You have 5 urgent emails requiring immediate attention and 12 informational updates."
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailDigestItem'
+        pagination:
+          $ref: '../components/common.yaml#/components/schemas/Pagination'
+
+    EmailDigestItem:
+      type: object
+      required: [email_id, subject, sender, category, summary, received_at]
+      properties:
+        email_id:
+          type: string
+          description: Unique identifier for the email
+          example: "email_789"
+        subject:
+          type: string
+          description: Email subject line
+          example: "Urgent: Client meeting moved to tomorrow"
+        sender:
+          type: string
+          description: Email sender
+          example: "client@example.com"
+        category:
+          type: string
+          enum: [urgent, important, informational, actionable, follow-up]
+          description: Categorization of the email
+          example: "urgent"
+        summary:
+          type: string
+          description: Brief summary of email content
+          example: "Client has moved the meeting from Friday to tomorrow at 2 PM"
+        action_items:
+          type: array
+          items:
+            type: string
+          description: Identified action items from the email
+          example: ["Update calendar", "Prepare presentation"]
+        received_at:
+          type: string
+          format: date-time
+          description: When the email was received
+          example: "2025-06-19T14:30:00Z"
+
+    EmailSummaryResponse:
+      type: object
+      required: [email_id, subject, sender, summary, category, confidence_score, received_at]
+      properties:
+        email_id:
+          type: string
+          description: Unique identifier for the email
+          example: "email_789"
+        subject:
+          type: string
+          description: Email subject line
+          example: "Urgent: Client meeting moved to tomorrow"
+        sender:
+          type: string
+          description: Email sender
+          example: "client@example.com"
+        summary:
+          type: string
+          description: AI-generated summary of email content
+          example: "Client has moved the meeting from Friday to tomorrow at 2 PM due to scheduling conflict"
+        category:
+          type: string
+          enum: [urgent, important, informational, actionable, follow-up]
+          description: AI-determined category
+          example: "urgent"
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Confidence in the categorization (0-1)
+          example: 0.95
+        key_points:
+          type: array
+          items:
+            type: string
+          description: Key points extracted from the email
+          example: ["Meeting rescheduled from Friday to tomorrow", "New time: 2 PM", "Reason: scheduling conflict"]
+        received_at:
+          type: string
+          format: date-time
+          description: When the email was received
+          example: "2025-06-19T14:30:00Z"
+
+    ActionItemsResponse:
+      type: object
+      required: [email_id, action_items, pagination]
+      properties:
+        email_id:
+          type: string
+          description: Unique identifier for the email
+          example: "email_789"
+        action_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionItem'
+        pagination:
+          type: object
+          properties:
+            limit:
+              type: integer
+              example: 20
+            offset:
+              type: integer
+              example: 0
+            has_more:
+              type: boolean
+              example: false
+            total_count:
+              type: integer
+              example: 2
+
+    ActionItem:
+      type: object
+      required: [text, confidence_score, priority]
+      properties:
+        text:
+          type: string
+          description: Description of the action item
+          example: "Update calendar with new meeting time"
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Confidence in this being an action item (0-1)
+          example: 0.92
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          description: Estimated priority of the action item
+          example: "high"
+        deadline:
+          type: string
+          format: date-time
+          description: Estimated or explicit deadline
+          example: "2025-06-20T14:00:00Z"
+
+    EmailIngestedEvent:
+      type: object
+      required: [event_type, user_id, email_id, timestamp]
+      properties:
+        event_type:
+          type: string
+          enum: [email-ingested]
+          description: Type of event
+          example: "email-ingested"
+        user_id:
+          type: string
+          description: User who owns the email
+          example: "user_123"
+        email_id:
+          type: string
+          description: Unique identifier for the ingested email
+          example: "email_789"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event occurred
+          example: "2025-06-19T22:15:00Z"
+        metadata:
+          type: object
+          description: Additional event metadata
+          properties:
+            subject:
+              type: string
+              example: "Urgent: Client meeting moved to tomorrow"
+            sender:
+              type: string
+              example: "client@example.com"
+            category:
+              type: string
+              example: "urgent"
+          additionalProperties: true
+
+  securitySchemes:
+    bearerAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/bearerAuth'

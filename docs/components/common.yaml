@@ -1,0 +1,278 @@
+openapi: 3.1.0
+info:
+  title: Personal EA - Shared Components
+  version: 1.0.0
+  description: Common schemas and components shared across all Personal EA microservices
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error, timestamp, request_id]
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: "Invalid request format or parameters"
+        error_code:
+          type: string
+          enum: [INVALID_REQUEST, UNAUTHORIZED, FORBIDDEN, RATE_LIMITED, 
+                 SERVICE_UNAVAILABLE, TIMEOUT, INTERNAL_ERROR, VERSION_CONFLICT]
+          example: "INVALID_REQUEST"
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error context
+          example:
+            field: "content.type"
+            allowed_values: ["text", "command", "override", "event"]
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when error occurred
+          example: "2025-06-19T22:15:00Z"
+        request_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this request
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        retry_after_ms:
+          type: integer
+          minimum: 0
+          description: Milliseconds to wait before retrying (for rate limits)
+          example: 5000
+
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: Maximum number of items to return
+          example: 20
+        cursor:
+          type: string
+          description: Opaque cursor for pagination (keyset-based)
+          example: "eyJpZCI6MTIzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTE5VDIyOjE1OjAwWiJ9"
+        has_more:
+          type: boolean
+          description: Whether there are more items available
+          example: true
+        total_count:
+          type: integer
+          minimum: 0
+          description: Total number of items (optional, may be expensive to compute)
+          example: 150
+
+    JobStatus:
+      type: object
+      required: [job_id, state, created_at]
+      properties:
+        job_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this job
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        state:
+          type: string
+          enum: [pending, running, completed, failed, cancelled]
+          description: Current state of the job
+          example: "running"
+        percent_complete:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Percentage completion (0-100)
+          example: 75
+        result_location:
+          type: string
+          format: uri
+          description: URL to fetch the job result (available when state is completed)
+          example: "/v1/emails/digest/results/550e8400-e29b-41d4-a716-446655440001"
+        created_at:
+          type: string
+          format: date-time
+          description: When the job was created
+          example: "2025-06-19T22:10:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the job was last updated
+          example: "2025-06-19T22:15:00Z"
+        error_message:
+          type: string
+          description: Error message if state is failed
+          example: "Failed to connect to email provider"
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Job-specific metadata
+          example:
+            user_id: "user_123"
+            operation: "email_sync"
+
+  parameters:
+    CorrelationIdHeader:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Unique identifier for request tracing across services
+      example: "550e8400-e29b-41d4-a716-446655440002"
+
+    IdempotencyKeyHeader:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        maxLength: 255
+      description: Unique key to ensure idempotent operations
+      example: "client_123_20250619_221500"
+
+    LimitQuery:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Maximum number of items to return
+      example: 20
+
+    CursorQuery:
+      name: cursor
+      in: query
+      schema:
+        type: string
+      description: Pagination cursor for keyset-based pagination
+      example: "eyJpZCI6MTIzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTE5VDIyOjE1OjAwWiJ9"
+
+  responses:
+    BadRequest:
+      description: Invalid request format or parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Invalid message content type"
+            error_code: "INVALID_REQUEST"
+            details:
+              field: "content.type"
+              allowed_values: ["text", "command", "override", "event"]
+            timestamp: "2025-06-19T22:15:00Z"
+            request_id: "550e8400-e29b-41d4-a716-446655440000"
+
+    Unauthorized:
+      description: Invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Invalid JWT token"
+            error_code: "UNAUTHORIZED"
+            timestamp: "2025-06-19T22:15:00Z"
+            request_id: "550e8400-e29b-41d4-a716-446655440000"
+
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Insufficient scope for this operation"
+            error_code: "FORBIDDEN"
+            details:
+              required_scope: "email.read"
+              provided_scopes: ["calendar.read"]
+            timestamp: "2025-06-19T22:15:00Z"
+            request_id: "550e8400-e29b-41d4-a716-446655440000"
+
+    RateLimited:
+      description: Too many requests
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Rate limit exceeded"
+            error_code: "RATE_LIMITED"
+            retry_after_ms: 5000
+            timestamp: "2025-06-19T22:15:00Z"
+            request_id: "550e8400-e29b-41d4-a716-446655440000"
+
+    ServiceUnavailable:
+      description: Service temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Service temporarily unavailable"
+            error_code: "SERVICE_UNAVAILABLE"
+            retry_after_ms: 30000
+            timestamp: "2025-06-19T22:15:00Z"
+            request_id: "550e8400-e29b-41d4-a716-446655440000"
+
+    VersionConflict:
+      description: Version conflict - resource was modified by another client
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Resource was modified by another client"
+            error_code: "VERSION_CONFLICT"
+            details:
+              current_version: "v2"
+              provided_version: "v1"
+            timestamp: "2025-06-19T22:15:00Z"
+            request_id: "550e8400-e29b-41d4-a716-446655440000"
+
+    JobAccepted:
+      description: Job accepted for asynchronous processing
+      headers:
+        Location:
+          schema:
+            type: string
+            format: uri
+          description: URL to check job status
+          example: "/v1/jobs/550e8400-e29b-41d4-a716-446655440001"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/JobStatus'
+          example:
+            job_id: "550e8400-e29b-41d4-a716-446655440001"
+            state: "pending"
+            percent_complete: 0
+            created_at: "2025-06-19T22:15:00Z"
+            updated_at: "2025-06-19T22:15:00Z"
+            metadata:
+              user_id: "user_123"
+              operation: "email_sync"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT must contain:
+        - sub: user identifier
+        - exp: expiration (max 1 hour)
+        - iat: issued at timestamp
+        - scope: space-separated permissions (email.read, email.write, calendar.read, calendar.write, goals.read, goals.write)

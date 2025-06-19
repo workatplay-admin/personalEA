@@ -1,0 +1,1135 @@
+openapi: 3.1.0
+info:
+  title: Goal & Strategy Service API
+  version: 1.0.0
+  description: |
+    API for managing user goals, TO-DOs, strategic prioritization, and progress tracking.
+    Provides context for intelligent justification and negotiation with users.
+    
+    **Semantic Versioning Rules:**
+    - MAJOR: Breaking changes to existing endpoints or response formats
+    - MINOR: New endpoints or optional fields added
+    - PATCH: Bug fixes, documentation updates, or internal improvements
+    
+    **Rate Limits:**
+    - 200 requests per minute per user for read operations
+    - 50 requests per minute per user for write operations
+    
+    **Authentication:**
+    - Requires JWT with `goals.read` scope for read operations
+    - Requires JWT with `goals.write` scope for write operations
+    
+    **Concurrency Control:**
+    - All PATCH operations require If-Match header with ETag to prevent lost updates
+    - ETags are returned in response headers and must be used for subsequent updates
+
+servers:
+  - url: http://goal-service:8085
+    description: Internal service endpoint
+
+security:
+  - bearerAuth: []
+
+paths:
+  /v1/goals:
+    get:
+      summary: Retrieve all user goals
+      operationId: getGoals
+      security:
+        - bearerAuth: [goals.read]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, completed, paused, archived]
+          description: Filter goals by status
+          example: "active"
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, urgent]
+          description: Filter goals by priority
+          example: "high"
+      responses:
+        '200':
+          description: Goals retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalsResponse'
+              example:
+                goals:
+                  - goal_id: "goal_123"
+                    title: "Launch new product feature"
+                    description: "Complete development and launch of the AI-powered analytics dashboard"
+                    status: "active"
+                    priority: "high"
+                    target_date: "2025-07-15T00:00:00Z"
+                    progress_percentage: 65
+                    created_at: "2025-06-01T00:00:00Z"
+                    updated_at: "2025-06-19T22:15:00Z"
+                    version: "v3"
+                pagination:
+                  limit: 20
+                  cursor: "eyJpZCI6MTIzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTE5VDIyOjE1OjAwWiJ9"
+                  has_more: false
+                  total_count: 5
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+    post:
+      summary: Create a new goal
+      operationId: createGoal
+      security:
+        - bearerAuth: [goals.write]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGoalRequest'
+            example:
+              title: "Learn advanced TypeScript"
+              description: "Master advanced TypeScript concepts including generics, conditional types, and metaprogramming"
+              priority: "medium"
+              target_date: "2025-08-31T00:00:00Z"
+              tags: ["learning", "typescript", "development"]
+              success_criteria:
+                - "Complete advanced TypeScript course"
+                - "Build a complex TypeScript project"
+                - "Pass TypeScript certification exam"
+      responses:
+        '201':
+          description: Goal created successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Version identifier for the created goal
+              example: "v1"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+              example:
+                goal_id: "goal_456"
+                title: "Learn advanced TypeScript"
+                description: "Master advanced TypeScript concepts including generics, conditional types, and metaprogramming"
+                status: "active"
+                priority: "medium"
+                target_date: "2025-08-31T00:00:00Z"
+                progress_percentage: 0
+                tags: ["learning", "typescript", "development"]
+                success_criteria:
+                  - "Complete advanced TypeScript course"
+                  - "Build a complex TypeScript project"
+                  - "Pass TypeScript certification exam"
+                created_at: "2025-06-19T22:20:00Z"
+                updated_at: "2025-06-19T22:20:00Z"
+                version: "v1"
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/goals/{goal_id}:
+    get:
+      summary: Retrieve a specific goal
+      operationId: getGoal
+      security:
+        - bearerAuth: [goals.read]
+      parameters:
+        - name: goal_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the goal
+          example: "goal_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      responses:
+        '200':
+          description: Goal retrieved successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Current version of the goal
+              example: "v3"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '404':
+          description: Goal not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+    put:
+      summary: Update a goal
+      operationId: updateGoal
+      security:
+        - bearerAuth: [goals.write]
+      parameters:
+        - name: goal_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the goal
+          example: "goal_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - name: If-Match
+          in: header
+          required: true
+          schema:
+            type: string
+          description: ETag of the goal version being updated
+          example: "v2"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGoalRequest'
+            example:
+              title: "Launch new product feature (Updated)"
+              description: "Complete development and launch of the AI-powered analytics dashboard with enhanced reporting"
+              priority: "urgent"
+              target_date: "2025-07-10T00:00:00Z"
+              status: "active"
+      responses:
+        '200':
+          description: Goal updated successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: New version identifier for the updated goal
+              example: "v3"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '404':
+          description: Goal not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '409':
+          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/goals/{goal_id}/tasks:
+    get:
+      summary: Get tasks for a specific goal
+      operationId: getGoalTasks
+      security:
+        - bearerAuth: [goals.read]
+      parameters:
+        - name: goal_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the goal
+          example: "goal_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, in_progress, completed, blocked]
+          description: Filter tasks by status
+          example: "pending"
+      responses:
+        '200':
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TasksResponse'
+        '404':
+          description: Goal not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+    post:
+      summary: Add a task to a goal
+      operationId: createGoalTask
+      security:
+        - bearerAuth: [goals.write]
+      parameters:
+        - name: goal_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the goal
+          example: "goal_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+            example:
+              title: "Design API endpoints"
+              description: "Design and document REST API endpoints for the analytics dashboard"
+              priority: "high"
+              estimated_hours: 8
+              deadline: "2025-06-25T17:00:00Z"
+              dependencies: ["task_456"]
+              tags: ["api", "design", "documentation"]
+      responses:
+        '201':
+          description: Task created successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Version identifier for the created task
+              example: "v1"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '404':
+          description: Goal not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/goals/{goal_id}/tasks/{task_id}/context:
+    get:
+      summary: Get detailed context for a specific task (for justification)
+      operationId: getTaskContext
+      security:
+        - bearerAuth: [goals.read]
+      parameters:
+        - name: goal_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the goal
+          example: "goal_123"
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the task
+          example: "task_789"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      responses:
+        '200':
+          description: Task context retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskContext'
+              example:
+                task_id: "task_789"
+                goal_id: "goal_123"
+                title: "Design API endpoints"
+                priority: "high"
+                deadline: "2025-06-25T17:00:00Z"
+                dependencies:
+                  - task_id: "task_456"
+                    title: "Complete database schema"
+                    status: "completed"
+                blocking_tasks:
+                  - task_id: "task_890"
+                    title: "Implement API endpoints"
+                    reason: "Cannot implement without design"
+                reason_for_priority: "Critical path item for product launch; blocks 3 other tasks"
+                impact_on_goal: "High - required for 40% of goal completion"
+                time_sensitivity: "Deadline in 6 days; no buffer time available"
+                resource_requirements:
+                  - "Senior backend developer"
+                  - "API documentation tools"
+                estimated_completion_time: "2025-06-24T17:00:00Z"
+        '404':
+          description: Goal or task not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/priorities:
+    get:
+      summary: Get suggested daily/weekly priorities
+      operationId: getPriorities
+      security:
+        - bearerAuth: [goals.read]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - name: time_range
+          in: query
+          schema:
+            type: string
+            enum: [today, tomorrow, this_week, next_week]
+            default: today
+          description: Time range for priority suggestions
+          example: "today"
+        - name: include_confidence
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include confidence scores in response
+          example: true
+      responses:
+        '200':
+          description: Priorities retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrioritiesResponse'
+              example:
+                time_range:
+                  start: "2025-06-19T00:00:00Z"
+                  end: "2025-06-19T23:59:59Z"
+                  label: "today"
+                priorities:
+                  - task_id: "task_789"
+                    goal_id: "goal_123"
+                    title: "Design API endpoints"
+                    priority_rank: 1
+                    confidence_score: 0.95
+                    reasoning: "Critical path item with tight deadline; blocks other tasks"
+                    estimated_duration: "PT8H"
+                    suggested_time_slot:
+                      start: "2025-06-19T09:00:00Z"
+                      end: "2025-06-19T17:00:00Z"
+                  - task_id: "task_890"
+                    goal_id: "goal_456"
+                    title: "Review TypeScript documentation"
+                    priority_rank: 2
+                    confidence_score: 0.78
+                    reasoning: "Important for learning goal; can be done in parallel"
+                    estimated_duration: "PT2H"
+                    suggested_time_slot:
+                      start: "2025-06-19T19:00:00Z"
+                      end: "2025-06-19T21:00:00Z"
+                generated_at: "2025-06-19T22:20:00Z"
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/tasks/{task_id}/progress:
+    patch:
+      summary: Update task progress
+      operationId: updateTaskProgress
+      security:
+        - bearerAuth: [goals.write]
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the task
+          example: "task_789"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - name: If-Match
+          in: header
+          required: true
+          schema:
+            type: string
+          description: ETag of the task version being updated
+          example: "v2"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskProgressPatch'
+            example:
+              op: "replace"
+              path: "/progress_percentage"
+              value: 75
+      responses:
+        '200':
+          description: Task progress updated successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: New version identifier for the updated task
+              example: "v3"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '409':
+          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/events/goal-created:
+    post:
+      summary: Webhook endpoint for goal creation events
+      operationId: handleGoalCreatedEvent
+      security:
+        - bearerAuth: [goals.write]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalCreatedEvent'
+      responses:
+        '200':
+          description: Event processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "processed"
+                  event_id:
+                    type: string
+                    example: "event_789"
+
+  /v1/jobs/{job_id}:
+    get:
+      summary: Get status of an asynchronous job
+      operationId: getJobStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the job
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      responses:
+        '200':
+          description: Job status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+
+components:
+  schemas:
+    Goal:
+      type: object
+      required: [goal_id, title, status, priority, created_at, updated_at, version]
+      properties:
+        goal_id:
+          type: string
+          description: Unique identifier for the goal
+          example: "goal_123"
+        title:
+          type: string
+          maxLength: 200
+          description: Goal title
+          example: "Launch new product feature"
+        description:
+          type: string
+          maxLength: 2000
+          description: Detailed description of the goal
+          example: "Complete development and launch of the AI-powered analytics dashboard"
+        status:
+          type: string
+          enum: [active, completed, paused, archived]
+          description: Current status of the goal
+          example: "active"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          description: Priority level of the goal
+          example: "high"
+        target_date:
+          type: string
+          format: date-time
+          description: Target completion date (ISO 8601 with timezone)
+          example: "2025-07-15T00:00:00Z"
+        progress_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Completion percentage (0-100)
+          example: 65
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags for categorization
+          example: ["product", "development", "analytics"]
+        success_criteria:
+          type: array
+          items:
+            type: string
+          description: Criteria that define success for this goal
+          example: ["Feature deployed to production", "User adoption > 80%", "Performance metrics met"]
+        created_at:
+          type: string
+          format: date-time
+          description: When the goal was created (ISO 8601 with timezone)
+          example: "2025-06-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the goal was last updated (ISO 8601 with timezone)
+          example: "2025-06-19T22:15:00Z"
+        version:
+          type: string
+          description: Version identifier for optimistic locking
+          example: "v3"
+
+    CreateGoalRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          maxLength: 200
+          description: Goal title
+          example: "Learn advanced TypeScript"
+        description:
+          type: string
+          maxLength: 2000
+          description: Detailed description of the goal
+          example: "Master advanced TypeScript concepts including generics, conditional types, and metaprogramming"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          default: medium
+          description: Priority level of the goal
+          example: "medium"
+        target_date:
+          type: string
+          format: date-time
+          description: Target completion date (ISO 8601 with timezone)
+          example: "2025-08-31T00:00:00Z"
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags for categorization
+          example: ["learning", "typescript", "development"]
+        success_criteria:
+          type: array
+          items:
+            type: string
+          description: Criteria that define success for this goal
+          example: ["Complete advanced TypeScript course", "Build a complex TypeScript project"]
+
+    UpdateGoalRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+          description: Goal title
+          example: "Launch new product feature (Updated)"
+        description:
+          type: string
+          maxLength: 2000
+          description: Detailed description of the goal
+          example: "Complete development and launch of the AI-powered analytics dashboard with enhanced reporting"
+        status:
+          type: string
+          enum: [active, completed, paused, archived]
+          description: Current status of the goal
+          example: "active"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          description: Priority level of the goal
+          example: "urgent"
+        target_date:
+          type: string
+          format: date-time
+          description: Target completion date (ISO 8601 with timezone)
+          example: "2025-07-10T00:00:00Z"
+        progress_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Completion percentage (0-100)
+          example: 75
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags for categorization
+          example: ["product", "development", "analytics", "urgent"]
+        success_criteria:
+          type: array
+          items:
+            type: string
+          description: Criteria that define success for this goal
+          example: ["Feature deployed to production", "User adoption > 80%", "Performance metrics met"]
+
+    Task:
+      type: object
+      required: [task_id, goal_id, title, status, priority, created_at, updated_at, version]
+      properties:
+        task_id:
+          type: string
+          description: Unique identifier for the task
+          example: "task_789"
+        goal_id:
+          type: string
+          description: Identifier of the parent goal
+          example: "goal_123"
+        title:
+          type: string
+          maxLength: 200
+          description: Task title
+          example: "Design API endpoints"
+        description:
+          type: string
+          maxLength: 2000
+          description: Detailed description of the task
+          example: "Design and document REST API endpoints for the analytics dashboard"
+        status:
+          type: string
+          enum: [pending, in_progress, completed, blocked]
+          description: Current status of the task
+          example: "pending"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          description: Priority level of the task
+          example: "high"
+        progress_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Completion percentage (0-100)
+          example: 25
+        estimated_hours:
+          type: number
+          minimum: 0
+          description: Estimated hours to complete
+          example: 8
+        actual_hours:
+          type: number
+          minimum: 0
+          description: Actual hours spent
+          example: 3
+        deadline:
+          type: string
+          format: date-time
+          description: Task deadline (ISO 8601 with timezone)
+          example: "2025-06-25T17:00:00Z"
+        dependencies:
+          type: array
+          items:
+            type: string
+          description: Task IDs that must be completed first
+          example: ["task_456", "task_567"]
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags for categorization
+          example: ["api", "design", "documentation"]
+        created_at:
+          type: string
+          format: date-time
+          description: When the task was created (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the task was last updated (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+        version:
+          type: string
+          description: Version identifier for optimistic locking
+          example: "v1"
+
+    CreateTaskRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          maxLength: 200
+          description: Task title
+          example: "Design API endpoints"
+        description:
+          type: string
+          maxLength: 2000
+          description: Detailed description of the task
+          example: "Design and document REST API endpoints for the analytics dashboard"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          default: medium
+          description: Priority level of the task
+          example: "high"
+        estimated_hours:
+          type: number
+          minimum: 0
+          description: Estimated hours to complete
+          example: 8
+        deadline:
+          type: string
+          format: date-time
+          description: Task deadline (ISO 8601 with timezone)
+          example: "2025-06-25T17:00:00Z"
+        dependencies:
+          type: array
+          items:
+            type: string
+          description: Task IDs that must be completed first
+          example: ["task_456"]
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags for categorization
+          example: ["api", "design", "documentation"]
+
+    TaskContext:
+      type: object
+      required: [task_id, goal_id, title, priority, reason_for_priority]
+      properties:
+        task_id:
+          type: string
+          description: Unique identifier for the task
+          example: "task_789"
+        goal_id:
+          type: string
+          description: Identifier of the parent goal
+          example: "goal_123"
+        title:
+          type: string
+          description: Task title
+          example: "Design API endpoints"
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          description: Priority level of the task
+          example: "high"
+        deadline:
+          type: string
+          format: date-time
+          description: Task deadline (ISO 8601 with timezone)
+          example: "2025-06-25T17:00:00Z"
+        dependencies:
+          type: array
+          items:
+            type: object
+            properties:
+              task_id:
+                type: string
+                example: "task_456"
+              title:
+                type: string
+                example: "Complete database schema"
+              status:
+                type: string
+                enum: [pending, in_progress, completed, blocked]
+                example: "completed"
+          description: Tasks that this task depends on
+        blocking_tasks:
+          type: array
+          items:
+            type: object
+            properties:
+              task_id:
+                type: string
+                example: "task_890"
+              title:
+                type: string
+                example: "Implement API endpoints"
+              reason:
+                type: string
+                example: "Cannot implement without design"
+          description: Tasks that are blocked by this task
+        reason_for_priority:
+          type: string
+          description: Explanation of why this task has its current priority
+          example: "Critical path item for product launch; blocks 3 other tasks"
+        impact_on_goal:
+          type: string
+          description: How this task impacts the parent goal
+          example: "High - required for 40% of goal completion"
+        time_sensitivity:
+          type: string
+          description: Time-related constraints and urgency
+          example: "Deadline in 6 days; no buffer time available"
+        resource_requirements:
+          type: array
+          items:
+            type: string
+          description: Resources needed to complete this task
+          example: ["Senior backend developer", "API documentation tools"]
+        estimated_completion_time:
+          type: string
+          format: date-time
+          description: Estimated completion time (ISO 8601 with timezone)
+          example: "2025-06-24T17:00:00Z"
+
+    TaskProgressPatch:
+      type: object
+      required: [op, path, value]
+      properties:
+        op:
+          type: string
+          enum: [replace, add, remove]
+          description: JSON Patch operation type
+          example: "replace"
+        path:
+          type: string
+          description: JSON Patch path
+          example: "/progress_percentage"
+        value:
+          description: New value for the specified path
+          example: 75
+
+    PrioritiesResponse:
+      type: object
+      required: [time_range, priorities, generated_at]
+      properties:
+        time_range:
+          type: object
+          required: [start, end, label]
+          properties:
+            start:
+              type: string
+              format: date-time
+              description: Start of the time range (ISO 8601 with timezone)
+              example: "2025-06-19T00:00:00Z"
+            end:
+              type: string
+              format: date-time
+              description: End of the time range (ISO 8601 with timezone)
+              example: "2025-06-19T23:59:59Z"
+            label:
+              type: string
+              description: Human-readable label for the time range
+              example: "today"
+        priorities:
+          type: array
+          items:
+            type: object
+            required: [task_id, goal_id, title, priority_rank]
+            properties:
+              task_id:
+                type: string
+                description: Unique identifier for the task
+                example: "task_789"
+              goal_id:
+                type: string
+                description: Identifier of the parent goal
+                example: "goal_123"
+              title:
+                type: string
+                description: Task title
+                example: "Design API endpoints"
+              priority_rank:
+                type: integer
+                minimum: 1
+                description: Priority ranking (1 = highest priority)
+                example: 1
+              confidence_score:
+                type: number
+                minimum: 0
+                maximum: 1
+                description: AI confidence in this priority suggestion (0-1)
+                example: 0.95
+              reasoning:
+                type: string
+                description: Explanation for why this task is prioritized
+                example: "Critical path item with tight deadline; blocks other tasks"
+              estimated_duration:
+                type: string
+                format: duration
+                description: Estimated time to complete (ISO 8601 duration)
+                example: "PT8H"
+              suggested_time_slot:
+                type: object
+                properties:
+                  start:
+                    type: string
+                    format: date-time
+                    description: Suggested start time (ISO 8601 with timezone)
+                    example: "2025-06-19T09:00:00Z"
+                  end:
+                    type: string
+                    format: date-time
+                    description: Suggested end time (ISO 8601 with timezone)
+                    example: "2025-06-19T17:00:00Z"
+                description: Suggested time slot for this task
+          description: List of prioritized tasks for the time range
+        generated_at:
+          type: string
+          format: date-time
+          description: When these priorities were generated (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+
+    GoalsResponse:
+      type: object
+      required: [goals]
+      properties:
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Goal'
+          description: List of user goals
+        pagination:
+          $ref: '../components/common.yaml#/components/schemas/Pagination'
+
+    TasksResponse:
+      type: object
+      required: [tasks]
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+          description: List of tasks for the goal
+        pagination:
+          $ref: '../components/common.yaml#/components/schemas/Pagination'
+
+    GoalCreatedEvent:
+      type: object
+      required: [event_id, event_type, timestamp, data]
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the event
+          example: "550e8400-e29b-41d4-a716-446655440002"
+        event_type:
+          type: string
+          enum: [goal.created]
+          description: Type of event
+          example: "goal.created"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event occurred (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+        data:
+          type: object
+          required: [goal_id, user_id]
+          properties:
+            goal_id:
+              type: string
+              description: ID of the created goal
+              example: "goal_456"
+            user_id:
+              type: string
+              description: ID of the user who created the goal
+              example: "user_123"
+            goal_title:
+              type: string
+              description: Title of the created goal
+              example: "Learn advanced TypeScript"
+          description: Event-specific data
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token with appropriate scopes:
+        - `goals.read`: Required for read operations
+        - `goals.write`: Required for write operations
+
+  parameters:
+    GoalIdPath:
+      name: goal_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Unique identifier for the goal
+      example: "goal_123"
+
+    TaskIdPath:
+      name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Unique identifier for the task
+      example: "task_789"

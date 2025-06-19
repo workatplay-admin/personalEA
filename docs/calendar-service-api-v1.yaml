@@ -1,0 +1,1552 @@
+openapi: 3.1.0
+info:
+  title: Calendar Service API
+  version: 1.0.0
+  description: |
+    API for calendar integration, scheduling, and time management within the personalEA system.
+    Provides intelligent scheduling suggestions, conflict detection, and integration with external calendar systems.
+    
+    **Semantic Versioning Rules:**
+    - MAJOR: Breaking changes to existing endpoints or response formats
+    - MINOR: New endpoints or optional fields added
+    - PATCH: Bug fixes, documentation updates, or internal improvements
+    
+    **Rate Limits:**
+    - 300 requests per minute per user for read operations
+    - 100 requests per minute per user for write operations
+    - 20 requests per minute per user for sync operations
+    
+    **Authentication:**
+    - Requires JWT with `calendar.read` scope for read operations
+    - Requires JWT with `calendar.write` scope for write operations
+    - Requires JWT with `calendar.sync` scope for sync operations
+    
+    **Concurrency Control:**
+    - All PUT/PATCH operations require If-Match header with ETag to prevent lost updates
+    - ETags are returned in response headers and must be used for subsequent updates
+
+servers:
+  - url: http://calendar-service:8086
+    description: Internal service endpoint
+
+security:
+  - bearerAuth: []
+
+paths:
+  /v1/calendars:
+    get:
+      summary: Retrieve all connected calendars
+      operationId: getCalendars
+      security:
+        - bearerAuth: [calendar.read]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - name: provider
+          in: query
+          schema:
+            type: string
+            enum: [google, outlook, apple, caldav]
+          description: Filter calendars by provider
+          example: "google"
+        - name: sync_status
+          in: query
+          schema:
+            type: string
+            enum: [active, error, disabled]
+          description: Filter calendars by sync status
+          example: "active"
+      responses:
+        '200':
+          description: Calendars retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarsResponse'
+              example:
+                calendars:
+                  - calendar_id: "cal_123"
+                    name: "Work Calendar"
+                    provider: "google"
+                    provider_calendar_id: "primary"
+                    sync_status: "active"
+                    last_sync: "2025-06-19T22:15:00Z"
+                    permissions: ["read", "write"]
+                    color: "#1976D2"
+                    timezone: "America/New_York"
+                    created_at: "2025-06-01T00:00:00Z"
+                    updated_at: "2025-06-19T22:15:00Z"
+                pagination:
+                  limit: 20
+                  cursor: "eyJpZCI6MTIzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTE5VDIyOjE1OjAwWiJ9"
+                  has_more: false
+                  total_count: 3
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+    post:
+      summary: Connect a new calendar
+      operationId: connectCalendar
+      security:
+        - bearerAuth: [calendar.write]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectCalendarRequest'
+            example:
+              provider: "google"
+              provider_calendar_id: "primary"
+              name: "Work Calendar"
+              permissions: ["read", "write"]
+              sync_enabled: true
+              auth_token: "ya29.a0AfH6SMC..."
+      responses:
+        '201':
+          description: Calendar connected successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Version identifier for the connected calendar
+              example: "v1"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calendar'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '409':
+          description: Calendar already connected
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/calendars/{calendar_id}/sync:
+    post:
+      summary: Trigger calendar synchronization
+      operationId: syncCalendar
+      security:
+        - bearerAuth: [calendar.sync]
+      parameters:
+        - name: calendar_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the calendar
+          example: "cal_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncCalendarRequest'
+            example:
+              sync_type: "incremental"
+              date_range:
+                start: "2025-06-01T00:00:00Z"
+                end: "2025-12-31T23:59:59Z"
+      responses:
+        '202':
+          description: Sync initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+              example:
+                job_id: "550e8400-e29b-41d4-a716-446655440001"
+                status: "pending"
+                created_at: "2025-06-19T22:20:00Z"
+                message: "Calendar sync initiated"
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '404':
+          description: Calendar not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/events:
+    get:
+      summary: Retrieve calendar events
+      operationId: getEvents
+      security:
+        - bearerAuth: [calendar.read]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - name: calendar_id
+          in: query
+          schema:
+            type: string
+          description: Filter events by calendar ID
+          example: "cal_123"
+        - name: start_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Start of time range (ISO 8601 with timezone)
+          example: "2025-06-19T00:00:00Z"
+        - name: end_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: End of time range (ISO 8601 with timezone)
+          example: "2025-06-26T23:59:59Z"
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [confirmed, tentative, cancelled]
+          description: Filter events by status
+          example: "confirmed"
+      responses:
+        '200':
+          description: Events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventsResponse'
+              example:
+                events:
+                  - event_id: "evt_123"
+                    calendar_id: "cal_123"
+                    title: "Team Standup"
+                    description: "Daily team synchronization meeting"
+                    start_time: "2025-06-20T09:00:00Z"
+                    end_time: "2025-06-20T09:30:00Z"
+                    timezone: "America/New_York"
+                    status: "confirmed"
+                    location: "Conference Room A"
+                    attendees:
+                      - email: "john@example.com"
+                        name: "John Doe"
+                        response_status: "accepted"
+                    created_at: "2025-06-19T22:20:00Z"
+                    updated_at: "2025-06-19T22:20:00Z"
+                pagination:
+                  limit: 50
+                  cursor: "eyJpZCI6MTIzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTE5VDIyOjE1OjAwWiJ9"
+                  has_more: true
+                  total_count: 127
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+    post:
+      summary: Create a new calendar event
+      operationId: createEvent
+      security:
+        - bearerAuth: [calendar.write]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+            example:
+              calendar_id: "cal_123"
+              title: "Project Review Meeting"
+              description: "Quarterly project review and planning session"
+              start_time: "2025-06-25T14:00:00Z"
+              end_time: "2025-06-25T15:30:00Z"
+              timezone: "America/New_York"
+              location: "Conference Room B"
+              attendees:
+                - email: "alice@example.com"
+                  name: "Alice Smith"
+                - email: "bob@example.com"
+                  name: "Bob Johnson"
+              reminders:
+                - method: "email"
+                  minutes_before: 60
+                - method: "popup"
+                  minutes_before: 15
+      responses:
+        '201':
+          description: Event created successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Version identifier for the created event
+              example: "v1"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '409':
+          description: Scheduling conflict detected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictResponse'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/events/{event_id}:
+    get:
+      summary: Retrieve a specific event
+      operationId: getEvent
+      security:
+        - bearerAuth: [calendar.read]
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the event
+          example: "evt_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      responses:
+        '200':
+          description: Event retrieved successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Current version of the event
+              example: "v2"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+    put:
+      summary: Update an event
+      operationId: updateEvent
+      security:
+        - bearerAuth: [calendar.write]
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the event
+          example: "evt_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - name: If-Match
+          in: header
+          required: true
+          schema:
+            type: string
+          description: ETag of the event version being updated
+          example: "v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventRequest'
+            example:
+              title: "Project Review Meeting (Updated)"
+              description: "Quarterly project review and planning session with Q3 goals"
+              start_time: "2025-06-25T14:30:00Z"
+              end_time: "2025-06-25T16:00:00Z"
+              location: "Conference Room C"
+      responses:
+        '200':
+          description: Event updated successfully
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: New version identifier for the updated event
+              example: "v2"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '409':
+          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+    delete:
+      summary: Delete an event
+      operationId: deleteEvent
+      security:
+        - bearerAuth: [calendar.write]
+      parameters:
+        - name: event_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the event
+          example: "evt_123"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - name: If-Match
+          in: header
+          required: true
+          schema:
+            type: string
+          description: ETag of the event version being deleted
+          example: "v2"
+        - name: send_notifications
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Whether to send cancellation notifications to attendees
+          example: true
+      responses:
+        '204':
+          description: Event deleted successfully
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '409':
+          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+
+  /v1/availability:
+    get:
+      summary: Check availability for scheduling
+      operationId: getAvailability
+      security:
+        - bearerAuth: [calendar.read]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - name: start_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Start of time range to check (ISO 8601 with timezone)
+          example: "2025-06-25T09:00:00Z"
+        - name: end_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: End of time range to check (ISO 8601 with timezone)
+          example: "2025-06-25T17:00:00Z"
+        - name: duration
+          in: query
+          required: true
+          schema:
+            type: string
+            format: duration
+          description: Duration of the event to schedule (ISO 8601 duration)
+          example: "PT1H30M"
+        - name: calendar_ids
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          description: Calendar IDs to check (comma-separated)
+          example: ["cal_123", "cal_456"]
+        - name: buffer_minutes
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 15
+          description: Buffer time in minutes between events
+          example: 15
+      responses:
+        '200':
+          description: Availability retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityResponse'
+              example:
+                time_range:
+                  start: "2025-06-25T09:00:00Z"
+                  end: "2025-06-25T17:00:00Z"
+                duration: "PT1H30M"
+                available_slots:
+                  - start: "2025-06-25T09:00:00Z"
+                    end: "2025-06-25T10:30:00Z"
+                    confidence: 1.0
+                  - start: "2025-06-25T14:00:00Z"
+                    end: "2025-06-25T15:30:00Z"
+                    confidence: 0.9
+                conflicts:
+                  - event_id: "evt_456"
+                    title: "Team Meeting"
+                    start: "2025-06-25T11:00:00Z"
+                    end: "2025-06-25T12:00:00Z"
+                    calendar_id: "cal_123"
+                suggestions:
+                  - start: "2025-06-25T09:00:00Z"
+                    end: "2025-06-25T10:30:00Z"
+                    score: 0.95
+                    reasoning: "Optimal time - no conflicts, good energy period"
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/scheduling/suggestions:
+    post:
+      summary: Get intelligent scheduling suggestions
+      operationId: getSchedulingSuggestions
+      security:
+        - bearerAuth: [calendar.read]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchedulingSuggestionsRequest'
+            example:
+              event_title: "Project Planning Session"
+              duration: "PT2H"
+              attendees:
+                - email: "alice@example.com"
+                - email: "bob@example.com"
+              preferences:
+                preferred_times:
+                  - start: "09:00"
+                    end: "12:00"
+                  - start: "14:00"
+                    end: "17:00"
+                avoid_days: ["saturday", "sunday"]
+                timezone: "America/New_York"
+              date_range:
+                start: "2025-06-25T00:00:00Z"
+                end: "2025-07-02T23:59:59Z"
+              priority: "high"
+      responses:
+        '200':
+          description: Scheduling suggestions generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchedulingSuggestionsResponse'
+              example:
+                suggestions:
+                  - start_time: "2025-06-26T14:00:00Z"
+                    end_time: "2025-06-26T16:00:00Z"
+                    score: 0.95
+                    reasoning: "All attendees available, optimal time slot"
+                    attendee_availability:
+                      - email: "alice@example.com"
+                        status: "available"
+                      - email: "bob@example.com"
+                        status: "available"
+                  - start_time: "2025-06-27T10:00:00Z"
+                    end_time: "2025-06-27T12:00:00Z"
+                    score: 0.87
+                    reasoning: "Good availability, minor conflict with one attendee"
+                    attendee_availability:
+                      - email: "alice@example.com"
+                        status: "available"
+                      - email: "bob@example.com"
+                        status: "tentative"
+                generated_at: "2025-06-19T22:20:00Z"
+        '400':
+          $ref: '../components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../components/common.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: '../components/common.yaml#/components/responses/RateLimited'
+
+  /v1/events/calendar-synced:
+    post:
+      summary: Webhook endpoint for calendar sync events
+      operationId: handleCalendarSyncedEvent
+      security:
+        - bearerAuth: [calendar.write]
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarSyncedEvent'
+      responses:
+        '200':
+          description: Event processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "processed"
+                  event_id:
+                    type: string
+                    example: "event_789"
+
+  /v1/jobs/{job_id}:
+    get:
+      summary: Get status of an asynchronous job
+      operationId: getJobStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Unique identifier for the job
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+      responses:
+        '200':
+          description: Job status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+
+components:
+  schemas:
+    Calendar:
+      type: object
+      required: [calendar_id, name, provider, provider_calendar_id, sync_status, permissions, created_at, updated_at]
+      properties:
+        calendar_id:
+          type: string
+          description: Unique identifier for the calendar
+          example: "cal_123"
+        name:
+          type: string
+          maxLength: 200
+          description: Display name for the calendar
+          example: "Work Calendar"
+        provider:
+          type: string
+          enum: [google, outlook, apple, caldav]
+          description: Calendar provider
+          example: "google"
+        provider_calendar_id:
+          type: string
+          description: Calendar ID from the provider
+          example: "primary"
+        sync_status:
+          type: string
+          enum: [active, error, disabled]
+          description: Current synchronization status
+          example: "active"
+        last_sync:
+          type: string
+          format: date-time
+          description: Last successful sync time (ISO 8601 with timezone)
+          example: "2025-06-19T22:15:00Z"
+        sync_error:
+          type: string
+          description: Error message if sync_status is 'error'
+          example: "Authentication token expired"
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [read, write]
+          description: Permissions granted for this calendar
+          example: ["read", "write"]
+        color:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+          description: Display color for the calendar (hex format)
+          example: "#1976D2"
+        timezone:
+          type: string
+          description: Default timezone for the calendar
+          example: "America/New_York"
+        created_at:
+          type: string
+          format: date-time
+          description: When the calendar was connected (ISO 8601 with timezone)
+          example: "2025-06-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the calendar was last updated (ISO 8601 with timezone)
+          example: "2025-06-19T22:15:00Z"
+
+    ConnectCalendarRequest:
+      type: object
+      required: [provider, provider_calendar_id, name, auth_token]
+      properties:
+        provider:
+          type: string
+          enum: [google, outlook, apple, caldav]
+          description: Calendar provider
+          example: "google"
+        provider_calendar_id:
+          type: string
+          description: Calendar ID from the provider
+          example: "primary"
+        name:
+          type: string
+          maxLength: 200
+          description: Display name for the calendar
+          example: "Work Calendar"
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [read, write]
+          default: ["read"]
+          description: Requested permissions for this calendar
+          example: ["read", "write"]
+        sync_enabled:
+          type: boolean
+          default: true
+          description: Whether to enable automatic synchronization
+          example: true
+        auth_token:
+          type: string
+          description: Authentication token for the calendar provider
+          example: "ya29.a0AfH6SMC..."
+        color:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+          description: Display color for the calendar (hex format)
+          example: "#1976D2"
+
+    SyncCalendarRequest:
+      type: object
+      properties:
+        sync_type:
+          type: string
+          enum: [full, incremental]
+          default: incremental
+          description: Type of synchronization to perform
+          example: "incremental"
+        date_range:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+              description: Start date for sync range (ISO 8601 with timezone)
+              example: "2025-06-01T00:00:00Z"
+            end:
+              type: string
+              format: date-time
+              description: End date for sync range (ISO 8601 with timezone)
+              example: "2025-12-31T23:59:59Z"
+          description: Date range to synchronize (optional for incremental sync)
+
+    Event:
+      type: object
+      required: [event_id, calendar_id, title, start_time, end_time, status, created_at, updated_at, version]
+      properties:
+        event_id:
+          type: string
+          description: Unique identifier for the event
+          example: "evt_123"
+        calendar_id:
+          type: string
+          description: ID of the calendar containing this event
+          example: "cal_123"
+        provider_event_id:
+          type: string
+          description: Event ID from the calendar provider
+          example: "abc123def456"
+        title:
+          type: string
+          maxLength: 200
+          description: Event title
+          example: "Team Standup"
+        description:
+          type: string
+          maxLength: 2000
+          description: Event description
+          example: "Daily team synchronization meeting"
+        start_time:
+          type: string
+          format: date-time
+          description: Event start time (ISO 8601 with timezone)
+          example: "2025-06-20T09:00:00Z"
+        end_time:
+          type: string
+          format: date-time
+          description: Event end time (ISO 8601 with timezone)
+          example: "2025-06-20T09:30:00Z"
+        timezone:
+          type: string
+          description: Event timezone
+          example: "America/New_York"
+        all_day:
+          type: boolean
+          default: false
+          description: Whether this is an all-day event
+          example: false
+        status:
+          type: string
+          enum: [confirmed, tentative, cancelled]
+          description: Event status
+          example: "confirmed"
+        location:
+          type: string
+          maxLength: 500
+          description: Event location
+          example: "Conference Room A"
+        attendees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attendee'
+          description: Event attendees
+        reminders:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reminder'
+          description: Event reminders
+        recurrence:
+          $ref: '#/components/schemas/Recurrence'
+        created_at:
+          type: string
+          format: date-time
+          description: When the event was created (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the event was last updated (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+        version:
+          type: string
+          description: Version identifier for optimistic locking
+          example: "v2"
+
+    CreateEventRequest:
+      type: object
+      required: [calendar_id, title, start_time, end_time]
+      properties:
+        calendar_id:
+          type: string
+          description: ID of the calendar to create the event in
+          example: "cal_123"
+        title:
+          type: string
+          maxLength: 200
+          description: Event title
+          example: "Project Review Meeting"
+        description:
+          type: string
+          maxLength: 2000
+          description: Event description
+          example: "Quarterly project review and planning session"
+        start_time:
+          type: string
+          format: date-time
+          description: Event start time (ISO 8601 with timezone)
+          example: "2025-06-25T14:00:00Z"
+        end_time:
+          type: string
+          format: date-time
+          description: Event end time (ISO 8601 with timezone)
+          example: "2025-06-25T15:30:00Z"
+        timezone:
+          type: string
+          description: Event timezone
+          example: "America/New_York"
+        all_day:
+          type: boolean
+          default: false
+          description: Whether this is an all-day event
+          example: false
+        location:
+          type: string
+          maxLength: 500
+          description: Event location
+          example: "Conference Room B"
+        attendees:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttendeeRequest'
+          description: Event attendees
+        reminders:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReminderRequest'
+          description: Event reminders
+        recurrence:
+          $ref: '#/components/schemas/RecurrenceRequest'
+
+    UpdateEventRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+          description: Event title
+          example: "Project Review Meeting (Updated)"
+        description:
+          type: string
+          maxLength: 2000
+          description: Event description
+          example: "Quarterly project review and planning session with Q3 goals"
+        start_time:
+          type: string
+          format: date-time
+          description: Event start time (ISO 8601 with timezone)
+          example: "2025-06-25T14:30:00Z"
+        end_time:
+          type: string
+          format: date-time
+          description: Event end time (ISO 8601 with timezone)
+          example: "2025-06-25T16:00:00Z"
+        timezone:
+          type: string
+          description: Event timezone
+          example: "America/New_York"
+        all_day:
+          type: boolean
+          description: Whether this is an all-day event
+          example: false
+        location:
+          type: string
+          maxLength: 500
+          description: Event location
+          example: "Conference Room C"
+        status:
+          type: string
+          enum: [confirmed, tentative, cancelled]
+          description: Event status
+          example: "confirmed"
+        attendees:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttendeeRequest'
+          description: Event attendees
+        reminders:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReminderRequest'
+          description: Event reminders
+
+    Attendee:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          description: Attendee email address
+          example: "john@example.com"
+        name:
+          type: string
+          maxLength: 100
+          description: Attendee display name
+          example: "John Doe"
+        response_status:
+          type: string
+          enum: [needs_action, accepted, declined, tentative]
+          description: Attendee response status
+          example: "accepted"
+        organizer:
+          type: boolean
+          default: false
+          description: Whether this attendee is the organizer
+          example: false
+
+    AttendeeRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          description: Attendee email address
+          example: "alice@example.com"
+        name:
+          type: string
+          maxLength: 100
+          description: Attendee display name
+          example: "Alice Smith"
+
+    Reminder:
+      type: object
+      required: [method, minutes_before]
+      properties:
+        method:
+          type: string
+          enum: [email, popup, sms]
+          description: Reminder delivery method
+          example: "email"
+        minutes_before:
+          type: integer
+          minimum: 0
+          description: Minutes before event to send reminder
+          example: 60
+
+    ReminderRequest:
+      type: object
+      required: [method, minutes_before]
+      properties:
+        method:
+          type: string
+          enum: [email, popup, sms]
+          description: Reminder delivery method
+          example: "email"
+        minutes_before:
+          type: integer
+          minimum: 0
+          description: Minutes before event to send reminder
+          example: 60
+
+    Recurrence:
+      type: object
+      required: [frequency]
+      properties:
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+          description: Recurrence frequency
+          example: "weekly"
+        interval:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Interval between recurrences
+          example: 1
+        days_of_week:
+          type: array
+          items:
+            type: string
+            enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+          description: Days of week for weekly recurrence
+          example: ["monday", "wednesday", "friday"]
+        end_date:
+          type: string
+          format: date-time
+          description: End date for recurrence (ISO 8601 with timezone)
+          example: "2025-12-31T23:59:59Z"
+        count:
+          type: integer
+          minimum: 1
+          description: Number of occurrences (alternative to end_date)
+          example: 10
+
+    RecurrenceRequest:
+      type: object
+      required: [frequency]
+      properties:
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+          description: Recurrence frequency
+          example: "weekly"
+        interval:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Interval between recurrences
+          example: 1
+        days_of_week:
+          type: array
+          items:
+            type: string
+            enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+          description: Days of week for weekly recurrence
+          example: ["monday", "wednesday", "friday"]
+        end_date:
+          type: string
+          format: date-time
+          description: End date for recurrence (ISO 8601 with timezone)
+          example: "2025-12-31T23:59:59Z"
+        count:
+          type: integer
+          minimum: 1
+          description: Number of occurrences (alternative to end_date)
+          example: 10
+
+    AvailabilityResponse:
+      type: object
+      required: [time_range, duration, available_slots]
+      properties:
+        time_range:
+          type: object
+          required: [start, end]
+          properties:
+            start:
+              type: string
+              format: date-time
+              description: Start of requested time range (ISO 8601 with timezone)
+              example: "2025-06-25T09:00:00Z"
+            end:
+              type: string
+              format: date-time
+              description: End of requested time range (ISO 8601 with timezone)
+              example: "2025-06-25T17:00:00Z"
+        duration:
+          type: string
+          format: duration
+          description: Requested duration (ISO 8601 duration)
+          example: "PT1H30M"
+        available_slots:
+          type: array
+          items:
+            type: object
+            required: [start, end, confidence]
+            properties:
+              start:
+                type: string
+                format: date-time
+                description: Slot start time (ISO 8601 with timezone)
+                example: "2025-06-25T09:00:00Z"
+              end:
+                type: string
+                format: date-time
+                description: Slot end time (ISO 8601 with timezone)
+                example: "2025-06-25T10:30:00Z"
+              confidence:
+                type: number
+                minimum: 0
+                maximum: 1
+                description: Confidence in availability (0-1)
+                example: 1.0
+          description: Available time slots
+        conflicts:
+          type: array
+          items:
+            type: object
+            required: [event_id, title, start, end, calendar_id]
+            properties:
+              event_id:
+                type: string
+                description: Conflicting event ID
+                example: "evt_456"
+              title:
+                type: string
+                description: Conflicting event title
+                example: "Team Meeting"
+              start:
+                type: string
+                format: date-time
+                description: Conflict start time (ISO 8601 with timezone)
+                example: "2025-06-25T11:00:00Z"
+              end:
+                type: string
+                format: date-time
+                description: Conflict end time (ISO 8601 with timezone)
+                example: "2025-06-25T12:00:00Z"
+              calendar_id:
+                type: string
+                description: Calendar containing the conflicting event
+                example: "cal_123"
+          description: Conflicting events in the time range
+        suggestions:
+          type: array
+          items:
+            type: object
+            required: [start, end, score]
+            properties:
+              start:
+                type: string
+                format: date-time
+                description: Suggested start time (ISO 8601 with timezone)
+                example: "2025-06-25T09:00:00Z"
+              end:
+                type: string
+                format: date-time
+                description: Suggested end time (ISO 8601 with timezone)
+                example: "2025-06-25T10:30:00Z"
+              score:
+                type: number
+                minimum: 0
+                maximum: 1
+                description: Quality score for this suggestion (0-1)
+                example: 0.95
+              reasoning:
+                type: string
+                description: Explanation for this suggestion
+                example: "Optimal time - no conflicts, good energy period"
+          description: AI-generated scheduling suggestions
+
+    SchedulingSuggestionsRequest:
+      type: object
+      required: [event_title, duration, date_range]
+      properties:
+        event_title:
+          type: string
+          maxLength: 200
+          description: Title of the event to schedule
+          example: "Project Planning Session"
+        duration:
+          type: string
+          format: duration
+          description: Event duration (ISO 8601 duration)
+          example: "PT2H"
+        attendees:
+          type: array
+          items:
+            type: object
+            required: [email]
+            properties:
+              email:
+                type: string
+                format: email
+                description: Attendee email address
+                example: "alice@example.com"
+          description: Required attendees for the meeting
+        preferences:
+          type: object
+          properties:
+            preferred_times:
+              type: array
+              items:
+                type: object
+                required: [start, end]
+                properties:
+                  start:
+                    type: string
+                    pattern: "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                    description: Preferred start time (HH:MM format)
+                    example: "09:00"
+                  end:
+                    type: string
+                    pattern: "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+                    description: Preferred end time (HH:MM format)
+                    example: "12:00"
+              description: Preferred time ranges during the day
+            avoid_days:
+              type: array
+              items:
+                type: string
+                enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+              description: Days to avoid scheduling
+              example: ["saturday", "sunday"]
+            timezone:
+              type: string
+              description: Timezone for preferences
+              example: "America/New_York"
+          description: Scheduling preferences
+        date_range:
+          type: object
+          required: [start, end]
+          properties:
+            start:
+              type: string
+              format: date-time
+              description: Earliest possible date (ISO 8601 with timezone)
+              example: "2025-06-25T00:00:00Z"
+            end:
+              type: string
+              format: date-time
+              description: Latest possible date (ISO 8601 with timezone)
+              example: "2025-07-02T23:59:59Z"
+          description: Date range for scheduling
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+          default: medium
+          description: Priority level for scheduling
+          example: "high"
+
+    SchedulingSuggestionsResponse:
+      type: object
+      required: [suggestions, generated_at]
+      properties:
+        suggestions:
+          type: array
+          items:
+            type: object
+            required: [start_time, end_time, score]
+            properties:
+              start_time:
+                type: string
+                format: date-time
+                description: Suggested start time (ISO 8601 with timezone)
+                example: "2025-06-26T14:00:00Z"
+              end_time:
+                type: string
+                format: date-time
+                description: Suggested end time (ISO 8601 with timezone)
+                example: "2025-06-26T16:00:00Z"
+              score:
+                type: number
+                minimum: 0
+                maximum: 1
+                description: Quality score for this suggestion (0-1)
+                example: 0.95
+              reasoning:
+                type: string
+                description: Explanation for this suggestion
+                example: "All attendees available, optimal time slot"
+              attendee_availability:
+                type: array
+                items:
+                  type: object
+                  required: [email, status]
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: Attendee email address
+                      example: "alice@example.com"
+                    status:
+                      type: string
+                      enum: [available, busy, tentative, unknown]
+                      description: Attendee availability status
+                      example: "available"
+                description: Availability status for each attendee
+          description: Suggested meeting times
+        generated_at:
+          type: string
+          format: date-time
+          description: When suggestions were generated (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+
+    ConflictResponse:
+      type: object
+      required: [error, conflicts]
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Scheduling conflict detected"
+        conflicts:
+          type: array
+          items:
+            type: object
+            required: [event_id, title, start, end, calendar_id]
+            properties:
+              event_id:
+                type: string
+                description: Conflicting event ID
+                example: "evt_789"
+              title:
+                type: string
+                description: Conflicting event title
+                example: "Existing Meeting"
+              start:
+                type: string
+                format: date-time
+                description: Conflict start time (ISO 8601 with timezone)
+                example: "2025-06-25T14:30:00Z"
+              end:
+                type: string
+                format: date-time
+                description: Conflict end time (ISO 8601 with timezone)
+                example: "2025-06-25T15:30:00Z"
+              calendar_id:
+                type: string
+                description: Calendar containing the conflicting event
+                example: "cal_123"
+          description: List of conflicting events
+        suggestions:
+          type: array
+          items:
+            type: object
+            required: [start_time, end_time, score]
+            properties:
+              start_time:
+                type: string
+                format: date-time
+                description: Alternative start time (ISO 8601 with timezone)
+                example: "2025-06-25T16:00:00Z"
+              end_time:
+                type: string
+                format: date-time
+                description: Alternative end time (ISO 8601 with timezone)
+                example: "2025-06-25T17:30:00Z"
+              score:
+                type: number
+                minimum: 0
+                maximum: 1
+                description: Quality score for this alternative (0-1)
+                example: 0.85
+              reasoning:
+                type: string
+                description: Explanation for this alternative
+                example: "No conflicts, slightly later in the day"
+          description: Alternative time suggestions
+
+    CalendarsResponse:
+      type: object
+      required: [calendars]
+      properties:
+        calendars:
+          type: array
+          items:
+            $ref: '#/components/schemas/Calendar'
+          description: List of connected calendars
+        pagination:
+          $ref: '../components/common.yaml#/components/schemas/Pagination'
+
+    EventsResponse:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+          description: List of calendar events
+        pagination:
+          $ref: '../components/common.yaml#/components/schemas/Pagination'
+
+    CalendarSyncedEvent:
+      type: object
+      required: [event_id, event_type, timestamp, data]
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the event
+          example: "550e8400-e29b-41d4-a716-446655440003"
+        event_type:
+          type: string
+          enum: [calendar.synced]
+          description: Type of event
+          example: "calendar.synced"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event occurred (ISO 8601 with timezone)
+          example: "2025-06-19T22:20:00Z"
+        data:
+          type: object
+          required: [calendar_id, sync_status]
+          properties:
+            calendar_id:
+              type: string
+              description: ID of the synced calendar
+              example: "cal_123"
+            sync_status:
+              type: string
+              enum: [success, error]
+              description: Result of the sync operation
+              example: "success"
+            events_synced:
+              type: integer
+              minimum: 0
+              description: Number of events synchronized
+              example: 42
+            sync_duration:
+              type: string
+              format: duration
+              description: Time taken for sync (ISO 8601 duration)
+              example: "PT5.2S"
+            error_message:
+              type: string
+              description: Error message if sync failed
+              example: "Rate limit exceeded"
+          description: Event-specific data
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token with appropriate scopes:
+        - `calendar.read`: Required for read operations
+        - `calendar.write`: Required for write operations
+        - `calendar.sync`: Required for sync operations
+
+  parameters:
+    CalendarIdPath:
+      name: calendar_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Unique identifier for the calendar
+      example: "cal_123"
+
+    EventIdPath:
+      name: event_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Unique identifier for the event
+      example: "evt_123"
