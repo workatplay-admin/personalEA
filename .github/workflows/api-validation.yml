@@ -1,0 +1,185 @@
+name: API Contract Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: [ 'docs/**/*.yaml', 'docs/**/*.yml' ]
+  pull_request:
+    branches: [ main, develop ]
+    paths: [ 'docs/**/*.yaml', 'docs/**/*.yml' ]
+
+jobs:
+  validate-api-contracts:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Validate API specifications with Spectral
+      run: npm run lint:api
+      
+    - name: Check for breaking changes
+      if: github.event_name == 'pull_request'
+      run: |
+        # Install oasdiff for breaking change detection
+        npm install -g oasdiff
+        
+        # Check each API for breaking changes
+        echo "Checking for breaking changes..."
+        
+        # Fetch base branch for comparison
+        git fetch origin ${{ github.base_ref }}
+        
+        # Check Email Service API
+        if git show origin/${{ github.base_ref }}:docs/email-service-api-v1.yaml > /tmp/base-email-api.yaml 2>/dev/null; then
+          oasdiff breaking /tmp/base-email-api.yaml docs/email-service-api-v1.yaml || echo "Breaking changes detected in Email Service API"
+        fi
+        
+        # Check Goal & Strategy Service API
+        if git show origin/${{ github.base_ref }}:docs/goal-strategy-service-api-v1.yaml > /tmp/base-goals-api.yaml 2>/dev/null; then
+          oasdiff breaking /tmp/base-goals-api.yaml docs/goal-strategy-service-api-v1.yaml || echo "Breaking changes detected in Goal & Strategy Service API"
+        fi
+        
+        # Check Calendar Service API
+        if git show origin/${{ github.base_ref }}:docs/calendar-service-api-v1.yaml > /tmp/base-calendar-api.yaml 2>/dev/null; then
+          oasdiff breaking /tmp/base-calendar-api.yaml docs/calendar-service-api-v1.yaml || echo "Breaking changes detected in Calendar Service API"
+        fi
+        
+    - name: Generate API documentation
+      run: |
+        npm run docs:build
+        
+    - name: Upload API documentation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-documentation
+        path: docs/*-docs.html
+        retention-days: 30
+        
+    - name: Start mock servers for testing
+      run: |
+        # Start mock servers in background
+        npm run mock:email &
+        npm run mock:goals &
+        npm run mock:calendar &
+        
+        # Wait for servers to start
+        sleep 10
+        
+        # Test mock server endpoints
+        curl -f http://localhost:8083/v1/health || echo "Email service mock failed"
+        curl -f http://localhost:8085/v1/health || echo "Goals service mock failed"
+        curl -f http://localhost:8086/v1/health || echo "Calendar service mock failed"
+        
+    - name: Comment PR with API changes
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          // Read API specs to check for version changes
+          const emailApi = fs.readFileSync('docs/email-service-api-v1.yaml', 'utf8');
+          const goalsApi = fs.readFileSync('docs/goal-strategy-service-api-v1.yaml', 'utf8');
+          const calendarApi = fs.readFileSync('docs/calendar-service-api-v1.yaml', 'utf8');
+          
+          // Extract versions
+          const emailVersion = emailApi.match(/version:\s*(.+)/)?.[1]?.trim();
+          const goalsVersion = goalsApi.match(/version:\s*(.+)/)?.[1]?.trim();
+          const calendarVersion = calendarApi.match(/version:\s*(.+)/)?.[1]?.trim();
+          
+          const comment = `## 🔄 API Contract Changes
+          
+          This PR includes changes to API specifications:
+          
+          ### Service Versions
+          - **Email Processing Service**: \`${emailVersion}\`
+          - **Goal & Strategy Service**: \`${goalsVersion}\`
+          - **Calendar Service**: \`${calendarVersion}\`
+          
+          ### Validation Results
+          ✅ All API specifications passed Spectral linting
+          
+          ### Mock Servers
+          Mock servers are available for testing:
+          - Email Service: http://localhost:8083
+          - Goal & Strategy Service: http://localhost:8085
+          - Calendar Service: http://localhost:8086
+          
+          ### Documentation
+          Updated API documentation has been generated and is available in the artifacts.
+          
+          Please ensure:
+          - [ ] Breaking changes are properly versioned
+          - [ ] New endpoints have comprehensive examples
+          - [ ] Security requirements are documented
+          - [ ] Rate limits are specified
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: validate-api-contracts
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run API security scan
+      uses: 42Crunch/api-security-audit-action@v3
+      with:
+        api-token: ${{ secrets.API_SECURITY_TOKEN }}
+        default-collection-name: PersonalEA APIs
+        upload-to-code-scanning: true
+        json-report: api-security-report.json
+        
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-security-report
+        path: api-security-report.json
+        retention-days: 30
+
+  deploy-docs:
+    runs-on: ubuntu-latest
+    needs: validate-api-contracts
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Generate documentation
+      run: npm run docs:build
+      
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        destination_dir: api-docs

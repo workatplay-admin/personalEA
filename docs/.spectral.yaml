@@ -1,0 +1,169 @@
+extends: ["@stoplight/spectral/rulesets/oas"]
+
+rules:
+  # Custom rules for personalEA API standards
+  
+  # Ensure all operations have operationId
+  operation-operationId: error
+  
+  # Require examples in schemas
+  oas3-schema-examples:
+    description: "All schemas should have examples"
+    given: "$.components.schemas[*]"
+    severity: warn
+    then:
+      field: "example"
+      function: "truthy"
+  
+  # Enforce semantic versioning in info.version
+  semantic-versioning:
+    description: "API version must follow semantic versioning"
+    given: "$.info.version"
+    severity: error
+    then:
+      function: "pattern"
+      functionOptions:
+        match: "^\\d+\\.\\d+\\.\\d+$"
+  
+  # Require correlation ID header parameter
+  correlation-id-header:
+    description: "All operations should support correlation ID header"
+    given: "$.paths[*][*].parameters[*]"
+    severity: warn
+    then:
+      field: "$ref"
+      function: "pattern"
+      functionOptions:
+        match: "CorrelationIdHeader"
+  
+  # Enforce consistent error responses
+  error-responses:
+    description: "All operations should have 401 and 403 error responses"
+    given: "$.paths[*][*].responses"
+    severity: error
+    then:
+      - field: "401"
+        function: "truthy"
+      - field: "403"
+        function: "truthy"
+  
+  # Require security schemes for all operations
+  operation-security-defined: error
+  
+  # Enforce consistent naming for webhook endpoints
+  webhook-naming:
+    description: "Webhook endpoints should follow /v1/events/{event-name} pattern"
+    given: "$.paths['/v1/events/*']"
+    severity: error
+    then:
+      function: "pattern"
+      functionOptions:
+        match: "^/v1/events/[a-z-]+$"
+  
+  # Require pagination for list operations
+  list-pagination:
+    description: "List operations should support pagination"
+    given: "$.paths[*].get.parameters[*]"
+    severity: warn
+    then:
+      field: "$ref"
+      function: "pattern"
+      functionOptions:
+        match: "(LimitQuery|CursorQuery)"
+  
+  # Enforce ETag headers for resource operations
+  etag-headers:
+    description: "Resource operations should include ETag headers"
+    given: "$.paths[*].(put|patch).responses.200.headers"
+    severity: warn
+    then:
+      field: "ETag"
+      function: "truthy"
+  
+  # Require idempotency keys for write operations
+  idempotency-keys:
+    description: "Write operations should support idempotency keys"
+    given: "$.paths[*].(post|put|patch).parameters[*]"
+    severity: warn
+    then:
+      field: "$ref"
+      function: "pattern"
+      functionOptions:
+        match: "IdempotencyKeyHeader"
+  
+  # Enforce consistent HTTP status codes
+  http-status-codes:
+    description: "Use appropriate HTTP status codes"
+    given: "$.paths[*][*].responses"
+    severity: error
+    then:
+      function: "schema"
+      functionOptions:
+        schema:
+          type: "object"
+          properties:
+            "200": true
+            "201": true
+            "202": true
+            "204": true
+            "400": true
+            "401": true
+            "403": true
+            "404": true
+            "409": true
+            "429": true
+            "500": true
+          additionalProperties: false
+  
+  # Require rate limiting documentation
+  rate-limiting-docs:
+    description: "API should document rate limiting"
+    given: "$.info.description"
+    severity: warn
+    then:
+      function: "pattern"
+      functionOptions:
+        match: "Rate Limits"
+  
+  # Enforce consistent parameter naming
+  parameter-naming:
+    description: "Parameters should use snake_case"
+    given: "$.paths[*][*].parameters[*].name"
+    severity: warn
+    then:
+      function: "pattern"
+      functionOptions:
+        match: "^[a-z][a-z0-9_]*$"
+  
+  # Require comprehensive operation descriptions
+  operation-description: error
+  
+  # Enforce consistent schema naming (PascalCase)
+  schema-naming:
+    description: "Schema names should use PascalCase"
+    given: "$.components.schemas[*]~"
+    severity: error
+    then:
+      function: "pattern"
+      functionOptions:
+        match: "^[A-Z][a-zA-Z0-9]*$"
+  
+  # Require security scopes documentation
+  security-scopes:
+    description: "Security schemes should document required scopes"
+    given: "$.components.securitySchemes[*].description"
+    severity: warn
+    then:
+      function: "pattern"
+      functionOptions:
+        match: "(read|write|sync)"
+
+# Disable some default rules that conflict with our standards
+overrides:
+  - files: ["**/*.yaml", "**/*.yml"]
+    rules:
+      # Allow longer operation IDs for clarity
+      operation-operationId-valid-in-url: off
+      
+      # Allow our custom error response format
+      oas3-valid-media-example: warn

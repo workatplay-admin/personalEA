@@ -1,0 +1,56 @@
+{
+  "name": "personal-ea",
+  "version": "1.0.0",
+  "description": "Personal AI Assistant System - API-first microservices architecture",
+  "private": true,
+  "scripts": {
+    "lint:api": "spectral lint docs/**/*-api-*.yaml",
+    "lint:api:fix": "spectral lint docs/**/*-api-*.yaml --format=pretty",
+    "validate:api": "npm run lint:api && echo 'All API specifications are valid'",
+    "mock:email": "prism mock docs/email-service-api-v1.yaml --port 8083",
+    "mock:goals": "prism mock docs/goal-strategy-service-api-v1.yaml --port 8085",
+    "mock:calendar": "prism mock docs/calendar-service-api-v1.yaml --port 8086",
+    "mock:all": "concurrently \"npm run mock:email\" \"npm run mock:goals\" \"npm run mock:calendar\"",
+    "docs:serve": "redoc-cli serve docs/email-service-api-v1.yaml --port 8080",
+    "docs:build": "redoc-cli build docs/email-service-api-v1.yaml --output docs/email-service-docs.html && redoc-cli build docs/goal-strategy-service-api-v1.yaml --output docs/goal-strategy-docs.html && redoc-cli build docs/calendar-service-api-v1.yaml --output docs/calendar-service-docs.html",
+    "generate:types": "openapi-typescript docs/email-service-api-v1.yaml --output types/email-service.ts && openapi-typescript docs/goal-strategy-service-api-v1.yaml --output types/goal-strategy.ts && openapi-typescript docs/calendar-service-api-v1.yaml --output types/calendar.ts",
+    "test:contract": "echo 'Contract tests not yet implemented'",
+    "prepare": "husky install",
+    "precommit": "npm run validate:api"
+  },
+  "devDependencies": {
+    "@stoplight/spectral-cli": "^6.11.0",
+    "@stoplight/prism-cli": "^5.8.0",
+    "redoc-cli": "^0.13.21",
+    "openapi-typescript": "^6.7.1",
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "docs/**/*-api-*.yaml": [
+      "spectral lint"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "keywords": [
+    "api",
+    "microservices",
+    "openapi",
+    "personal-assistant",
+    "ai"
+  ],
+  "author": "PersonalEA Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "workspaces": [
+    "services/*"
+  ]
+}
