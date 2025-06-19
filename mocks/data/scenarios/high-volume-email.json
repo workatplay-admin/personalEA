@@ -1,0 +1,103 @@
+{
+  "data": [
+    {
+      "id": "email_bulk_01",
+      "messageId": "<newsletter@techcompany.com>",
+      "threadId": "thread_newsletter_01",
+      "subject": "Weekly Tech Newsletter - AI Breakthroughs",
+      "from": {
+        "email": "newsletter@techcompany.com",
+        "name": "Tech Weekly"
+      },
+      "to": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User"
+        }
+      ],
+      "receivedAt": "2024-01-15T06:00:00Z",
+      "body": {
+        "text": "This week in tech: Major AI breakthroughs, new programming languages, and startup funding rounds...",
+        "html": "<h1>This week in tech</h1><p>Major AI breakthroughs, new programming languages, and startup funding rounds...</p>"
+      },
+      "labels": ["newsletter", "tech", "low-priority"],
+      "isRead": false,
+      "isImportant": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "aiAnalysis": {
+        "sentiment": "neutral",
+        "urgency": "low",
+        "category": "newsletter",
+        "actionItems": [],
+        "keyTopics": ["AI", "programming", "startups"],
+        "entities": []
+      },
+      "createdAt": "2024-01-15T06:00:00Z",
+      "updatedAt": "2024-01-15T06:00:00Z"
+    },
+    {
+      "id": "email_bulk_02",
+      "messageId": "<alerts@monitoring.com>",
+      "threadId": "thread_alert_01",
+      "subject": "URGENT: Server CPU Usage Alert - Production",
+      "from": {
+        "email": "alerts@monitoring.com",
+        "name": "System Monitoring"
+      },
+      "to": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User"
+        }
+      ],
+      "receivedAt": "2024-01-15T15:45:00Z",
+      "body": {
+        "text": "ALERT: Production server CPU usage has exceeded 85% for the last 10 minutes. Immediate attention required.",
+        "html": "<div style='color: red;'><strong>ALERT:</strong> Production server CPU usage has exceeded 85% for the last 10 minutes. Immediate attention required.</div>"
+      },
+      "labels": ["alert", "urgent", "production"],
+      "isRead": false,
+      "isImportant": true,
+      "hasAttachments": false,
+      "attachments": [],
+      "aiAnalysis": {
+        "sentiment": "negative",
+        "urgency": "critical",
+        "category": "system_alert",
+        "actionItems": [
+          {
+            "id": "action_alert_01",
+            "description": "Investigate production server CPU usage spike",
+            "dueDate": "2024-01-15T16:00:00Z",
+            "priority": "critical",
+            "assignee": "user@personalea.com"
+          }
+        ],
+        "keyTopics": ["server", "CPU", "production", "monitoring"],
+        "entities": [
+          {
+            "type": "system",
+            "value": "Production server",
+            "confidence": 0.98
+          },
+          {
+            "type": "metric",
+            "value": "85% CPU usage",
+            "confidence": 0.95
+          }
+        ]
+      },
+      "createdAt": "2024-01-15T15:45:00Z",
+      "updatedAt": "2024-01-15T15:45:00Z"
+    }
+  ],
+  "pagination": {
+    "cursor": "email_bulk_02",
+    "hasMore": true,
+    "limit": 20,
+    "total": 89
+  },
+  "scenario": "high_volume",
+  "description": "High email volume scenario with mix of newsletters, alerts, and business communications"
+}

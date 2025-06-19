@@ -40,9 +40,9 @@ paths:
       security:
         - bearerAuth: [calendar.read]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
-        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CursorQuery'
         - name: provider
           in: query
           schema:
@@ -83,11 +83,11 @@ paths:
                   has_more: false
                   total_count: 3
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
     post:
       summary: Connect a new calendar
@@ -95,8 +95,8 @@ paths:
       security:
         - bearerAuth: [calendar.write]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/IdempotencyKeyHeader'
       requestBody:
         required: true
         content:
@@ -124,19 +124,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Calendar'
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '409':
           description: Calendar already connected
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/calendars/{calendar_id}/sync:
     post:
@@ -152,8 +152,8 @@ paths:
             type: string
           description: Unique identifier for the calendar
           example: "cal_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/IdempotencyKeyHeader'
       requestBody:
         required: false
         content:
@@ -171,26 +171,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+                $ref: 'components/common.yaml#/components/schemas/JobStatus'
               example:
                 job_id: "550e8400-e29b-41d4-a716-446655440001"
                 status: "pending"
                 created_at: "2025-06-19T22:20:00Z"
                 message: "Calendar sync initiated"
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '404':
           description: Calendar not found
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/events:
     get:
@@ -199,9 +199,9 @@ paths:
       security:
         - bearerAuth: [calendar.read]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
-        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CursorQuery'
         - name: calendar_id
           in: query
           schema:
@@ -261,13 +261,13 @@ paths:
                   has_more: true
                   total_count: 127
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
     post:
       summary: Create a new calendar event
@@ -275,8 +275,8 @@ paths:
       security:
         - bearerAuth: [calendar.write]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/IdempotencyKeyHeader'
       requestBody:
         required: true
         content:
@@ -315,11 +315,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Event'
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '409':
           description: Scheduling conflict detected
           content:
@@ -327,7 +327,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConflictResponse'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/events/{event_id}:
     get:
@@ -343,7 +343,7 @@ paths:
             type: string
           description: Unique identifier for the event
           example: "evt_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       responses:
         '200':
           description: Event retrieved successfully
@@ -362,11 +362,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
     put:
       summary: Update an event
@@ -381,7 +381,7 @@ paths:
             type: string
           description: Unique identifier for the event
           example: "evt_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
         - name: If-Match
           in: header
           required: true
@@ -415,19 +415,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Event'
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '404':
           description: Event not found
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '409':
-          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+          $ref: 'components/common.yaml#/components/responses/VersionConflict'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
     delete:
       summary: Delete an event
@@ -442,7 +442,7 @@ paths:
             type: string
           description: Unique identifier for the event
           example: "evt_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
         - name: If-Match
           in: header
           required: true
@@ -465,13 +465,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '409':
-          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+          $ref: 'components/common.yaml#/components/responses/VersionConflict'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/availability:
     get:
@@ -480,7 +480,7 @@ paths:
       security:
         - bearerAuth: [calendar.read]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
         - name: start_time
           in: query
           required: true
@@ -554,13 +554,13 @@ paths:
                     score: 0.95
                     reasoning: "Optimal time - no conflicts, good energy period"
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/scheduling/suggestions:
     post:
@@ -569,7 +569,7 @@ paths:
       security:
         - bearerAuth: [calendar.read]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       requestBody:
         required: true
         content:
@@ -623,13 +623,13 @@ paths:
                         status: "tentative"
                 generated_at: "2025-06-19T22:20:00Z"
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/events/calendar-synced:
     post:
@@ -638,7 +638,7 @@ paths:
       security:
         - bearerAuth: [calendar.write]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       requestBody:
         required: true
         content:
@@ -675,22 +675,22 @@ paths:
             format: uuid
           description: Unique identifier for the job
           example: "550e8400-e29b-41d4-a716-446655440001"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       responses:
         '200':
           description: Job status retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+                $ref: 'components/common.yaml#/components/schemas/JobStatus'
         '404':
           description: Job not found
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
 
 components:
   schemas:
@@ -1459,7 +1459,7 @@ components:
             $ref: '#/components/schemas/Calendar'
           description: List of connected calendars
         pagination:
-          $ref: '../components/common.yaml#/components/schemas/Pagination'
+          $ref: 'components/common.yaml#/components/schemas/Pagination'
 
     EventsResponse:
       type: object
@@ -1471,7 +1471,7 @@ components:
             $ref: '#/components/schemas/Event'
           description: List of calendar events
         pagination:
-          $ref: '../components/common.yaml#/components/schemas/Pagination'
+          $ref: 'components/common.yaml#/components/schemas/Pagination'
 
     CalendarSyncedEvent:
       type: object

@@ -38,9 +38,9 @@ paths:
       security:
         - bearerAuth: [goals.read]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
-        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CursorQuery'
         - name: status
           in: query
           schema:
@@ -80,11 +80,11 @@ paths:
                   has_more: false
                   total_count: 5
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
     post:
       summary: Create a new goal
@@ -92,7 +92,7 @@ paths:
       security:
         - bearerAuth: [goals.write]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       requestBody:
         required: true
         content:
@@ -139,13 +139,13 @@ paths:
                 updated_at: "2025-06-19T22:20:00Z"
                 version: "v1"
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/goals/{goal_id}:
     get:
@@ -161,7 +161,7 @@ paths:
             type: string
           description: Unique identifier for the goal
           example: "goal_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       responses:
         '200':
           description: Goal retrieved successfully
@@ -180,11 +180,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
     put:
       summary: Update a goal
@@ -199,7 +199,7 @@ paths:
             type: string
           description: Unique identifier for the goal
           example: "goal_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
         - name: If-Match
           in: header
           required: true
@@ -233,19 +233,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Goal'
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '404':
           description: Goal not found
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '409':
-          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+          $ref: 'components/common.yaml#/components/responses/VersionConflict'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/goals/{goal_id}/tasks:
     get:
@@ -261,9 +261,9 @@ paths:
             type: string
           description: Unique identifier for the goal
           example: "goal_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
-        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CursorQuery'
         - name: status
           in: query
           schema:
@@ -283,11 +283,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
     post:
       summary: Add a task to a goal
@@ -302,7 +302,7 @@ paths:
             type: string
           description: Unique identifier for the goal
           example: "goal_123"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       requestBody:
         required: true
         content:
@@ -331,17 +331,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/Task'
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '404':
           description: Goal not found
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/goals/{goal_id}/tasks/{task_id}/context:
     get:
@@ -364,7 +364,7 @@ paths:
             type: string
           description: Unique identifier for the task
           example: "task_789"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       responses:
         '200':
           description: Task context retrieved successfully
@@ -398,11 +398,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/priorities:
     get:
@@ -411,7 +411,7 @@ paths:
       security:
         - bearerAuth: [goals.read]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
         - name: time_range
           in: query
           schema:
@@ -462,11 +462,11 @@ paths:
                       end: "2025-06-19T21:00:00Z"
                 generated_at: "2025-06-19T22:20:00Z"
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/tasks/{task_id}/progress:
     patch:
@@ -482,7 +482,7 @@ paths:
             type: string
           description: Unique identifier for the task
           example: "task_789"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
         - name: If-Match
           in: header
           required: true
@@ -514,19 +514,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/Task'
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '404':
           description: Task not found
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '409':
-          $ref: '../components/common.yaml#/components/responses/VersionConflict'
+          $ref: 'components/common.yaml#/components/responses/VersionConflict'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/events/goal-created:
     post:
@@ -535,7 +535,7 @@ paths:
       security:
         - bearerAuth: [goals.write]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       requestBody:
         required: true
         content:
@@ -572,22 +572,22 @@ paths:
             format: uuid
           description: Unique identifier for the job
           example: "550e8400-e29b-41d4-a716-446655440001"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       responses:
         '200':
           description: Job status retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+                $ref: 'components/common.yaml#/components/schemas/JobStatus'
         '404':
           description: Job not found
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
 
 components:
   schemas:
@@ -1054,7 +1054,7 @@ components:
             $ref: '#/components/schemas/Goal'
           description: List of user goals
         pagination:
-          $ref: '../components/common.yaml#/components/schemas/Pagination'
+          $ref: 'components/common.yaml#/components/schemas/Pagination'
 
     TasksResponse:
       type: object
@@ -1066,7 +1066,7 @@ components:
             $ref: '#/components/schemas/Task'
           description: List of tasks for the goal
         pagination:
-          $ref: '../components/common.yaml#/components/schemas/Pagination'
+          $ref: 'components/common.yaml#/components/schemas/Pagination'
 
     GoalCreatedEvent:
       type: object

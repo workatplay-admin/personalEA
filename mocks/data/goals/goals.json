@@ -1,0 +1,181 @@
+{
+  "data": [
+    {
+      "id": "goal_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+      "title": "Complete Q1 Performance Review Process",
+      "description": "Conduct comprehensive performance reviews for all direct reports, including goal setting for Q2 and career development discussions",
+      "type": "professional",
+      "status": "in_progress",
+      "priority": "high",
+      "dueDate": "2024-03-31T17:00:00Z",
+      "createdAt": "2024-01-01T09:00:00Z",
+      "updatedAt": "2024-01-15T14:30:00Z",
+      "progress": {
+        "percentage": 65,
+        "completedTasks": 13,
+        "totalTasks": 20,
+        "lastUpdated": "2024-01-15T14:30:00Z"
+      },
+      "tags": ["management", "hr", "q1", "performance"],
+      "context": {
+        "justification": "Annual performance reviews are critical for team development and organizational alignment. This process ensures fair evaluation, goal alignment, and career growth opportunities for all team members.",
+        "stakeholders": ["HR Team", "Direct Reports", "Senior Management"],
+        "dependencies": ["HR system access", "Performance data collection", "Budget approval for promotions"],
+        "risks": ["Timeline constraints", "Resource availability", "Employee satisfaction impact"]
+      },
+      "metrics": [
+        {
+          "name": "Reviews Completed",
+          "current": 13,
+          "target": 20,
+          "unit": "count"
+        },
+        {
+          "name": "Employee Satisfaction",
+          "current": 4.2,
+          "target": 4.5,
+          "unit": "rating"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+          "title": "Schedule performance review meetings",
+          "status": "completed",
+          "dueDate": "2024-01-15T17:00:00Z",
+          "completedAt": "2024-01-14T16:30:00Z"
+        },
+        {
+          "id": "task_01HQZX8K9M2N3P4Q5R6S7T8U9W",
+          "title": "Collect 360-degree feedback",
+          "status": "in_progress",
+          "dueDate": "2024-01-25T17:00:00Z"
+        },
+        {
+          "id": "task_01HQZX8K9M2N3P4Q5R6S7T8U9X",
+          "title": "Prepare development plans",
+          "status": "pending",
+          "dueDate": "2024-02-15T17:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "goal_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+      "title": "Learn Spanish for Business Communication",
+      "description": "Achieve conversational fluency in Spanish to better communicate with Latin American clients and expand business opportunities",
+      "type": "personal",
+      "status": "in_progress",
+      "priority": "medium",
+      "dueDate": "2024-12-31T23:59:59Z",
+      "createdAt": "2024-01-01T09:00:00Z",
+      "updatedAt": "2024-01-15T08:00:00Z",
+      "progress": {
+        "percentage": 25,
+        "completedTasks": 5,
+        "totalTasks": 20,
+        "lastUpdated": "2024-01-15T08:00:00Z"
+      },
+      "tags": ["language", "professional-development", "communication", "business"],
+      "context": {
+        "justification": "Spanish fluency will enable direct communication with key clients in Mexico and Argentina, potentially increasing business by 30% and improving relationship quality.",
+        "stakeholders": ["Latin American Clients", "Business Development Team"],
+        "dependencies": ["Language learning app subscription", "Practice partner availability", "Time allocation"],
+        "risks": ["Time management", "Motivation consistency", "Practice opportunities"]
+      },
+      "metrics": [
+        {
+          "name": "Study Hours per Week",
+          "current": 3,
+          "target": 5,
+          "unit": "hours"
+        },
+        {
+          "name": "Vocabulary Words Learned",
+          "current": 450,
+          "target": 2000,
+          "unit": "words"
+        },
+        {
+          "name": "Conversation Sessions",
+          "current": 8,
+          "target": 50,
+          "unit": "sessions"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+          "title": "Complete Duolingo Spanish course basics",
+          "status": "completed",
+          "dueDate": "2024-02-01T23:59:59Z",
+          "completedAt": "2024-01-28T20:15:00Z"
+        },
+        {
+          "id": "task_01HQZX8K9M2N3P4Q5R6S7T8U9Z",
+          "title": "Schedule weekly conversation practice",
+          "status": "in_progress",
+          "dueDate": "2024-01-20T17:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "goal_01HQZX8K9M2N3P4Q5R6S7T8U9Z",
+      "title": "Launch Personal Finance Dashboard",
+      "description": "Develop and deploy a comprehensive personal finance tracking application with investment portfolio analysis and budget optimization features",
+      "type": "project",
+      "status": "planning",
+      "priority": "low",
+      "dueDate": "2024-06-30T23:59:59Z",
+      "createdAt": "2024-01-10T10:00:00Z",
+      "updatedAt": "2024-01-15T11:00:00Z",
+      "progress": {
+        "percentage": 10,
+        "completedTasks": 2,
+        "totalTasks": 25,
+        "lastUpdated": "2024-01-15T11:00:00Z"
+      },
+      "tags": ["side-project", "fintech", "development", "personal"],
+      "context": {
+        "justification": "Current finance tracking tools lack integration and customization needed for complex investment strategies. A custom solution will provide better insights and automation.",
+        "stakeholders": ["Personal Use", "Potential Users", "Financial Advisor"],
+        "dependencies": ["API access to financial institutions", "Cloud hosting setup", "Development time allocation"],
+        "risks": ["Scope creep", "Security requirements", "Regulatory compliance", "Time constraints"]
+      },
+      "metrics": [
+        {
+          "name": "Features Implemented",
+          "current": 2,
+          "target": 15,
+          "unit": "features"
+        },
+        {
+          "name": "Test Coverage",
+          "current": 0,
+          "target": 85,
+          "unit": "percentage"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task_01HQZX8K9M2N3P4Q5R6S7T8U9A",
+          "title": "Research financial APIs and data sources",
+          "status": "completed",
+          "dueDate": "2024-01-15T17:00:00Z",
+          "completedAt": "2024-01-14T19:30:00Z"
+        },
+        {
+          "id": "task_01HQZX8K9M2N3P4Q5R6S7T8U9B",
+          "title": "Create technical architecture document",
+          "status": "in_progress",
+          "dueDate": "2024-01-25T17:00:00Z"
+        }
+      ]
+    }
+  ],
+  "pagination": {
+    "cursor": "goal_01HQZX8K9M2N3P4Q5R6S7T8U9Z",
+    "hasMore": false,
+    "limit": 20,
+    "total": 3
+  }
+}
