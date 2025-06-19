@@ -1,0 +1,91 @@
+{
+  "id": "digest_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+  "period": {
+    "start": "2024-01-15T00:00:00Z",
+    "end": "2024-01-15T23:59:59Z"
+  },
+  "summary": {
+    "totalEmails": 23,
+    "unreadEmails": 8,
+    "importantEmails": 5,
+    "actionItemsCount": 12,
+    "categories": {
+      "work": 15,
+      "personal": 6,
+      "newsletters": 2
+    }
+  },
+  "highlights": [
+    {
+      "type": "urgent_action",
+      "title": "Q1 Budget Review - 3 Action Items Due Friday",
+      "description": "Sarah Johnson sent urgent budget review items requiring your approval by end of week",
+      "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+      "priority": "high"
+    },
+    {
+      "type": "meeting_request",
+      "title": "New Meeting Request from Product Team",
+      "description": "Sprint planning meeting scheduled for Thursday 2 PM",
+      "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9W",
+      "priority": "medium"
+    },
+    {
+      "type": "deadline_reminder",
+      "title": "Project Proposal Due Tomorrow",
+      "description": "Reminder: Innovation project proposal submission deadline is tomorrow",
+      "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9X",
+      "priority": "high"
+    }
+  ],
+  "actionItems": [
+    {
+      "id": "action_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+      "description": "Review and approve the marketing budget increase of $50K",
+      "dueDate": "2024-01-19T17:00:00Z",
+      "priority": "high",
+      "source": {
+        "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+        "from": "sarah.johnson@company.com"
+      }
+    },
+    {
+      "id": "action_01HQZX8K9M2N3P4Q5R6S7T8U9W",
+      "description": "Confirm attendance for family dinner on Sunday",
+      "dueDate": "2024-01-21T18:00:00Z",
+      "priority": "low",
+      "source": {
+        "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+        "from": "mom@family.com"
+      }
+    },
+    {
+      "id": "action_01HQZX8K9M2N3P4Q5R6S7T8U9X",
+      "description": "Submit innovation project proposal",
+      "dueDate": "2024-01-16T17:00:00Z",
+      "priority": "high",
+      "source": {
+        "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9X",
+        "from": "innovation@company.com"
+      }
+    }
+  ],
+  "trends": {
+    "emailVolumeChange": "+15%",
+    "responseTimeAvg": "2.5 hours",
+    "topSenders": [
+      {
+        "email": "sarah.johnson@company.com",
+        "name": "Sarah Johnson",
+        "count": 4
+      },
+      {
+        "email": "team@company.com",
+        "name": "Team Updates",
+        "count": 3
+      }
+    ]
+  },
+  "generatedAt": "2024-01-15T23:00:00Z",
+  "version": "1.0"
+}

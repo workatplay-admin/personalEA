@@ -1,0 +1,231 @@
+{
+  "timeZone": "America/New_York",
+  "period": {
+    "start": "2024-01-16T00:00:00Z",
+    "end": "2024-01-22T23:59:59Z"
+  },
+  "availability": [
+    {
+      "date": "2024-01-16",
+      "slots": [
+        {
+          "start": "2024-01-16T13:00:00Z",
+          "end": "2024-01-16T14:00:00Z",
+          "status": "available",
+          "duration": 60
+        },
+        {
+          "start": "2024-01-16T14:00:00Z",
+          "end": "2024-01-16T17:00:00Z",
+          "status": "busy",
+          "duration": 180,
+          "event": {
+            "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+            "title": "Focus Time - Deep Work"
+          }
+        },
+        {
+          "start": "2024-01-16T17:00:00Z",
+          "end": "2024-01-16T18:00:00Z",
+          "status": "available",
+          "duration": 60
+        },
+        {
+          "start": "2024-01-16T18:00:00Z",
+          "end": "2024-01-16T22:00:00Z",
+          "status": "available",
+          "duration": 240
+        }
+      ],
+      "workingHours": {
+        "start": "2024-01-16T13:00:00Z",
+        "end": "2024-01-16T22:00:00Z"
+      },
+      "totalAvailable": 300,
+      "totalBusy": 180
+    },
+    {
+      "date": "2024-01-17",
+      "slots": [
+        {
+          "start": "2024-01-17T13:00:00Z",
+          "end": "2024-01-17T15:00:00Z",
+          "status": "available",
+          "duration": 120
+        },
+        {
+          "start": "2024-01-17T15:00:00Z",
+          "end": "2024-01-17T16:00:00Z",
+          "status": "busy",
+          "duration": 60,
+          "event": {
+            "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9Z",
+            "title": "1:1 with Team Lead"
+          }
+        },
+        {
+          "start": "2024-01-17T16:00:00Z",
+          "end": "2024-01-17T22:00:00Z",
+          "status": "available",
+          "duration": 360
+        }
+      ],
+      "workingHours": {
+        "start": "2024-01-17T13:00:00Z",
+        "end": "2024-01-17T22:00:00Z"
+      },
+      "totalAvailable": 480,
+      "totalBusy": 60
+    },
+    {
+      "date": "2024-01-18",
+      "slots": [
+        {
+          "start": "2024-01-18T13:00:00Z",
+          "end": "2024-01-18T19:00:00Z",
+          "status": "available",
+          "duration": 360
+        },
+        {
+          "start": "2024-01-18T19:00:00Z",
+          "end": "2024-01-18T20:30:00Z",
+          "status": "busy",
+          "duration": 90,
+          "event": {
+            "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9W",
+            "title": "Sprint Planning - Product Team"
+          }
+        },
+        {
+          "start": "2024-01-18T20:30:00Z",
+          "end": "2024-01-18T22:00:00Z",
+          "status": "available",
+          "duration": 90
+        }
+      ],
+      "workingHours": {
+        "start": "2024-01-18T13:00:00Z",
+        "end": "2024-01-18T22:00:00Z"
+      },
+      "totalAvailable": 450,
+      "totalBusy": 90
+    },
+    {
+      "date": "2024-01-19",
+      "slots": [
+        {
+          "start": "2024-01-19T13:00:00Z",
+          "end": "2024-01-19T14:00:00Z",
+          "status": "available",
+          "duration": 60
+        },
+        {
+          "start": "2024-01-19T14:00:00Z",
+          "end": "2024-01-19T16:00:00Z",
+          "status": "busy",
+          "duration": 120,
+          "event": {
+            "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+            "title": "Q1 Budget Review Meeting"
+          }
+        },
+        {
+          "start": "2024-01-19T16:00:00Z",
+          "end": "2024-01-19T22:00:00Z",
+          "status": "available",
+          "duration": 360
+        }
+      ],
+      "workingHours": {
+        "start": "2024-01-19T13:00:00Z",
+        "end": "2024-01-19T22:00:00Z"
+      },
+      "totalAvailable": 420,
+      "totalBusy": 120
+    },
+    {
+      "date": "2024-01-20",
+      "slots": [
+        {
+          "start": "2024-01-20T13:00:00Z",
+          "end": "2024-01-20T22:00:00Z",
+          "status": "available",
+          "duration": 540
+        }
+      ],
+      "workingHours": {
+        "start": "2024-01-20T13:00:00Z",
+        "end": "2024-01-20T22:00:00Z"
+      },
+      "totalAvailable": 540,
+      "totalBusy": 0
+    },
+    {
+      "date": "2024-01-21",
+      "slots": [
+        {
+          "start": "2024-01-21T14:00:00Z",
+          "end": "2024-01-21T23:00:00Z",
+          "status": "available",
+          "duration": 540
+        },
+        {
+          "start": "2024-01-21T23:00:00Z",
+          "end": "2024-01-22T01:00:00Z",
+          "status": "busy",
+          "duration": 120,
+          "event": {
+            "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9X",
+            "title": "Family Dinner"
+          }
+        }
+      ],
+      "workingHours": {
+        "start": "2024-01-21T14:00:00Z",
+        "end": "2024-01-21T23:00:00Z"
+      },
+      "totalAvailable": 540,
+      "totalBusy": 120
+    },
+    {
+      "date": "2024-01-22",
+      "slots": [
+        {
+          "start": "2024-01-22T14:00:00Z",
+          "end": "2024-01-22T23:59:59Z",
+          "status": "available",
+          "duration": 600
+        }
+      ],
+      "workingHours": {
+        "start": "2024-01-22T14:00:00Z",
+        "end": "2024-01-22T23:59:59Z"
+      },
+      "totalAvailable": 600,
+      "totalBusy": 0
+    }
+  ],
+  "summary": {
+    "totalDays": 7,
+    "totalAvailableMinutes": 3090,
+    "totalBusyMinutes": 690,
+    "utilizationRate": 18.3,
+    "averageAvailablePerDay": 441.4,
+    "busiestDay": "2024-01-19",
+    "mostAvailableDay": "2024-01-22"
+  },
+  "preferences": {
+    "workingHours": {
+      "monday": { "start": "09:00", "end": "17:00" },
+      "tuesday": { "start": "09:00", "end": "17:00" },
+      "wednesday": { "start": "09:00", "end": "17:00" },
+      "thursday": { "start": "09:00", "end": "17:00" },
+      "friday": { "start": "09:00", "end": "17:00" },
+      "saturday": { "start": "10:00", "end": "18:00" },
+      "sunday": { "start": "10:00", "end": "18:00" }
+    },
+    "bufferTime": 15,
+    "maxMeetingsPerDay": 6,
+    "preferredMeetingDuration": [30, 60, 90]
+  }
+}

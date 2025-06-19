@@ -1,0 +1,157 @@
+{
+  "data": [
+    {
+      "id": "email_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+      "messageId": "<CABcdefghijklmnop@gmail.com>",
+      "threadId": "thread_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+      "subject": "Q1 Budget Review Meeting - Action Items Required",
+      "from": {
+        "email": "sarah.johnson@company.com",
+        "name": "Sarah Johnson"
+      },
+      "to": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User"
+        }
+      ],
+      "cc": [
+        {
+          "email": "finance@company.com",
+          "name": "Finance Team"
+        }
+      ],
+      "receivedAt": "2024-01-15T14:30:00Z",
+      "body": {
+        "text": "Hi there,\n\nFollowing our Q1 budget review meeting, we need to finalize the following action items by Friday:\n\n1. Review and approve the marketing budget increase of $50K\n2. Analyze the cost savings from the new vendor contracts\n3. Prepare the executive summary for the board presentation\n\nPlease let me know if you have any questions.\n\nBest regards,\nSarah",
+        "html": "<p>Hi there,</p><p>Following our Q1 budget review meeting, we need to finalize the following action items by Friday:</p><ol><li>Review and approve the marketing budget increase of $50K</li><li>Analyze the cost savings from the new vendor contracts</li><li>Prepare the executive summary for the board presentation</li></ol><p>Please let me know if you have any questions.</p><p>Best regards,<br>Sarah</p>"
+      },
+      "labels": ["work", "urgent", "action-required"],
+      "isRead": false,
+      "isImportant": true,
+      "hasAttachments": true,
+      "attachments": [
+        {
+          "id": "att_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+          "filename": "Q1_Budget_Summary.xlsx",
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "size": 245760
+        }
+      ],
+      "aiAnalysis": {
+        "sentiment": "neutral",
+        "urgency": "high",
+        "category": "business",
+        "actionItems": [
+          {
+            "id": "action_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+            "description": "Review and approve the marketing budget increase of $50K",
+            "dueDate": "2024-01-19T17:00:00Z",
+            "priority": "high",
+            "assignee": "user@personalea.com"
+          },
+          {
+            "id": "action_01HQZX8K9M2N3P4Q5R6S7T8U9W",
+            "description": "Analyze the cost savings from the new vendor contracts",
+            "dueDate": "2024-01-19T17:00:00Z",
+            "priority": "medium",
+            "assignee": "user@personalea.com"
+          },
+          {
+            "id": "action_01HQZX8K9M2N3P4Q5R6S7T8U9X",
+            "description": "Prepare the executive summary for the board presentation",
+            "dueDate": "2024-01-19T17:00:00Z",
+            "priority": "high",
+            "assignee": "user@personalea.com"
+          }
+        ],
+        "keyTopics": ["budget", "marketing", "vendor contracts", "board presentation"],
+        "entities": [
+          {
+            "type": "person",
+            "value": "Sarah Johnson",
+            "confidence": 0.95
+          },
+          {
+            "type": "money",
+            "value": "$50K",
+            "confidence": 0.98
+          },
+          {
+            "type": "date",
+            "value": "Friday",
+            "confidence": 0.92
+          }
+        ]
+      },
+      "createdAt": "2024-01-15T14:30:00Z",
+      "updatedAt": "2024-01-15T14:30:00Z"
+    },
+    {
+      "id": "email_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+      "messageId": "<CABcdefghijklmnop@outlook.com>",
+      "threadId": "thread_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+      "subject": "Weekend Plans - Family Dinner",
+      "from": {
+        "email": "mom@family.com",
+        "name": "Mom"
+      },
+      "to": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User"
+        }
+      ],
+      "receivedAt": "2024-01-15T10:15:00Z",
+      "body": {
+        "text": "Hi honey,\n\nJust wanted to confirm our family dinner this Sunday at 6 PM. Your dad is making his famous lasagna! Let me know if you can make it.\n\nLove,\nMom",
+        "html": "<p>Hi honey,</p><p>Just wanted to confirm our family dinner this Sunday at 6 PM. Your dad is making his famous lasagna! Let me know if you can make it.</p><p>Love,<br>Mom</p>"
+      },
+      "labels": ["personal", "family"],
+      "isRead": true,
+      "isImportant": false,
+      "hasAttachments": false,
+      "attachments": [],
+      "aiAnalysis": {
+        "sentiment": "positive",
+        "urgency": "low",
+        "category": "personal",
+        "actionItems": [
+          {
+            "id": "action_01HQZX8K9M2N3P4Q5R6S7T8U9Z",
+            "description": "Confirm attendance for family dinner on Sunday",
+            "dueDate": "2024-01-21T18:00:00Z",
+            "priority": "low",
+            "assignee": "user@personalea.com"
+          }
+        ],
+        "keyTopics": ["family", "dinner", "Sunday"],
+        "entities": [
+          {
+            "type": "person",
+            "value": "Mom",
+            "confidence": 0.98
+          },
+          {
+            "type": "person",
+            "value": "dad",
+            "confidence": 0.95
+          },
+          {
+            "type": "time",
+            "value": "Sunday at 6 PM",
+            "confidence": 0.92
+          }
+        ]
+      },
+      "createdAt": "2024-01-15T10:15:00Z",
+      "updatedAt": "2024-01-15T10:15:00Z"
+    }
+  ],
+  "pagination": {
+    "cursor": "email_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+    "hasMore": true,
+    "limit": 20,
+    "total": 156
+  }
+}

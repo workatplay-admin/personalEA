@@ -33,8 +33,8 @@ paths:
       security:
         - bearerAuth: [email.write]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/IdempotencyKeyHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/IdempotencyKeyHeader'
       requestBody:
         required: true
         content:
@@ -50,17 +50,17 @@ paths:
                 max_results: 1000
       responses:
         '202':
-          $ref: '../components/common.yaml#/components/responses/JobAccepted'
+          $ref: 'components/common.yaml#/components/responses/JobAccepted'
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
         '503':
-          $ref: '../components/common.yaml#/components/responses/ServiceUnavailable'
+          $ref: 'components/common.yaml#/components/responses/ServiceUnavailable'
 
   /v1/emails/digest:
     post:
@@ -69,9 +69,9 @@ paths:
       security:
         - bearerAuth: [email.read]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
-        - $ref: '../components/common.yaml#/components/parameters/CursorQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CursorQuery'
       requestBody:
         required: true
         content:
@@ -110,13 +110,13 @@ paths:
                   has_more: true
                   total_count: 17
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
-          $ref: '../components/common.yaml#/components/responses/RateLimited'
+          $ref: 'components/common.yaml#/components/responses/RateLimited'
 
   /v1/emails/{email_id}/summary:
     get:
@@ -132,7 +132,7 @@ paths:
             type: string
           description: Unique identifier for the email
           example: "email_789"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       responses:
         '200':
           description: Email summary retrieved successfully
@@ -157,11 +157,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/emails/{email_id}/action-items:
     get:
@@ -177,8 +177,8 @@ paths:
             type: string
           description: Unique identifier for the email
           example: "email_789"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - $ref: '../components/common.yaml#/components/parameters/LimitQuery'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/LimitQuery'
         - name: offset
           in: query
           schema:
@@ -215,11 +215,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/events/email-ingested:
     post:
@@ -228,7 +228,7 @@ paths:
       security:
         - bearerAuth: [email.write]
       parameters:
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       requestBody:
         required: true
         content:
@@ -259,11 +259,11 @@ paths:
                     type: string
                     example: "event_456"
         '400':
-          $ref: '../components/common.yaml#/components/responses/BadRequest'
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
         '403':
-          $ref: '../components/common.yaml#/components/responses/Forbidden'
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/jobs/{job_id}:
     get:
@@ -280,14 +280,14 @@ paths:
             format: uuid
           description: Unique identifier for the job
           example: "550e8400-e29b-41d4-a716-446655440001"
-        - $ref: '../components/common.yaml#/components/parameters/CorrelationIdHeader'
+        - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
       responses:
         '200':
           description: Job status retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/JobStatus'
+                $ref: 'components/common.yaml#/components/schemas/JobStatus'
               example:
                 job_id: "550e8400-e29b-41d4-a716-446655440001"
                 state: "completed"
@@ -304,9 +304,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
-          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
 
 components:
   schemas:
@@ -329,7 +329,7 @@ components:
               type: array
               items:
                 type: string
-              description: Gmail labels to sync (default: all)
+              description: "Gmail labels to sync (default: all)"
               example: ["INBOX", "IMPORTANT"]
             since:
               type: string
@@ -402,7 +402,7 @@ components:
           items:
             $ref: '#/components/schemas/EmailDigestItem'
         pagination:
-          $ref: '../components/common.yaml#/components/schemas/Pagination'
+          $ref: 'components/common.yaml#/components/schemas/Pagination'
 
     EmailDigestItem:
       type: object
@@ -576,4 +576,4 @@ components:
 
   securitySchemes:
     bearerAuth:
-      $ref: '../components/common.yaml#/components/securitySchemes/bearerAuth'
+      $ref: 'components/common.yaml#/components/securitySchemes/bearerAuth'

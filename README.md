@@ -44,15 +44,29 @@ All services are designed with OpenAPI 3.1 specifications following contract-fir
    npm run validate:api
    ```
 
-4. **Start mock servers for development**
+4. **Start enhanced mock servers for development**
    ```bash
-   # Start all mock servers
-   npm run mock:all
+   # Quick start with Docker Compose (Recommended)
+   npm run mock:docker
    
-   # Or start individual services
-   npm run mock:email    # Port 8083
-   npm run mock:goals    # Port 8085
-   npm run mock:calendar # Port 8086
+   # Or use the setup script for full management
+   ./mocks/setup.sh start
+   
+   # Or start individual Prism servers
+   npm run mock:all
+   ```
+
+5. **Access mock services**
+   - Email Service: http://localhost:8083
+   - Goal & Strategy Service: http://localhost:8085
+   - Calendar Service: http://localhost:8086
+   - Mock Data Server: http://localhost:8090
+
+6. **Try the client development kit**
+   ```bash
+   cd client-dev-kit
+   npm install
+   npm run examples
    ```
 
 5. **Generate and serve API documentation**
@@ -82,9 +96,16 @@ npm run docs:serve        # Serve interactive documentation
 
 # Mock Servers
 npm run mock:email        # Start Email Service mock server
-npm run mock:goals        # Start Goal & Strategy Service mock server  
+npm run mock:goals        # Start Goal & Strategy Service mock server
 npm run mock:calendar     # Start Calendar Service mock server
 npm run mock:all          # Start all mock servers concurrently
+
+# Enhanced Mock Servers (Docker Compose)
+npm run mock:docker       # Start all services with Docker Compose
+npm run mock:docker:stop  # Stop Docker Compose services
+npm run mock:docker:logs  # View service logs
+npm run mock:status       # Check service health
+./mocks/setup.sh start    # Full setup with health checks
 
 # Code Generation
 npm run generate:types    # Generate TypeScript types from OpenAPI specs
@@ -151,6 +172,76 @@ Access interactive API documentation:
 - Email Service: http://localhost:8080 (when running `npm run docs:serve`)
 - Generated HTML docs available after running `npm run docs:build`
 
+## 🎯 Client Development
+
+### Enhanced Mock Servers
+
+PersonalEA provides production-ready mock servers with realistic data and stateful responses:
+
+**Features:**
+- **Realistic Data**: Business emails, personal goals, calendar events with relationships
+- **Stateful Responses**: Created resources persist, updates modify existing data
+- **Cross-Service Integration**: Mock data includes realistic relationships between services
+- **Docker Compose Setup**: Easy orchestration with health checks and logging
+- **CORS Support**: Ready for frontend development
+
+**Quick Start:**
+```bash
+# Start all enhanced mock servers
+npm run mock:docker
+
+# Or use the management script
+./mocks/setup.sh start
+
+# Check service health
+npm run mock:status
+
+# View logs
+npm run mock:docker:logs
+```
+
+**Service URLs:**
+- Email Service: http://localhost:8083
+- Goal & Strategy Service: http://localhost:8085
+- Calendar Service: http://localhost:8086
+- Mock Data Server: http://localhost:8090
+
+### Client Development Kit
+
+The `client-dev-kit/` directory provides everything needed for frontend development:
+
+**Included:**
+- **TypeScript Types**: Generated from OpenAPI specifications
+- **API Clients**: Pre-configured HTTP clients with authentication
+- **Working Examples**: Comprehensive examples for all services
+- **Testing Utilities**: Helpers for API integration testing
+
+**Quick Start:**
+```bash
+cd client-dev-kit
+npm install
+npm run examples        # Run all examples
+npm run examples:email  # Run Email Service examples
+```
+
+**Example Usage:**
+```typescript
+import { EmailClient } from './clients/email-client';
+
+const emailClient = new EmailClient();
+
+// Get emails with realistic mock data
+const emails = await emailClient.getEmails({ limit: 10 });
+
+// Generate email digest
+const digest = await emailClient.getDigest();
+
+// Extract action items
+const actionItems = await emailClient.extractActionItems(emailId);
+```
+
+See [`client-dev-kit/README.md`](client-dev-kit/README.md) and [`docs/mock-servers.md`](docs/mock-servers.md) for detailed guides.
+
 ## 🧪 Testing
 
 ### Mock Server Testing
@@ -161,7 +252,7 @@ Mock servers provide realistic API responses for development and testing:
 # Test Email Service mock
 curl http://localhost:8083/v1/health
 
-# Test Goals Service mock  
+# Test Goals Service mock
 curl http://localhost:8085/v1/health
 
 # Test Calendar Service mock
@@ -251,6 +342,8 @@ See [`docs/development-plan.md`](docs/development-plan.md) for detailed deployme
 - [`docs/personal-ea-prd.md`](docs/personal-ea-prd.md) - Product Requirements Document
 - [`docs/development-plan.md`](docs/development-plan.md) - Detailed development roadmap
 - [`docs/contract-testing.md`](docs/contract-testing.md) - Contract testing guide and best practices
+- [`docs/mock-servers.md`](docs/mock-servers.md) - Enhanced mock server setup and usage guide
+- [`client-dev-kit/README.md`](client-dev-kit/README.md) - Client development kit documentation
 - [`docs/api-spec.md`](docs/api-spec.md) - API specification guidelines
 - Generated API docs in `docs/*-docs.html`
 

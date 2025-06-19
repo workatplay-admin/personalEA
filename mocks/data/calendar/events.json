@@ -1,0 +1,218 @@
+{
+  "data": [
+    {
+      "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+      "calendarId": "cal_primary",
+      "title": "Q1 Budget Review Meeting",
+      "description": "Quarterly budget review with finance team to discuss allocations, variances, and Q2 planning",
+      "location": {
+        "type": "physical",
+        "address": "Conference Room A, 15th Floor",
+        "coordinates": {
+          "latitude": 40.7589,
+          "longitude": -73.9851
+        }
+      },
+      "startTime": "2024-01-19T14:00:00Z",
+      "endTime": "2024-01-19T16:00:00Z",
+      "timeZone": "America/New_York",
+      "isAllDay": false,
+      "status": "confirmed",
+      "visibility": "private",
+      "attendees": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User",
+          "role": "organizer",
+          "status": "accepted"
+        },
+        {
+          "email": "sarah.johnson@company.com",
+          "name": "Sarah Johnson",
+          "role": "required",
+          "status": "accepted"
+        },
+        {
+          "email": "finance@company.com",
+          "name": "Finance Team",
+          "role": "required",
+          "status": "pending"
+        }
+      ],
+      "recurrence": null,
+      "reminders": [
+        {
+          "method": "email",
+          "minutes": 1440
+        },
+        {
+          "method": "popup",
+          "minutes": 15
+        }
+      ],
+      "metadata": {
+        "source": "email",
+        "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9V",
+        "priority": "high",
+        "category": "meeting"
+      },
+      "createdAt": "2024-01-15T14:30:00Z",
+      "updatedAt": "2024-01-15T14:30:00Z"
+    },
+    {
+      "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9W",
+      "calendarId": "cal_primary",
+      "title": "Sprint Planning - Product Team",
+      "description": "Bi-weekly sprint planning session for the product development team",
+      "location": {
+        "type": "virtual",
+        "url": "https://zoom.us/j/123456789",
+        "platform": "Zoom"
+      },
+      "startTime": "2024-01-18T19:00:00Z",
+      "endTime": "2024-01-18T20:30:00Z",
+      "timeZone": "America/New_York",
+      "isAllDay": false,
+      "status": "confirmed",
+      "visibility": "private",
+      "attendees": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User",
+          "role": "required",
+          "status": "accepted"
+        },
+        {
+          "email": "product@company.com",
+          "name": "Product Team",
+          "role": "organizer",
+          "status": "accepted"
+        },
+        {
+          "email": "dev@company.com",
+          "name": "Development Team",
+          "role": "required",
+          "status": "accepted"
+        }
+      ],
+      "recurrence": {
+        "frequency": "weekly",
+        "interval": 2,
+        "daysOfWeek": ["thursday"],
+        "endDate": "2024-12-31T23:59:59Z"
+      },
+      "reminders": [
+        {
+          "method": "popup",
+          "minutes": 10
+        }
+      ],
+      "metadata": {
+        "source": "calendar",
+        "priority": "medium",
+        "category": "meeting"
+      },
+      "createdAt": "2024-01-01T09:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9X",
+      "calendarId": "cal_personal",
+      "title": "Family Dinner",
+      "description": "Sunday family dinner at parents' house - Dad's famous lasagna!",
+      "location": {
+        "type": "physical",
+        "address": "123 Family Street, Hometown, NY 12345"
+      },
+      "startTime": "2024-01-21T23:00:00Z",
+      "endTime": "2024-01-22T01:00:00Z",
+      "timeZone": "America/New_York",
+      "isAllDay": false,
+      "status": "confirmed",
+      "visibility": "private",
+      "attendees": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User",
+          "role": "required",
+          "status": "tentative"
+        },
+        {
+          "email": "mom@family.com",
+          "name": "Mom",
+          "role": "organizer",
+          "status": "accepted"
+        },
+        {
+          "email": "dad@family.com",
+          "name": "Dad",
+          "role": "required",
+          "status": "accepted"
+        }
+      ],
+      "recurrence": {
+        "frequency": "weekly",
+        "interval": 1,
+        "daysOfWeek": ["sunday"],
+        "endDate": null
+      },
+      "reminders": [
+        {
+          "method": "popup",
+          "minutes": 60
+        }
+      ],
+      "metadata": {
+        "source": "email",
+        "emailId": "email_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+        "priority": "low",
+        "category": "personal"
+      },
+      "createdAt": "2024-01-15T10:15:00Z",
+      "updatedAt": "2024-01-15T10:15:00Z"
+    },
+    {
+      "id": "event_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+      "calendarId": "cal_primary",
+      "title": "Focus Time - Deep Work",
+      "description": "Blocked time for focused work on innovation project proposal",
+      "location": null,
+      "startTime": "2024-01-16T14:00:00Z",
+      "endTime": "2024-01-16T17:00:00Z",
+      "timeZone": "America/New_York",
+      "isAllDay": false,
+      "status": "confirmed",
+      "visibility": "busy",
+      "attendees": [
+        {
+          "email": "user@personalea.com",
+          "name": "Personal EA User",
+          "role": "organizer",
+          "status": "accepted"
+        }
+      ],
+      "recurrence": null,
+      "reminders": [
+        {
+          "method": "popup",
+          "minutes": 5
+        }
+      ],
+      "metadata": {
+        "source": "ai_suggestion",
+        "priority": "high",
+        "category": "focus_time",
+        "aiGenerated": true,
+        "relatedGoal": "goal_01HQZX8K9M2N3P4Q5R6S7T8U9Z"
+      },
+      "createdAt": "2024-01-15T16:00:00Z",
+      "updatedAt": "2024-01-15T16:00:00Z"
+    }
+  ],
+  "pagination": {
+    "cursor": "event_01HQZX8K9M2N3P4Q5R6S7T8U9Y",
+    "hasMore": true,
+    "limit": 20,
+    "total": 47
+  }
+}
