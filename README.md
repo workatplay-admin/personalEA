@@ -1,13 +1,45 @@
 # PersonalEA - Personal AI Assistant System
 
-A microservices-based personal AI assistant system built with API-first design principles.
+Your personal AI assistant that helps you manage emails, goals, and calendar more efficiently. Built with API-first design principles and designed for both end users and developers.
+
+## 🎯 For End Users
+
+### 🚀 The One Command Installation
+
+**Get PersonalEA running in 5 minutes:**
+
+```bash
+curl -sL https://raw.githubusercontent.com/workatplay-admin/personalEA/[1;33m⚠️ No Git tags found, using default version: v1.0.0[0mv1.0.0/scripts/bootstrap.sh | bash
+```
+
+**That's it!** The script automatically:
+- ✅ Downloads PersonalEA
+- ✅ Installs prerequisites
+- ✅ Sets up with Docker
+- ✅ Starts your AI assistant
+- ✅ Opens http://localhost:3000
+
+### Alternative Options
+
+**🌐 One-Click Cloud Deployment**
+- [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/personalea)
+- [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/workatplay-admin/personalEA)
+
+**📖 Need Help?**
+- [📋 User Installation Guide](docs/user-installation-guide.md) - Step-by-step setup for non-technical users
+- [❓ FAQ](docs/faq.md) - Common questions and troubleshooting
+- [⚙️ Configuration Guide](docs/configuration-management-plan.md) - Easy configuration options
+
+---
+
+## 🛠️ For Developers
 
 ## 🏗️ Architecture Overview
 
 PersonalEA follows a microservices architecture with three core services:
 
 - **Email Processing Service** - Email synchronization, summarization, and action item extraction
-- **Goal & Strategy Service** - Goal management, task prioritization, and strategic planning
+- **Goal & Strategy Service** - Sophisticated 8-step goal-setting workflow with AI-powered SMART translation, milestone breakdown, work breakdown structure, dependency mapping, task estimation, calendar scheduling, and capacity management
 - **Calendar Service** - Calendar integration, intelligent scheduling, and availability management
 
 ## 📋 API Specifications
@@ -371,6 +403,7 @@ See [`docs/development-plan.md`](docs/development-plan.md) for detailed deployme
 
 - [`docs/personal-ea-prd.md`](docs/personal-ea-prd.md) - Product Requirements Document
 - [`docs/development-plan.md`](docs/development-plan.md) - Detailed development roadmap
+- [`docs/goal-strategy-service-specification.md`](docs/goal-strategy-service-specification.md) - Comprehensive Goal & Strategy Service technical specification
 - [`docs/contract-testing.md`](docs/contract-testing.md) - Contract testing guide and best practices
 - [`docs/mock-servers.md`](docs/mock-servers.md) - Enhanced mock server setup and usage guide
 - [`client-dev-kit/README.md`](client-dev-kit/README.md) - Client development kit documentation
