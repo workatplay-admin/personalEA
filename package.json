@@ -4,20 +4,20 @@
   "description": "Personal AI Assistant System - API-first microservices architecture",
   "private": true,
   "scripts": {
-    "lint:api": "spectral lint docs/**/*-api-*.yaml",
-    "lint:api:fix": "spectral lint docs/**/*-api-*.yaml --format=pretty",
+    "lint:api": "spectral lint docs/**/*-api-*.yaml --ruleset docs/.spectral.yaml",
+    "lint:api:fix": "spectral lint docs/**/*-api-*.yaml --ruleset docs/.spectral.yaml --format=pretty",
     "validate:api": "npm run lint:api && echo 'All API specifications are valid'",
-    "mock:email": "prism mock docs/email-service-api-v1.yaml --port 8083 --config mocks/prism.config.json",
-    "mock:goals": "prism mock docs/goal-strategy-service-api-v1.yaml --port 8085 --config mocks/prism.config.json",
-    "mock:calendar": "prism mock docs/calendar-service-api-v1.yaml --port 8086 --config mocks/prism.config.json",
+    "mock:email": "npx prism mock docs/email-service-api-v1.yaml --port 8083 --host 127.0.0.1 --dynamic --cors",
+    "mock:goals": "npx prism mock docs/goal-strategy-service-api-v1.yaml --port 8085 --host 127.0.0.1 --dynamic --cors",
+    "mock:calendar": "npx prism mock docs/calendar-service-api-v1.yaml --port 8086 --host 127.0.0.1 --dynamic --cors",
     "mock:all": "concurrently \"npm run mock:email\" \"npm run mock:goals\" \"npm run mock:calendar\"",
     "mock:docker": "docker-compose -f docker-compose.mock.yml up -d",
     "mock:docker:stop": "docker-compose -f docker-compose.mock.yml down",
     "mock:docker:logs": "docker-compose -f docker-compose.mock.yml logs -f",
     "mock:docker:rebuild": "docker-compose -f docker-compose.mock.yml down && docker-compose -f docker-compose.mock.yml up -d --build",
     "mock:status": "curl -s http://localhost:8083/v1/health && curl -s http://localhost:8085/v1/health && curl -s http://localhost:8086/v1/health",
-    "docs:serve": "redoc-cli serve docs/email-service-api-v1.yaml --port 8080",
-    "docs:build": "redoc-cli build docs/email-service-api-v1.yaml --output docs/email-service-docs.html && redoc-cli build docs/goal-strategy-service-api-v1.yaml --output docs/goal-strategy-docs.html && redoc-cli build docs/calendar-service-api-v1.yaml --output docs/calendar-service-docs.html",
+    "docs:serve": "npx @redocly/cli preview-docs docs/email-service-api-v1.yaml --port 8080",
+    "docs:build": "npx @redocly/cli build-docs docs/email-service-api-v1.yaml --output docs/email-service-docs.html && npx @redocly/cli build-docs docs/goal-strategy-service-api-v1.yaml --output docs/goal-strategy-docs.html && npx @redocly/cli build-docs docs/calendar-service-api-v1.yaml --output docs/calendar-service-docs.html",
     "generate:types": "openapi-typescript docs/email-service-api-v1.yaml --output types/email-service.ts && openapi-typescript docs/goal-strategy-service-api-v1.yaml --output types/goal-strategy.ts && openapi-typescript docs/calendar-service-api-v1.yaml --output types/calendar.ts",
     "test:contract": "npm run test:contract:api && npm run test:contract:pact",
     "test:contract:api": "npm run test:contract:schemathesis && npm run test:contract:dredd",
@@ -28,7 +28,9 @@
     "test:contract:pact:consumer": "jest --testPathPattern=tests/pact/consumer",
     "test:contract:mock": "npm run mock:all & sleep 5 && npm run test:contract:api; kill %1",
     "prepare": "husky install",
-    "precommit": "npm run validate:api"
+    "precommit": "npm run validate:api",
+    "ci:validate": "npm run lint:api && npm run docs:build && echo 'CI validation completed successfully'",
+    "ci:setup": "npm ci && npm run ci:validate"
   },
   "devDependencies": {
     "@stoplight/spectral-cli": "^6.11.0",
@@ -38,7 +40,6 @@
     "concurrently": "^8.2.2",
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
-    "schemathesis": "^3.19.7",
     "dredd": "^14.1.0",
     "@pact-foundation/pact": "^12.1.0",
     "@pact-foundation/pact-node": "^10.17.7",
@@ -50,7 +51,7 @@
   },
   "lint-staged": {
     "docs/**/*-api-*.yaml": [
-      "spectral lint"
+      "spectral lint --ruleset docs/.spectral.yaml"
     ]
   },
   "husky": {

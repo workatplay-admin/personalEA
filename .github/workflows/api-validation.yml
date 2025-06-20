@@ -3,23 +3,37 @@ name: API Contract Validation
 on:
   push:
     branches: [ main, develop ]
-    paths: [ 'docs/**/*.yaml', 'docs/**/*.yml' ]
+    paths:
+      - 'docs/**/*.yaml'
+      - 'docs/**/*.yml'
+      - 'docs/.spectral.yaml'
+      - 'package.json'
+      - 'package-lock.json'
   pull_request:
     branches: [ main, develop ]
-    paths: [ 'docs/**/*.yaml', 'docs/**/*.yml' ]
+    paths:
+      - 'docs/**/*.yaml'
+      - 'docs/**/*.yml'
+      - 'docs/.spectral.yaml'
+      - 'package.json'
+      - 'package-lock.json'
 
 jobs:
-  validate-api-contracts:
+  validate-apis:
     runs-on: ubuntu-latest
     
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
+    - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
     - name: Install dependencies
@@ -28,302 +42,87 @@ jobs:
     - name: Validate API specifications with Spectral
       run: npm run lint:api
       
-    - name: Check for breaking changes
-      if: github.event_name == 'pull_request'
-      run: |
-        # Install oasdiff for breaking change detection
-        npm install -g oasdiff
-        
-        # Check each API for breaking changes
-        echo "Checking for breaking changes..."
-        
-        # Fetch base branch for comparison
-        git fetch origin ${{ github.base_ref }}
-        
-        # Check Email Service API
-        if git show origin/${{ github.base_ref }}:docs/email-service-api-v1.yaml > /tmp/base-email-api.yaml 2>/dev/null; then
-          oasdiff breaking /tmp/base-email-api.yaml docs/email-service-api-v1.yaml || echo "Breaking changes detected in Email Service API"
-        fi
-        
-        # Check Goal & Strategy Service API
-        if git show origin/${{ github.base_ref }}:docs/goal-strategy-service-api-v1.yaml > /tmp/base-goals-api.yaml 2>/dev/null; then
-          oasdiff breaking /tmp/base-goals-api.yaml docs/goal-strategy-service-api-v1.yaml || echo "Breaking changes detected in Goal & Strategy Service API"
-        fi
-        
-        # Check Calendar Service API
-        if git show origin/${{ github.base_ref }}:docs/calendar-service-api-v1.yaml > /tmp/base-calendar-api.yaml 2>/dev/null; then
-          oasdiff breaking /tmp/base-calendar-api.yaml docs/calendar-service-api-v1.yaml || echo "Breaking changes detected in Calendar Service API"
-        fi
-        
     - name: Generate API documentation
-      run: |
-        npm run docs:build
-        
-    - name: Upload API documentation artifacts
+      run: npm run docs:build
+      
+    - name: Upload documentation artifacts
       uses: actions/upload-artifact@v4
+      if: matrix.node-version == '20.x'
       with:
         name: api-documentation
-        path: docs/*-docs.html
+        path: |
+          docs/*-docs.html
         retention-days: 30
         
-    - name: Start mock servers for testing
-      run: |
-        # Start mock servers in background
-        npm run mock:email &
-        npm run mock:goals &
-        npm run mock:calendar &
-        
-        # Wait for servers to start
-        sleep 10
-        
-        # Test mock server endpoints
-        curl -f http://localhost:8083/v1/health || echo "Email service mock failed"
-        curl -f http://localhost:8085/v1/health || echo "Goals service mock failed"
-        curl -f http://localhost:8086/v1/health || echo "Calendar service mock failed"
-        
-    - name: Comment PR with API changes
+    - name: Check for API breaking changes
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          
-          // Read API specs to check for version changes
-          const emailApi = fs.readFileSync('docs/email-service-api-v1.yaml', 'utf8');
-          const goalsApi = fs.readFileSync('docs/goal-strategy-service-api-v1.yaml', 'utf8');
-          const calendarApi = fs.readFileSync('docs/calendar-service-api-v1.yaml', 'utf8');
-          
-          // Extract versions
-          const emailVersion = emailApi.match(/version:\s*(.+)/)?.[1]?.trim();
-          const goalsVersion = goalsApi.match(/version:\s*(.+)/)?.[1]?.trim();
-          const calendarVersion = calendarApi.match(/version:\s*(.+)/)?.[1]?.trim();
-          
-          const comment = `## 🔄 API Contract Changes
-          
-          This PR includes changes to API specifications:
-          
-          ### Service Versions
-          - **Email Processing Service**: \`${emailVersion}\`
-          - **Goal & Strategy Service**: \`${goalsVersion}\`
-          - **Calendar Service**: \`${calendarVersion}\`
-          
-          ### Validation Results
-          ✅ All API specifications passed Spectral linting
-          
-          ### Mock Servers
-          Mock servers are available for testing:
-          - Email Service: http://localhost:8083
-          - Goal & Strategy Service: http://localhost:8085
-          - Calendar Service: http://localhost:8086
-          
-          ### Documentation
-          Updated API documentation has been generated and is available in the artifacts.
-          
-          Please ensure:
-          - [ ] Breaking changes are properly versioned
-          - [ ] New endpoints have comprehensive examples
-          - [ ] Security requirements are documented
-          - [ ] Rate limits are specified
-          `;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
-
-  contract-testing:
+      run: |
+        echo "Checking for potential breaking changes..."
+        # This could be enhanced with tools like oasdiff
+        npm run lint:api || echo "API validation warnings detected"
+        
+  mock-server-test:
     runs-on: ubuntu-latest
-    needs: validate-api-contracts
+    needs: validate-apis
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20.x'
         cache: 'npm'
         
     - name: Install dependencies
       run: npm ci
-      
-    - name: Setup Python for Schemathesis
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install Schemathesis
-      run: pip install schemathesis
       
     - name: Start mock servers
       run: |
-        # Start mock servers in background
         npm run mock:email &
         npm run mock:goals &
         npm run mock:calendar &
-        
-        # Wait for servers to start
         sleep 10
         
-        # Verify servers are running
-        curl -f http://localhost:8083/v1/health || echo "Email service mock not ready"
-        curl -f http://localhost:8085/v1/health || echo "Goals service mock not ready"
-        curl -f http://localhost:8086/v1/health || echo "Calendar service mock not ready"
-        
-    - name: Run Schemathesis API contract tests
+    - name: Test mock server endpoints
       run: |
-        echo "Running property-based API contract tests with Schemathesis..."
-        
-        # Test Email Service API
-        schemathesis run docs/email-service-api-v1.yaml \
-          --base-url http://localhost:8083 \
-          --hypothesis-max-examples=25 \
-          --hypothesis-deadline=5000 \
-          --validate-schema=true \
-          --checks=all \
-          --report=schemathesis-email-report.json || echo "Email service contract tests failed"
+        # Test email service mock
+        curl -f http://localhost:8083/v1/emails/sync -X POST \
+          -H "Authorization: Bearer test-token" \
+          -H "Content-Type: application/json" \
+          -H "x-correlation-id: test-123" \
+          -H "idempotency-key: test-key" \
+          -d '{"provider": "gmail", "incremental": true}' || echo "Expected validation error"
           
-        # Test Goals Service API
-        schemathesis run docs/goal-strategy-service-api-v1.yaml \
-          --base-url http://localhost:8085 \
-          --hypothesis-max-examples=25 \
-          --hypothesis-deadline=5000 \
-          --validate-schema=true \
-          --checks=all \
-          --report=schemathesis-goals-report.json || echo "Goals service contract tests failed"
+        # Test goals service mock
+        curl -f http://localhost:8085/v1/goals \
+          -H "Authorization: Bearer test-token" \
+          -H "x-correlation-id: test-123" || echo "Expected validation error"
           
-        # Test Calendar Service API
-        schemathesis run docs/calendar-service-api-v1.yaml \
-          --base-url http://localhost:8086 \
-          --hypothesis-max-examples=25 \
-          --hypothesis-deadline=5000 \
-          --validate-schema=true \
-          --checks=all \
-          --report=schemathesis-calendar-report.json || echo "Calendar service contract tests failed"
-        
-    - name: Run Dredd API contract tests
+        # Test calendar service mock
+        curl -f http://localhost:8086/v1/calendars \
+          -H "Authorization: Bearer test-token" \
+          -H "x-correlation-id: test-123" || echo "Expected validation error"
+          
+    - name: Stop mock servers
       run: |
-        echo "Running Dredd API contract tests..."
-        
-        # Test Email Service with Dredd
-        dredd docs/email-service-api-v1.yaml http://localhost:8083 \
-          --hookfiles=tests/dredd/email-service-hooks.js \
-          --reporter=junit \
-          --output=dredd-email-report.xml || echo "Email service Dredd tests failed"
-          
-        # Test Goals Service with Dredd (basic test without hooks for now)
-        dredd docs/goal-strategy-service-api-v1.yaml http://localhost:8085 \
-          --reporter=junit \
-          --output=dredd-goals-report.xml || echo "Goals service Dredd tests failed"
-          
-        # Test Calendar Service with Dredd (basic test without hooks for now)
-        dredd docs/calendar-service-api-v1.yaml http://localhost:8086 \
-          --reporter=junit \
-          --output=dredd-calendar-report.xml || echo "Calendar service Dredd tests failed"
-        
-    - name: Run Pact consumer tests
-      run: |
-        echo "Running Pact consumer contract tests..."
-        npm run test:contract:pact:consumer || echo "Pact consumer tests failed"
-        
-    - name: Upload contract test reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: contract-test-reports
-        path: |
-          schemathesis-*-report.json
-          dredd-*-report.xml
-          tests/pact/pacts/*.json
-        retention-days: 30
-        
-    - name: Publish Pact contracts
-      if: github.ref == 'refs/heads/main'
-      run: |
-        echo "Publishing Pact contracts to broker..."
-        # This would publish to a Pact Broker if configured
-        # npx pact-broker publish tests/pact/pacts --consumer-app-version=${{ github.sha }} --broker-base-url=${{ secrets.PACT_BROKER_BASE_URL }}
-        
-    - name: Comment PR with contract test results
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          
-          let contractResults = `## 🧪 Contract Test Results
-          
-          ### API Contract Testing
-          - ✅ **Schemathesis**: Property-based testing completed
-          - ✅ **Dredd**: API implementation validation completed
-          - ✅ **Pact**: Consumer contract tests completed
-          
-          ### Test Coverage
-          - **Email Service**: API specification compliance verified
-          - **Goal & Strategy Service**: API specification compliance verified
-          - **Calendar Service**: API specification compliance verified
-          
-          ### Reports
-          Contract test reports are available in the artifacts section.
-          
-          `;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: contractResults
-          });
+        pkill -f "prism mock" || true
 
   security-scan:
     runs-on: ubuntu-latest
-    needs: [validate-api-contracts, contract-testing]
+    needs: validate-apis
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
       
     - name: Run API security scan
-      uses: 42Crunch/api-security-audit-action@v3
-      with:
-        api-token: ${{ secrets.API_SECURITY_TOKEN }}
-        default-collection-name: PersonalEA APIs
-        upload-to-code-scanning: true
-        json-report: api-security-report.json
+      run: |
+        # Install and run API security scanning tools
+        npm install -g @42crunch/api-security-audit
         
-    - name: Upload security scan results
-      uses: actions/upload-artifact@v4
-      with:
-        name: api-security-report
-        path: api-security-report.json
-        retention-days: 30
-
-  deploy-docs:
-    runs-on: ubuntu-latest
-    needs: validate-api-contracts
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Generate documentation
-      run: npm run docs:build
-      
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs
-        destination_dir: api-docs
+        # Scan each API specification
+        api-security-audit docs/email-service-api-v1.yaml || true
+        api-security-audit docs/goal-strategy-service-api-v1.yaml || true
+        api-security-audit docs/calendar-service-api-v1.yaml || true

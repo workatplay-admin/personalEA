@@ -1,4 +1,4 @@
-extends: ["@stoplight/spectral/rulesets/oas"]
+extends: ["spectral:oas"]
 
 rules:
   # Custom rules for personalEA API standards
@@ -48,7 +48,13 @@ rules:
         function: "truthy"
   
   # Require security schemes for all operations
-  operation-security-defined: error
+  operation-security-defined:
+    description: "All operations should have security defined"
+    given: "$.paths[*][*]"
+    severity: error
+    then:
+      field: "security"
+      function: "truthy"
   
   # Enforce consistent naming for webhook endpoints
   webhook-naming:
@@ -74,7 +80,7 @@ rules:
   # Enforce ETag headers for resource operations
   etag-headers:
     description: "Resource operations should include ETag headers"
-    given: "$.paths[*].(put|patch).responses.200.headers"
+    given: "$.paths[*][put,patch].responses.200.headers"
     severity: warn
     then:
       field: "ETag"
@@ -83,7 +89,7 @@ rules:
   # Require idempotency keys for write operations
   idempotency-keys:
     description: "Write operations should support idempotency keys"
-    given: "$.paths[*].(post|put|patch).parameters[*]"
+    given: "$.paths[*][post,put,patch].parameters[*]"
     severity: warn
     then:
       field: "$ref"
@@ -113,6 +119,7 @@ rules:
             "409": true
             "429": true
             "500": true
+            "503": true
           additionalProperties: false
   
   # Require rate limiting documentation
