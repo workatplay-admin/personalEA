@@ -1,0 +1,250 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Email provider configurations
+  emailProviders EmailProvider[]
+  
+  // User's emails
+  emails Email[]
+  
+  // Email digests
+  digests EmailDigest[]
+  
+  // Sync jobs
+  syncJobs EmailSyncJob[]
+
+  @@map("users")
+}
+
+model EmailProvider {
+  id           String              @id @default(cuid())
+  userId       String
+  providerType EmailProviderType
+  
+  // OAuth tokens (encrypted)
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+  
+  // IMAP/SMTP configuration
+  imapHost     String?
+  imapPort     Int?
+  smtpHost     String?
+  smtpPort     Int?
+  username     String?
+  password     String? // encrypted
+  
+  // Provider-specific settings
+  settings     Json?
+  
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, providerType])
+  @@map("email_providers")
+}
+
+model Email {
+  id              String   @id @default(cuid())
+  userId          String
+  providerId      String?
+  
+  // Email metadata
+  messageId       String   @unique // Provider's message ID
+  threadId        String?
+  subject         String
+  sender          String
+  recipients      String[] // JSON array of recipients
+  ccRecipients    String[] // JSON array of CC recipients
+  bccRecipients   String[] // JSON array of BCC recipients
+  
+  // Content
+  textContent     String?
+  htmlContent     String?
+  snippet         String?
+  
+  // Gmail-specific
+  labels          String[] // Gmail labels
+  
+  // Timestamps
+  receivedAt      DateTime
+  sentAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // AI Processing
+  isProcessed     Boolean  @default(false)
+  processingError String?
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // AI-generated content
+  summary         EmailSummary?
+  actionItems     ActionItem[]
+  
+  // Digest associations
+  digestItems     EmailDigestItem[]
+
+  @@index([userId, receivedAt])
+  @@index([userId, labels])
+  @@index([messageId])
+  @@map("emails")
+}
+
+model EmailSummary {
+  id              String  @id @default(cuid())
+  emailId         String  @unique
+  
+  // AI-generated content
+  summary         String
+  category        EmailCategory
+  confidenceScore Float
+  keyPoints       String[] // JSON array
+  
+  // Processing metadata
+  model           String   // AI model used
+  processingTime  Int      // milliseconds
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@map("email_summaries")
+}
+
+model ActionItem {
+  id              String         @id @default(cuid())
+  emailId         String
+  
+  // Action item content
+  text            String
+  priority        ActionPriority
+  confidenceScore Float
+  deadline        DateTime?
+  
+  // Processing metadata
+  extractedAt     DateTime @default(now())
+  
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId])
+  @@map("action_items")
+}
+
+model EmailDigest {
+  id          String   @id @default(cuid())
+  userId      String
+  
+  // Digest metadata
+  title       String
+  summary     String
+  timeWindow  Json     // { start: DateTime, end: DateTime }
+  filters     Json?    // labels, categories, etc.
+  
+  // Generation metadata
+  generatedAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Digest items
+  items EmailDigestItem[]
+
+  @@index([userId, generatedAt])
+  @@map("email_digests")
+}
+
+model EmailDigestItem {
+  id       String @id @default(cuid())
+  digestId String
+  emailId  String
+  
+  // Item-specific summary (may differ from full email summary)
+  summary  String?
+  order    Int    @default(0)
+
+  digest EmailDigest @relation(fields: [digestId], references: [id], onDelete: Cascade)
+  email  Email       @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@unique([digestId, emailId])
+  @@map("email_digest_items")
+}
+
+model EmailSyncJob {
+  id            String         @id @default(cuid())
+  userId        String
+  
+  // Job configuration
+  syncOptions   Json           // labels, since, maxResults, etc.
+  
+  // Job status
+  status        JobStatus      @default(PENDING)
+  progress      Int            @default(0) // 0-100
+  
+  // Results
+  emailsFound   Int?
+  emailsSynced  Int?
+  errors        Json?          // Array of error messages
+  
+  // Timestamps
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([createdAt])
+  @@map("email_sync_jobs")
+}
+
+// Enums
+enum EmailProviderType {
+  GMAIL
+  OUTLOOK
+  IMAP
+  EXCHANGE
+}
+
+enum EmailCategory {
+  URGENT
+  IMPORTANT
+  INFORMATIONAL
+  ACTIONABLE
+  FOLLOW_UP
+  SPAM
+  PROMOTIONAL
+}
+
+enum ActionPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
