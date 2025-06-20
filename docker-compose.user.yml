@@ -18,6 +18,8 @@ services:
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this}
       - SESSION_SECRET=${SESSION_SECRET:-your-super-secret-session-key-change-this}
       - EMAIL_ENCRYPTION_KEY=${EMAIL_ENCRYPTION_KEY:-your-32-char-encryption-key-here}
+      # Centralized API key configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -80,6 +82,8 @@ services:
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this}
       - EMAIL_ENCRYPTION_KEY=${EMAIL_ENCRYPTION_KEY:-your-32-char-encryption-key-here}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+      # Centralized API key configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       db:
         condition: service_healthy

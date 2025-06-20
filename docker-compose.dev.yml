@@ -50,6 +50,8 @@ services:
       JWT_REFRESH_EXPIRES_IN: 7d
       CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
       LOG_LEVEL: debug
+      # Centralized API key configuration
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     ports:
       - "3001:3001"
     depends_on:

@@ -59,6 +59,27 @@ All services are designed with OpenAPI 3.1 specifications following contract-fir
 - Docker and Docker Compose
 - Git
 
+### 🔑 Secret Management Setup
+
+PersonalEA uses a centralized configuration approach for managing API keys and secrets:
+
+1. **Copy the environment template**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Configure your OpenAI API key**
+   ```bash
+   # Edit .env and replace the placeholder with your real API key
+   OPENAI_API_KEY=sk-your-actual-openai-api-key-here
+   ```
+
+3. **How it works**
+   - Root [`config/default.json`](config/default.json) references `${OPENAI_API_KEY}` environment variable
+   - All services automatically inherit this configuration
+   - No need to configure API keys in individual service `.env` files
+   - Centralized secret management ensures consistency across all services
+
 ### Setup Development Environment
 
 **Option 1: Full Development Environment (Recommended)**
@@ -406,6 +427,8 @@ See [`docs/development-plan.md`](docs/development-plan.md) for detailed deployme
 - [`docs/goal-strategy-service-specification.md`](docs/goal-strategy-service-specification.md) - Comprehensive Goal & Strategy Service technical specification
 - [`docs/contract-testing.md`](docs/contract-testing.md) - Contract testing guide and best practices
 - [`docs/mock-servers.md`](docs/mock-servers.md) - Enhanced mock server setup and usage guide
+- [`docs/configuration-management-plan.md`](docs/configuration-management-plan.md) - Configuration management system overview
+- [`docs/secret-management-guide.md`](docs/secret-management-guide.md) - Centralized secret management guide and best practices
 - [`client-dev-kit/README.md`](client-dev-kit/README.md) - Client development kit documentation
 - [`docs/api-spec.md`](docs/api-spec.md) - API specification guidelines
 - Generated API docs in `docs/*-docs.html`

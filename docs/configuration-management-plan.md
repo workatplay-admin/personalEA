@@ -4,6 +4,39 @@
 
 This document outlines the comprehensive configuration management system for PersonalEA, designed to provide user-friendly configuration options for both technical and non-technical users.
 
+## 🔑 Centralized Secret Management
+
+PersonalEA implements a centralized approach to managing API keys and secrets:
+
+### Root-Level Configuration
+- **Primary Config**: [`config/default.json`](../config/default.json) - Central configuration file
+- **Environment Variables**: [`.env`](../.env.example) - Root-level environment variables
+- **Template**: [`.env.example`](../.env.example) - Template for new installations
+
+### How It Works
+```json
+{
+  "openaiApiKey": "${OPENAI_API_KEY}"
+}
+```
+
+1. **Root configuration** references environment variables using `${VARIABLE_NAME}` syntax
+2. **All services** inherit configuration from the root level automatically
+3. **Single source of truth** for API keys and secrets across the entire system
+4. **No duplication** - API keys are configured once at the root level
+
+### Benefits
+- **Consistency**: All services use the same API keys
+- **Security**: Single location to manage and rotate secrets
+- **Simplicity**: Configure once, use everywhere
+- **Maintainability**: Easy to update and audit secret usage
+
+### Service Integration
+Services access the centralized configuration through:
+- Environment variable inheritance from root `.env` file
+- Configuration injection from root `config/default.json`
+- No need for service-specific API key configuration
+
 ## 🏗️ Configuration Architecture
 
 ### 1. Multi-Layer Configuration System
@@ -24,13 +57,40 @@ This document outlines the comprehensive configuration management system for Per
 └─────────────────────────────────────┘
 ```
 
+### Root vs Service-Specific Configuration
+
+PersonalEA uses a hybrid approach combining centralized and service-specific configuration:
+
+#### Centralized Configuration (Root Level)
+- **API Keys & Secrets**: Managed centrally in root `.env` and `config/default.json`
+- **Global Settings**: Cross-service configuration like logging levels, security settings
+- **Infrastructure**: Database connections, Redis URLs, shared resources
+
+#### Service-Specific Configuration
+- **Service Ports**: Each service has its own port configuration
+- **Service Features**: Feature flags specific to individual services
+- **Service Behavior**: Rate limiting, timeouts, service-specific business logic
+
+#### Configuration Inheritance
+```
+Root Configuration (.env + config/default.json)
+├── OPENAI_API_KEY → Inherited by all services
+├── JWT_SECRET → Inherited by all services
+├── DATABASE_URL → Inherited by all services
+└── Service-Specific (.env files)
+    ├── PORT → Service-specific
+    ├── FEATURE_FLAGS → Service-specific
+    └── RATE_LIMITS → Service-specific
+```
+
 ### 2. Configuration Sources (Priority Order)
 
 1. **User Interface Settings** (Highest priority)
 2. **Environment Variables** (Override for deployment)
-3. **Configuration Files** (Local customization)
-4. **Database Settings** (Persistent user preferences)
-5. **Default Values** (Fallback)
+3. **Root Configuration Files** (Centralized settings)
+4. **Service Configuration Files** (Service-specific settings)
+5. **Database Settings** (Persistent user preferences)
+6. **Default Values** (Fallback)
 
 ## 🖥️ User Interface Components
 

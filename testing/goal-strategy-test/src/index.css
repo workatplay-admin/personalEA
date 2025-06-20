@@ -28,3 +28,10 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+/* Additional styling for input boxes to ensure visibility */
+input, textarea {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+}
