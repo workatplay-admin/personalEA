@@ -24,7 +24,7 @@ Contract testing ensures that:
 npm run test:contract:schemathesis
 
 # Individual service testing
-schemathesis run docs/email-service-api-v1.yaml --base-url http://localhost:8083
+schemathesis run docs/email-service-api-v1.yaml --url http://localhost:8083
 ```
 
 #### Dredd (Implementation Validation)
@@ -115,12 +115,11 @@ Contract tests run automatically in GitHub Actions:
 
 ### Schemathesis Configuration
 
-```python
-# Configured via CLI parameters
---hypothesis-max-examples=25    # Number of test cases per endpoint
---hypothesis-deadline=5000      # Timeout per test case (ms)
---validate-schema=true          # Validate response schemas
---checks=all                    # Run all available checks
+```bash
+# Configured via CLI parameters (v4 syntax)
+--max-examples=25               # Number of test cases per endpoint
+--phases=examples,fuzzing       # Test phases to run
+--checks=all                    # Run all available checks (default in v4)
 ```
 
 ### Dredd Configuration
@@ -259,7 +258,7 @@ hooks.after('/v1/digest > GET', (transaction, done) => {
 
 ```bash
 # Verbose Schemathesis output
-schemathesis run docs/email-service-api-v1.yaml --base-url http://localhost:8083 --verbosity=2
+schemathesis run docs/email-service-api-v1.yaml --url http://localhost:8083
 
 # Dredd with detailed output
 dredd docs/email-service-api-v1.yaml http://localhost:8083 --level=debug
