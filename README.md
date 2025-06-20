@@ -24,9 +24,22 @@ All services are designed with OpenAPI 3.1 specifications following contract-fir
 ### Prerequisites
 
 - Node.js 18+ and npm 9+
+- Docker and Docker Compose
 - Git
 
 ### Setup Development Environment
+
+**Option 1: Full Development Environment (Recommended)**
+```bash
+# Clone the repository
+git clone <repository-url>
+cd personalEA
+
+# Run the automated setup script
+./scripts/setup-dev.sh
+```
+
+**Option 2: Manual Setup**
 
 1. **Clone the repository**
    ```bash
@@ -39,12 +52,28 @@ All services are designed with OpenAPI 3.1 specifications following contract-fir
    npm install
    ```
 
-3. **Validate API specifications**
+3. **Setup services**
+   ```bash
+   # Start PostgreSQL and Redis
+   docker-compose -f docker-compose.dev.yml up -d postgres redis
+   
+   # Setup environment files
+   cp services/email-processing/.env.example services/email-processing/.env
+   ```
+
+4. **Start the email processing service**
+   ```bash
+   cd services/email-processing
+   npm install
+   npm run dev
+   ```
+
+5. **Validate API specifications**
    ```bash
    npm run validate:api
    ```
 
-4. **Start enhanced mock servers for development**
+6. **Start enhanced mock servers for development**
    ```bash
    # Quick start with Docker Compose (Recommended)
    npm run mock:docker
@@ -56,20 +85,21 @@ All services are designed with OpenAPI 3.1 specifications following contract-fir
    npm run mock:all
    ```
 
-5. **Access mock services**
-   - Email Service: http://localhost:8083
-   - Goal & Strategy Service: http://localhost:8085
-   - Calendar Service: http://localhost:8086
+7. **Access services**
+   - Email Processing Service: http://localhost:3001
+   - Email Service Mock: http://localhost:8083
+   - Goal & Strategy Service Mock: http://localhost:8085
+   - Calendar Service Mock: http://localhost:8086
    - Mock Data Server: http://localhost:8090
 
-6. **Try the client development kit**
+8. **Try the client development kit**
    ```bash
    cd client-dev-kit
    npm install
    npm run examples
    ```
 
-5. **Generate and serve API documentation**
+9. **Generate and serve API documentation**
    ```bash
    npm run docs:build  # Generate static HTML docs
    npm run docs:serve  # Serve interactive docs on port 8080

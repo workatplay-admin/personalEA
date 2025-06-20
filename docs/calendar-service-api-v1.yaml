@@ -24,6 +24,10 @@ info:
     **Concurrency Control:**
     - All PUT/PATCH operations require If-Match header with ETag to prevent lost updates
     - ETags are returned in response headers and must be used for subsequent updates
+  contact:
+    name: Personal EA Development Team
+    email: dev@personalea.com
+    url: https://github.com/workatplay-admin/personalEA
 
 servers:
   - url: http://calendar-service:8086
@@ -32,11 +36,30 @@ servers:
 security:
   - bearerAuth: []
 
+tags:
+  - name: Calendars
+    description: Calendar connection and management
+  - name: Events
+    description: Calendar event operations
+  - name: Availability
+    description: Availability checking and scheduling
+  - name: Scheduling
+    description: Intelligent scheduling suggestions
+  - name: Sync
+    description: Calendar synchronization operations
+  - name: Webhooks
+    description: Webhook endpoints for events
+  - name: Jobs
+    description: Asynchronous job management
+
 paths:
   /v1/calendars:
     get:
       summary: Retrieve all connected calendars
+      description: Retrieves a list of all calendars connected to the user's account with their sync status and permissions.
       operationId: getCalendars
+      tags:
+        - Calendars
       security:
         - bearerAuth: [calendar.read]
       parameters:
@@ -91,7 +114,10 @@ paths:
 
     post:
       summary: Connect a new calendar
+      description: Connects a new calendar from a supported provider (Google, Outlook, Apple, CalDAV) to the user's account.
       operationId: connectCalendar
+      tags:
+        - Calendars
       security:
         - bearerAuth: [calendar.write]
       parameters:
@@ -141,7 +167,10 @@ paths:
   /v1/calendars/{calendar_id}/sync:
     post:
       summary: Trigger calendar synchronization
+      description: Initiates synchronization of events from the external calendar provider to the local system.
       operationId: syncCalendar
+      tags:
+        - Sync
       security:
         - bearerAuth: [calendar.sync]
       parameters:
@@ -174,7 +203,7 @@ paths:
                 $ref: 'components/common.yaml#/components/schemas/JobStatus'
               example:
                 job_id: "550e8400-e29b-41d4-a716-446655440001"
-                status: "pending"
+                state: "pending"
                 created_at: "2025-06-19T22:20:00Z"
                 message: "Calendar sync initiated"
         '400':
@@ -195,7 +224,10 @@ paths:
   /v1/events:
     get:
       summary: Retrieve calendar events
+      description: Retrieves calendar events within a specified time range with optional filtering by calendar and status.
       operationId: getEvents
+      tags:
+        - Events
       security:
         - bearerAuth: [calendar.read]
       parameters:
@@ -271,7 +303,10 @@ paths:
 
     post:
       summary: Create a new calendar event
+      description: Creates a new event in the specified calendar with attendees, reminders, and recurrence options.
       operationId: createEvent
+      tags:
+        - Events
       security:
         - bearerAuth: [calendar.write]
       parameters:
@@ -332,7 +367,10 @@ paths:
   /v1/events/{event_id}:
     get:
       summary: Retrieve a specific event
+      description: Retrieves detailed information about a specific calendar event including attendees and recurrence.
       operationId: getEvent
+      tags:
+        - Events
       security:
         - bearerAuth: [calendar.read]
       parameters:
@@ -370,7 +408,10 @@ paths:
 
     put:
       summary: Update an event
+      description: Updates an existing calendar event with optimistic locking using ETag for concurrency control.
       operationId: updateEvent
+      tags:
+        - Events
       security:
         - bearerAuth: [calendar.write]
       parameters:
@@ -382,7 +423,7 @@ paths:
           description: Unique identifier for the event
           example: "evt_123"
         - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - name: If-Match
+        - name: if_match
           in: header
           required: true
           schema:
@@ -431,7 +472,10 @@ paths:
 
     delete:
       summary: Delete an event
+      description: Deletes a calendar event with optional notification to attendees and ETag-based concurrency control.
       operationId: deleteEvent
+      tags:
+        - Events
       security:
         - bearerAuth: [calendar.write]
       parameters:
@@ -443,7 +487,7 @@ paths:
           description: Unique identifier for the event
           example: "evt_123"
         - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - name: If-Match
+        - name: if_match
           in: header
           required: true
           schema:
@@ -476,7 +520,10 @@ paths:
   /v1/availability:
     get:
       summary: Check availability for scheduling
+      description: Analyzes calendar availability within a time range and provides scheduling suggestions with conflict detection.
       operationId: getAvailability
+      tags:
+        - Availability
       security:
         - bearerAuth: [calendar.read]
       parameters:
@@ -565,7 +612,10 @@ paths:
   /v1/scheduling/suggestions:
     post:
       summary: Get intelligent scheduling suggestions
+      description: Generates AI-powered scheduling suggestions based on attendee availability, preferences, and priority.
       operationId: getSchedulingSuggestions
+      tags:
+        - Scheduling
       security:
         - bearerAuth: [calendar.read]
       parameters:
@@ -634,7 +684,10 @@ paths:
   /v1/events/calendar-synced:
     post:
       summary: Webhook endpoint for calendar sync events
+      description: Handles webhook notifications when calendar synchronization operations complete.
       operationId: handleCalendarSyncedEvent
+      tags:
+        - Webhooks
       security:
         - bearerAuth: [calendar.write]
       parameters:
@@ -659,11 +712,20 @@ paths:
                   event_id:
                     type: string
                     example: "event_789"
+        '400':
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/jobs/{job_id}:
     get:
       summary: Get status of an asynchronous job
+      description: Retrieves the current status and progress of an asynchronous job such as calendar synchronization.
       operationId: getJobStatus
+      tags:
+        - Jobs
       security:
         - bearerAuth: []
       parameters:
@@ -691,6 +753,8 @@ paths:
                 $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
           $ref: 'components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
 components:
   schemas:
@@ -1514,7 +1578,7 @@ components:
               type: string
               format: duration
               description: Time taken for sync (ISO 8601 duration)
-              example: "PT5.2S"
+              example: "PT5S"
             error_message:
               type: string
               description: Error message if sync failed

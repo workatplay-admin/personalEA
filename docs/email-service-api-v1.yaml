@@ -17,6 +17,10 @@ info:
     **Authentication:**
     - Requires JWT with `email.read` scope for read operations
     - Requires JWT with `email.write` scope for sync operations
+  contact:
+    name: Personal EA Development Team
+    email: dev@personalea.com
+    url: https://github.com/workatplay-admin/personalEA
 
 servers:
   - url: http://email-service:8084
@@ -25,11 +29,28 @@ servers:
 security:
   - bearerAuth: []
 
+tags:
+  - name: Email Sync
+    description: Email synchronization operations
+  - name: Email Digest
+    description: Email digest generation
+  - name: Email Summary
+    description: Individual email summarization
+  - name: Action Items
+    description: Action item extraction from emails
+  - name: Webhooks
+    description: Webhook endpoints for events
+  - name: Jobs
+    description: Asynchronous job management
+
 paths:
   /v1/emails/sync:
     post:
       summary: Initiate email synchronization from Google Suite
+      description: Starts an asynchronous job to sync emails from Google Suite for the specified user. Returns a job ID that can be used to track progress.
       operationId: syncEmails
+      tags:
+        - Email Sync
       security:
         - bearerAuth: [email.write]
       parameters:
@@ -59,13 +80,22 @@ paths:
           $ref: 'components/common.yaml#/components/responses/Forbidden'
         '429':
           $ref: 'components/common.yaml#/components/responses/RateLimited'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '503':
           $ref: 'components/common.yaml#/components/responses/ServiceUnavailable'
 
   /v1/emails/digest:
     post:
       summary: Generate email digest for specified time window and labels
+      description: Creates a summarized digest of emails within the specified time window, filtered by labels and categories.
       operationId: generateEmailDigest
+      tags:
+        - Email Digest
       security:
         - bearerAuth: [email.read]
       parameters:
@@ -121,7 +151,10 @@ paths:
   /v1/emails/{email_id}/summary:
     get:
       summary: Get summary of a specific email
+      description: Retrieves an AI-generated summary of a specific email including key points and categorization.
       operationId: getEmailSummary
+      tags:
+        - Email Summary
       security:
         - bearerAuth: [email.read]
       parameters:
@@ -166,7 +199,10 @@ paths:
   /v1/emails/{email_id}/action-items:
     get:
       summary: Get actionable items from a specific email
+      description: Extracts and returns actionable items identified within a specific email with confidence scores and priorities.
       operationId: getEmailActionItems
+      tags:
+        - Action Items
       security:
         - bearerAuth: [email.read]
       parameters:
@@ -224,7 +260,10 @@ paths:
   /v1/events/email-ingested:
     post:
       summary: Webhook endpoint for email ingestion events
+      description: Handles webhook notifications when new emails are ingested into the system.
       operationId: handleEmailIngestedEvent
+      tags:
+        - Webhooks
       security:
         - bearerAuth: [email.write]
       parameters:
@@ -268,7 +307,10 @@ paths:
   /v1/jobs/{job_id}:
     get:
       summary: Get status of an asynchronous job
+      description: Retrieves the current status and progress of an asynchronous job such as email synchronization.
       operationId: getJobStatus
+      tags:
+        - Jobs
       security:
         - bearerAuth: []
       parameters:
@@ -292,7 +334,7 @@ paths:
                 job_id: "550e8400-e29b-41d4-a716-446655440001"
                 state: "completed"
                 percent_complete: 100
-                result_location: "/v1/emails/sync/results/550e8400-e29b-41d4-a716-446655440001"
+                result_location: "https://api.personalea.com/v1/emails/sync/results/550e8400-e29b-41d4-a716-446655440001"
                 created_at: "2025-06-19T22:10:00Z"
                 updated_at: "2025-06-19T22:15:00Z"
                 metadata:
@@ -307,12 +349,21 @@ paths:
                 $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
           $ref: 'components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
 components:
   schemas:
     EmailSyncRequest:
       type: object
       required: [user_id, access_token]
+      example:
+        user_id: "user_123"
+        access_token: "ya29.a0AfH6SMC..."
+        sync_options:
+          labels: ["INBOX", "IMPORTANT"]
+          since: "2025-06-19T00:00:00Z"
+          max_results: 1000
       properties:
         user_id:
           type: string
@@ -347,6 +398,13 @@ components:
     EmailDigestRequest:
       type: object
       required: [user_id, time_window]
+      example:
+        user_id: "user_123"
+        time_window:
+          start: "2025-06-19T00:00:00Z"
+          end: "2025-06-19T23:59:59Z"
+        labels: ["INBOX", "IMPORTANT"]
+        categories: ["urgent", "actionable"]
       properties:
         user_id:
           type: string
@@ -383,6 +441,23 @@ components:
     EmailDigestResponse:
       type: object
       required: [digest_id, generated_at, summary, emails, pagination]
+      example:
+        digest_id: "digest_456"
+        generated_at: "2025-06-19T22:15:00Z"
+        summary: "You have 5 urgent emails requiring immediate attention and 12 informational updates."
+        emails:
+          - email_id: "email_789"
+            subject: "Urgent: Client meeting moved to tomorrow"
+            sender: "client@example.com"
+            category: "urgent"
+            summary: "Client has moved the meeting from Friday to tomorrow at 2 PM"
+            action_items: ["Update calendar", "Prepare presentation"]
+            received_at: "2025-06-19T14:30:00Z"
+        pagination:
+          limit: 20
+          cursor: "eyJpZCI6MTIzLCJ0aW1lc3RhbXAiOiIyMDI1LTA2LTE5VDIyOjE1OjAwWiJ9"
+          has_more: true
+          total_count: 17
       properties:
         digest_id:
           type: string
@@ -407,6 +482,14 @@ components:
     EmailDigestItem:
       type: object
       required: [email_id, subject, sender, category, summary, received_at]
+      example:
+        email_id: "email_789"
+        subject: "Urgent: Client meeting moved to tomorrow"
+        sender: "client@example.com"
+        category: "urgent"
+        summary: "Client has moved the meeting from Friday to tomorrow at 2 PM"
+        action_items: ["Update calendar", "Prepare presentation"]
+        received_at: "2025-06-19T14:30:00Z"
       properties:
         email_id:
           type: string
@@ -444,6 +527,18 @@ components:
     EmailSummaryResponse:
       type: object
       required: [email_id, subject, sender, summary, category, confidence_score, received_at]
+      example:
+        email_id: "email_789"
+        subject: "Urgent: Client meeting moved to tomorrow"
+        sender: "client@example.com"
+        summary: "Client has moved the meeting from Friday to tomorrow at 2 PM due to scheduling conflict"
+        category: "urgent"
+        confidence_score: 0.95
+        key_points:
+          - "Meeting rescheduled from Friday to tomorrow"
+          - "New time: 2 PM"
+          - "Reason: scheduling conflict"
+        received_at: "2025-06-19T14:30:00Z"
       properties:
         email_id:
           type: string
@@ -487,6 +582,22 @@ components:
     ActionItemsResponse:
       type: object
       required: [email_id, action_items, pagination]
+      example:
+        email_id: "email_789"
+        action_items:
+          - text: "Update calendar with new meeting time"
+            confidence_score: 0.92
+            priority: "high"
+            deadline: "2025-06-20T14:00:00Z"
+          - text: "Prepare presentation for client meeting"
+            confidence_score: 0.87
+            priority: "medium"
+            deadline: "2025-06-20T14:00:00Z"
+        pagination:
+          limit: 20
+          offset: 0
+          has_more: false
+          total_count: 2
       properties:
         email_id:
           type: string
@@ -515,6 +626,11 @@ components:
     ActionItem:
       type: object
       required: [text, confidence_score, priority]
+      example:
+        text: "Update calendar with new meeting time"
+        confidence_score: 0.92
+        priority: "high"
+        deadline: "2025-06-20T14:00:00Z"
       properties:
         text:
           type: string
@@ -540,6 +656,15 @@ components:
     EmailIngestedEvent:
       type: object
       required: [event_type, user_id, email_id, timestamp]
+      example:
+        event_type: "email-ingested"
+        user_id: "user_123"
+        email_id: "email_789"
+        timestamp: "2025-06-19T22:15:00Z"
+        metadata:
+          subject: "Urgent: Client meeting moved to tomorrow"
+          sender: "client@example.com"
+          category: "urgent"
       properties:
         event_type:
           type: string

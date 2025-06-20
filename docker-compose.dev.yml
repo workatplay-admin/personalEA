@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: personalea-postgres
+    environment:
+      POSTGRES_DB: personalea
+      POSTGRES_USER: personalea
+      POSTGRES_PASSWORD: personalea_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./shared/database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U personalea"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: personalea-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Email Processing Service
+  email-service:
+    build:
+      context: ./services/email-processing
+      dockerfile: Dockerfile
+    container_name: personalea-email-service
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://personalea:personalea_dev_password@postgres:5432/personalea
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: development-jwt-secret-key-at-least-32-characters-long
+      JWT_EXPIRES_IN: 24h
+      JWT_REFRESH_EXPIRES_IN: 7d
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+      LOG_LEVEL: debug
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/email-processing/src:/app/src
+      - ./services/email-processing/logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Goal & Strategy Service (placeholder)
+  goal-service:
+    image: node:18-alpine
+    container_name: personalea-goal-service
+    working_dir: /app
+    command: ["sh", "-c", "echo 'Goal service placeholder - to be implemented' && sleep infinity"]
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      DATABASE_URL: postgresql://personalea:personalea_dev_password@postgres:5432/personalea
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  # Calendar Service (placeholder)
+  calendar-service:
+    image: node:18-alpine
+    container_name: personalea-calendar-service
+    working_dir: /app
+    command: ["sh", "-c", "echo 'Calendar service placeholder - to be implemented' && sleep infinity"]
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      DATABASE_URL: postgresql://personalea:personalea_dev_password@postgres:5432/personalea
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+
+  # Dialog Gateway (placeholder)
+  dialog-gateway:
+    image: node:18-alpine
+    container_name: personalea-dialog-gateway
+    working_dir: /app
+    command: ["sh", "-c", "echo 'Dialog gateway placeholder - to be implemented' && sleep infinity"]
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+    depends_on:
+      - email-service
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: personalea-network

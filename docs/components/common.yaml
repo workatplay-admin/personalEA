@@ -90,7 +90,7 @@ components:
           type: string
           format: uri
           description: URL to fetch the job result (available when state is completed)
-          example: "/v1/emails/digest/results/550e8400-e29b-41d4-a716-446655440001"
+          example: "https://api.personalea.com/v1/emails/digest/results/550e8400-e29b-41d4-a716-446655440001"
         created_at:
           type: string
           format: date-time
@@ -115,7 +115,7 @@ components:
 
   parameters:
     CorrelationIdHeader:
-      name: X-Correlation-Id
+      name: x_correlation_id
       in: header
       required: true
       schema:
@@ -125,7 +125,7 @@ components:
       example: "550e8400-e29b-41d4-a716-446655440002"
 
     IdempotencyKeyHeader:
-      name: Idempotency-Key
+      name: idempotency_key
       in: header
       required: true
       schema:
@@ -250,7 +250,7 @@ components:
             type: string
             format: uri
           description: URL to check job status
-          example: "/v1/jobs/550e8400-e29b-41d4-a716-446655440001"
+          example: "https://api.personalea.com/v1/jobs/550e8400-e29b-41d4-a716-446655440001"
       content:
         application/json:
           schema:

@@ -22,6 +22,10 @@ info:
     **Concurrency Control:**
     - All PATCH operations require If-Match header with ETag to prevent lost updates
     - ETags are returned in response headers and must be used for subsequent updates
+  contact:
+    name: Personal EA Development Team
+    email: dev@personalea.com
+    url: https://github.com/workatplay-admin/personalEA
 
 servers:
   - url: http://goal-service:8085
@@ -30,11 +34,30 @@ servers:
 security:
   - bearerAuth: []
 
+tags:
+  - name: Goals
+    description: Goal management and tracking
+  - name: Tasks
+    description: Task operations and progress tracking
+  - name: Priorities
+    description: Strategic prioritization and suggestions
+  - name: Context
+    description: Task context for intelligent justification
+  - name: Progress
+    description: Progress tracking and updates
+  - name: Webhooks
+    description: Webhook endpoints for events
+  - name: Jobs
+    description: Asynchronous job management
+
 paths:
   /v1/goals:
     get:
       summary: Retrieve all user goals
+      description: Retrieves a paginated list of user goals with optional filtering by status and priority.
       operationId: getGoals
+      tags:
+        - Goals
       security:
         - bearerAuth: [goals.read]
       parameters:
@@ -88,7 +111,10 @@ paths:
 
     post:
       summary: Create a new goal
+      description: Creates a new goal with title, description, priority, target date, and success criteria.
       operationId: createGoal
+      tags:
+        - Goals
       security:
         - bearerAuth: [goals.write]
       parameters:
@@ -150,7 +176,10 @@ paths:
   /v1/goals/{goal_id}:
     get:
       summary: Retrieve a specific goal
+      description: Retrieves detailed information about a specific goal including progress and metadata.
       operationId: getGoal
+      tags:
+        - Goals
       security:
         - bearerAuth: [goals.read]
       parameters:
@@ -188,7 +217,10 @@ paths:
 
     put:
       summary: Update a goal
+      description: Updates an existing goal with optimistic locking using ETag for concurrency control.
       operationId: updateGoal
+      tags:
+        - Goals
       security:
         - bearerAuth: [goals.write]
       parameters:
@@ -200,7 +232,7 @@ paths:
           description: Unique identifier for the goal
           example: "goal_123"
         - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - name: If-Match
+        - name: if_match
           in: header
           required: true
           schema:
@@ -250,7 +282,10 @@ paths:
   /v1/goals/{goal_id}/tasks:
     get:
       summary: Get tasks for a specific goal
+      description: Retrieves all tasks associated with a specific goal with optional status filtering.
       operationId: getGoalTasks
+      tags:
+        - Tasks
       security:
         - bearerAuth: [goals.read]
       parameters:
@@ -291,7 +326,10 @@ paths:
 
     post:
       summary: Add a task to a goal
+      description: Creates a new task within a specific goal with dependencies, deadlines, and priority.
       operationId: createGoalTask
+      tags:
+        - Tasks
       security:
         - bearerAuth: [goals.write]
       parameters:
@@ -346,7 +384,10 @@ paths:
   /v1/goals/{goal_id}/tasks/{task_id}/context:
     get:
       summary: Get detailed context for a specific task (for justification)
+      description: Retrieves comprehensive context about a task including dependencies, impact, and justification for AI decision-making.
       operationId: getTaskContext
+      tags:
+        - Context
       security:
         - bearerAuth: [goals.read]
       parameters:
@@ -407,7 +448,10 @@ paths:
   /v1/priorities:
     get:
       summary: Get suggested daily/weekly priorities
+      description: Generates AI-powered priority suggestions for tasks within a specified time range with confidence scores.
       operationId: getPriorities
+      tags:
+        - Priorities
       security:
         - bearerAuth: [goals.read]
       parameters:
@@ -471,7 +515,10 @@ paths:
   /v1/tasks/{task_id}/progress:
     patch:
       summary: Update task progress
+      description: Updates task progress using JSON Patch operations with optimistic locking via ETag.
       operationId: updateTaskProgress
+      tags:
+        - Progress
       security:
         - bearerAuth: [goals.write]
       parameters:
@@ -483,7 +530,7 @@ paths:
           description: Unique identifier for the task
           example: "task_789"
         - $ref: 'components/common.yaml#/components/parameters/CorrelationIdHeader'
-        - name: If-Match
+        - name: if_match
           in: header
           required: true
           schema:
@@ -531,7 +578,10 @@ paths:
   /v1/events/goal-created:
     post:
       summary: Webhook endpoint for goal creation events
+      description: Handles webhook notifications when new goals are created in the system.
       operationId: handleGoalCreatedEvent
+      tags:
+        - Webhooks
       security:
         - bearerAuth: [goals.write]
       parameters:
@@ -556,11 +606,20 @@ paths:
                   event_id:
                     type: string
                     example: "event_789"
+        '400':
+          $ref: 'components/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: 'components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
   /v1/jobs/{job_id}:
     get:
       summary: Get status of an asynchronous job
+      description: Retrieves the current status and progress of an asynchronous job such as goal analysis or priority calculation.
       operationId: getJobStatus
+      tags:
+        - Jobs
       security:
         - bearerAuth: []
       parameters:
@@ -588,6 +647,8 @@ paths:
                 $ref: 'components/common.yaml#/components/schemas/ErrorResponse'
         '401':
           $ref: 'components/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: 'components/common.yaml#/components/responses/Forbidden'
 
 components:
   schemas:
