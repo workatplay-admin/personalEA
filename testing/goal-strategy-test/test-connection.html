@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connection Test</title>
+</head>
+<body>
+    <h1>Testing Frontend-Backend Connection</h1>
+    <button onclick="testConnection()">Test Connection</button>
+    <div id="result"></div>
+
+    <script>
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing connection...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/v1/goals/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xMjMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJzY29wZXMiOlsiZ29hbHM6cmVhZCIsImdvYWxzOndyaXRlIiwibWlsZXN0b25lczpyZWFkIiwibWlsZXN0b25lczp3cml0ZSIsInRhc2tzOnJlYWQiLCJ0YXNrczp3cml0ZSJdLCJpYXQiOjE3NTAzODgxNTAsImV4cCI6MTc1MDQ3NDU1MH0.OIt7jE_A3EvuAZN2FnVbaagTfdtaPFaQk9YaZivTS_0',
+                        'X-OpenAI-API-Key': 'sk-test-key'
+                    },
+                    body: JSON.stringify({
+                        raw_goal: 'test connection'
+                    })
+                });
+                
+                const data = await response.text();
+                resultDiv.innerHTML = `
+                    <h3>✅ Connection Successful!</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Response:</strong> ${data}</p>
+                    <p style="color: green;">CORS is working! Frontend can now communicate with backend.</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>❌ Connection Failed</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

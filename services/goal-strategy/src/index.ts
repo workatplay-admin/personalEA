@@ -15,6 +15,7 @@ import milestoneRoutes from '@/routes/milestones';
 import wbsRoutes from '@/routes/wbs';
 import dependencyRoutes from '@/routes/dependencies';
 import estimationRoutes from '@/routes/estimations';
+import feedbackRoutes from '@/routes/feedback';
 // import taskRoutes from '@/routes/tasks';
 // import capacityRoutes from '@/routes/capacity';
 
@@ -48,7 +49,8 @@ app.use(cors({
     'X-Correlation-ID',
     'X-Requested-With',
     'Accept',
-    'Origin'
+    'Origin',
+    'X-OpenAI-API-Key'
   ],
   exposedHeaders: ['X-Correlation-ID']
 }));
@@ -100,6 +102,7 @@ apiRouter.use('/milestones', milestoneRoutes);
 apiRouter.use('/wbs', wbsRoutes);
 apiRouter.use('/dependencies', dependencyRoutes);
 apiRouter.use('/estimations', estimationRoutes);
+apiRouter.use('/feedback', feedbackRoutes);
 // apiRouter.use('/tasks', taskRoutes);
 // apiRouter.use('/capacity', capacityRoutes);
 

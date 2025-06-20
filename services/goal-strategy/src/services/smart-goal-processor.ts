@@ -58,27 +58,30 @@ export interface ClarificationAnswer {
 export class SMARTGoalProcessor {
   private readonly aiApiKey: string;
   private readonly aiModel: string;
+  private readonly mockMode: boolean;
 
   constructor() {
     this.aiApiKey = env.OPENAI_API_KEY;
     this.aiModel = env.OPENAI_MODEL || 'gpt-4';
+    this.mockMode = env.NODE_ENV === 'development' && (!this.aiApiKey || this.aiApiKey.startsWith('sk-test-'));
   }
 
   /**
    * Translate a raw goal into SMART format using AI analysis
    */
-  async translateGoal(input: RawGoalInput): Promise<GoalTranslationResult> {
+  async translateGoal(input: RawGoalInput, userApiKey?: string): Promise<GoalTranslationResult> {
     const correlationId = Math.random().toString(36).substring(7);
     
     logger.info('Starting SMART goal translation', {
       correlationId,
       rawGoal: input.goal,
-      hasContext: !!input.context
+      hasContext: !!input.context,
+      hasUserApiKey: !!userApiKey
     });
 
     try {
       const prompt = this.buildTranslationPrompt(input);
-      const aiResponse = await this.callOpenAI(prompt, correlationId);
+      const aiResponse = await this.callOpenAI(prompt, correlationId, userApiKey);
       const result = this.parseAIResponse(aiResponse);
 
       logger.info('SMART goal translation completed', {
@@ -105,19 +108,21 @@ export class SMARTGoalProcessor {
   async processClarifications(
     originalGoal: string,
     smartCriteria: SMARTCriteria,
-    answers: ClarificationAnswer[]
+    answers: ClarificationAnswer[],
+    userApiKey?: string
   ): Promise<GoalTranslationResult> {
     const correlationId = Math.random().toString(36).substring(7);
     
     logger.info('Processing goal clarifications', {
       correlationId,
       originalGoal,
-      answersCount: answers.length
+      answersCount: answers.length,
+      hasUserApiKey: !!userApiKey
     });
 
     try {
       const prompt = this.buildClarificationPrompt(originalGoal, smartCriteria, answers);
-      const aiResponse = await this.callOpenAI(prompt, correlationId);
+      const aiResponse = await this.callOpenAI(prompt, correlationId, userApiKey);
       const result = this.parseAIResponse(aiResponse);
 
       logger.info('Goal clarification processing completed', {
@@ -139,7 +144,7 @@ export class SMARTGoalProcessor {
   /**
    * Analyze goal completeness and suggest improvements
    */
-  async analyzeGoalCompleteness(smartCriteria: SMARTCriteria): Promise<{
+  async analyzeGoalCompleteness(smartCriteria: SMARTCriteria, userApiKey?: string): Promise<{
     completenessScore: number;
     strengths: string[];
     weaknesses: string[];
@@ -147,11 +152,14 @@ export class SMARTGoalProcessor {
   }> {
     const correlationId = Math.random().toString(36).substring(7);
     
-    logger.info('Analyzing goal completeness', { correlationId });
+    logger.info('Analyzing goal completeness', {
+      correlationId,
+      hasUserApiKey: !!userApiKey
+    });
 
     try {
       const prompt = this.buildAnalysisPrompt(smartCriteria);
-      const aiResponse = await this.callOpenAI(prompt, correlationId);
+      const aiResponse = await this.callOpenAI(prompt, correlationId, userApiKey);
       const analysis = this.parseAnalysisResponse(aiResponse);
 
       logger.info('Goal completeness analysis completed', {
@@ -246,15 +254,17 @@ Provide analysis in JSON format:
 `;
   }
 
-  private async callOpenAI(prompt: string, correlationId: string): Promise<string> {
-    if (!this.aiApiKey) {
+  private async callOpenAI(prompt: string, correlationId: string, userApiKey?: string): Promise<string> {
+    const apiKey = userApiKey || this.aiApiKey;
+    
+    if (!apiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.aiApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -279,7 +289,8 @@ Provide analysis in JSON format:
       logger.error('OpenAI API call failed', {
         correlationId,
         status: response.status,
-        error: errorData
+        error: errorData,
+        usingUserApiKey: !!userApiKey
       });
       throw new Error(`OpenAI API call failed: ${response.status} ${errorData}`);
     }
@@ -296,7 +307,9 @@ Provide analysis in JSON format:
 
   private parseAIResponse(response: string): GoalTranslationResult {
     try {
-      const parsed = JSON.parse(response);
+      // Strip markdown code blocks if present
+      const cleanedResponse = this.stripMarkdownCodeBlocks(response);
+      const parsed = JSON.parse(cleanedResponse);
       
       // Validate required fields
       if (!parsed.smartGoal || !parsed.smartCriteria || !parsed.confidence) {
@@ -326,7 +339,9 @@ Provide analysis in JSON format:
     recommendations: string[];
   } {
     try {
-      const parsed = JSON.parse(response);
+      // Strip markdown code blocks if present
+      const cleanedResponse = this.stripMarkdownCodeBlocks(response);
+      const parsed = JSON.parse(cleanedResponse);
       
       return {
         completenessScore: parsed.completenessScore || 0,
@@ -341,6 +356,28 @@ Provide analysis in JSON format:
       });
       throw new Error('Failed to parse analysis response');
     }
+  }
+
+  /**
+   * Strip markdown code blocks from AI response to extract pure JSON
+   */
+  private stripMarkdownCodeBlocks(response: string): string {
+    // Remove markdown code blocks (```json ... ``` or ``` ... ```)
+    let cleaned = response.trim();
+    
+    // Handle ```json format
+    if (cleaned.startsWith('```json')) {
+      cleaned = cleaned.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    }
+    // Handle generic ``` format
+    else if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+    
+    // Remove any leading/trailing whitespace
+    cleaned = cleaned.trim();
+    
+    return cleaned;
   }
 }
 
