@@ -1,18 +1,34 @@
+export interface SMARTCriterionDetail {
+  value: string;
+  confidence: number;
+  missing?: string[];
+}
+
+export interface MeasurableCriterionDetail extends SMARTCriterionDetail {
+  metrics: string[];
+}
+
+export interface TimeBoundCriterionDetail extends SMARTCriterionDetail {
+  deadline?: string;
+}
+
 export interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  specific: string;
-  measurable: string;
-  achievable: string;
-  relevant: string;
-  timeBound: string;
-  successMetric: string;
-  targetValue: number;
-  unit: string;
-  deadline: string;
-  createdAt: string;
-  updatedAt: string;
+  id: string; // Added id
+  title: string; // maps from smartGoal
+  targetValue?: number; // Added targetValue
+  unit?: string; // Added unit
+  deadline?: string; // Added deadline
+  criteria: { // maps from smartCriteria
+    specific: SMARTCriterionDetail;
+    measurable: MeasurableCriterionDetail;
+    achievable: SMARTCriterionDetail;
+    relevant: SMARTCriterionDetail;
+    timeBound: TimeBoundCriterionDetail;
+  };
+  missingCriteria: string[];
+  clarificationQuestions: string[];
+  confidence: number;
+  correlation_id?: string;
 }
 
 export interface Milestone {

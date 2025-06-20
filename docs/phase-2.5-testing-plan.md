@@ -11,6 +11,7 @@ This phase validates the Goal & Strategy Service's core workflow through user te
 - **Components**: Goal input, SMART translation display, milestone visualization, WBS tree, estimation results
 - **API Integration**: Direct calls to Goal & Strategy Service endpoints
 - **Real-time Feedback**: Live workflow progression with intermediate results
+- **User Configuration**: API key management for OpenAI integration testing
 
 ### 2. Core Workflow Validation
 **Complete Pipeline Testing**: SMART Translation → Milestones → WBS → Estimation
@@ -91,9 +92,17 @@ This phase validates the Goal & Strategy Service's core workflow through user te
 ### Phase 2.5.1: Testing Interface Development (3-4 days)
 1. **Setup React + Vite project** with TypeScript and Tailwind
 2. **Create core components** for each workflow step
-3. **Implement API integration** with error handling
-4. **Add feedback collection** mechanisms
-5. **Deploy testing environment** for user access
+3. **Implement API key configuration** with secure browser storage
+4. **Implement API integration** with user-provided keys and error handling
+5. **Add feedback collection** mechanisms
+6. **Deploy testing environment** for user access
+
+#### API Key Configuration Implementation
+- **User Interface**: Secure input field for OpenAI API key entry
+- **Storage Strategy**: Browser sessionStorage for temporary key retention
+- **Security Measures**: Input masking and automatic key validation
+- **Integration**: Dynamic API key injection into service requests
+- **Fallback**: Clear error messages when keys are missing or invalid
 
 ### Phase 2.5.2: User Testing & Validation (4-5 days)
 1. **Recruit test users** (internal team + external volunteers)

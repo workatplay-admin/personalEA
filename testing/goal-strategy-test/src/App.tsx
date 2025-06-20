@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Target, CheckCircle, Clock, Users } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Target, CheckCircle, Clock, Users, Settings } from 'lucide-react'
+import ApiConfig from './components/ApiConfig'
 import GoalInput from './components/GoalInput'
 import SmartGoalDisplay from './components/SmartGoalDisplay'
 import MilestonesDisplay from './components/MilestonesDisplay'
@@ -7,9 +8,10 @@ import WBSDisplay from './components/WBSDisplay'
 import EstimationDisplay from './components/EstimationDisplay'
 import FeedbackForm from './components/FeedbackForm'
 import { Goal, Milestone, WBSTask, TaskEstimation } from './types'
+import { getApiConfig } from './services/api'
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(1)
+  const [currentStep, setCurrentStep] = useState(0)
   const [originalGoal, setOriginalGoal] = useState('')
   const [smartGoal, setSmartGoal] = useState<Goal | null>(null)
   const [milestones, setMilestones] = useState<Milestone[]>([])
@@ -17,7 +19,12 @@ function App() {
   const [estimations, setEstimations] = useState<TaskEstimation[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
+  console.log('App Component Rendered. Current Step:', currentStep);
+  console.log('Original Goal:', originalGoal);
+  console.log('Smart Goal:', smartGoal);
+
   const steps = [
+    { id: 0, name: 'API Config', icon: Settings, description: 'Configure authentication' },
     { id: 1, name: 'Goal Input', icon: Target, description: 'Enter your goal' },
     { id: 2, name: 'SMART Translation', icon: CheckCircle, description: 'AI converts to SMART goal' },
     { id: 3, name: 'Milestones', icon: Clock, description: 'Break into milestones' },
@@ -25,32 +32,58 @@ function App() {
     { id: 5, name: 'Estimation', icon: Clock, description: 'Estimate time & effort' },
   ]
 
+  // Check if API is configured on component mount
+  useEffect(() => {
+    console.log('App useEffect: Checking API config');
+    const config = getApiConfig()
+    if (config) {
+      setCurrentStep(1) // Skip to goal input if already configured
+      console.log('App useEffect: API config found, setting step to 1');
+    }
+  }, [])
+
+  const handleApiConfigured = () => {
+    console.log('handleApiConfigured: Setting step to 1');
+    setCurrentStep(1)
+  }
+
   const handleGoalSubmit = (goal: string) => {
+    console.log('handleGoalSubmit: Setting originalGoal to', goal);
     setOriginalGoal(goal)
     setCurrentStep(2)
+    console.log('handleGoalSubmit: Setting step to 2');
   }
 
   const handleSmartGoalComplete = (goal: Goal) => {
+    console.log('handleSmartGoalComplete: Setting smartGoal to', goal);
     setSmartGoal(goal)
     setCurrentStep(3)
+    console.log('handleSmartGoalComplete: Setting step to 3');
   }
 
   const handleMilestonesComplete = (milestoneList: Milestone[]) => {
+    console.log('handleMilestonesComplete: Setting milestones to', milestoneList);
     setMilestones(milestoneList)
     setCurrentStep(4)
+    console.log('handleMilestonesComplete: Setting step to 4');
   }
 
   const handleWBSComplete = (tasks: WBSTask[]) => {
+    console.log('handleWBSComplete: Setting wbsTasks to', tasks);
     setWbsTasks(tasks)
     setCurrentStep(5)
+    console.log('handleWBSComplete: Setting step to 5');
   }
 
   const handleEstimationComplete = (taskEstimations: TaskEstimation[]) => {
+    console.log('handleEstimationComplete: Setting estimations to', taskEstimations);
     setEstimations(taskEstimations)
   }
 
   const resetWorkflow = () => {
-    setCurrentStep(1)
+    console.log('resetWorkflow: Resetting all states');
+    const config = getApiConfig()
+    setCurrentStep(config ? 1 : 0) // Go to config if not set, otherwise goal input
     setOriginalGoal('')
     setSmartGoal(null)
     setMilestones([])
@@ -108,6 +141,10 @@ function App() {
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto">
+          {currentStep === 0 && (
+            <ApiConfig onConfigured={handleApiConfigured} />
+          )}
+          
           {currentStep === 1 && (
             <GoalInput onSubmit={handleGoalSubmit} isLoading={isLoading} />
           )}
@@ -164,7 +201,7 @@ function App() {
         )}
 
         {/* Reset Button */}
-        {currentStep > 1 && (
+        {currentStep > 0 && (
           <div className="text-center mt-8">
             <button
               onClick={resetWorkflow}

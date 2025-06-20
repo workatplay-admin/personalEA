@@ -73,6 +73,23 @@ export default function GoalInput({ onSubmit, isLoading }: GoalInputProps) {
             </>
           )}
         </button>
+        
+        {/* Debug Test Button */}
+        <button
+          type="button"
+          onClick={() => {
+            const timestamp = new Date().toISOString();
+            console.log(`[${timestamp}] 🧪 Test Goal Translation button clicked from GoalInput`);
+            console.log(`[${timestamp}] 📊 Current goal value:`, goal);
+            console.log(`[${timestamp}] 📊 Goal trimmed:`, goal.trim());
+            console.log(`[${timestamp}] 📊 Goal length:`, goal.length);
+            console.log(`[${timestamp}] 📊 Will call onSubmit with empty goal`);
+            onSubmit(''); // This simulates the problematic scenario
+          }}
+          className="w-full mt-2 flex items-center justify-center px-6 py-2 border border-blue-300 text-base font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          🧪 Test Goal Translation (Empty Goal)
+        </button>
       </form>
 
       {/* Example Goals */}

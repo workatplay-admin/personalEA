@@ -98,19 +98,28 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
   try {
     const { raw_goal, context } = translateGoalSchema.parse(req.body);
     const correlationId = req.correlationId;
+    const userApiKey = req.headers['x-openai-api-key'] as string;
 
     logger.info('Goal translation request', {
       correlationId,
       userId: req.user?.id,
-      rawGoal: raw_goal
+      rawGoal: raw_goal,
+      hasUserApiKey: !!userApiKey
     });
 
     const input: RawGoalInput = {
       goal: raw_goal,
-      context: context || undefined
+      context: context ? Object.fromEntries(
+        Object.entries({
+          timeframe: context.timeframe,
+          resources: context.resources,
+          constraints: context.constraints,
+          priority: context.priority
+        }).filter(([_, value]) => value !== undefined)
+      ) as any : undefined
     };
 
-    const result = await smartGoalProcessor.translateGoal(input);
+    const result = await smartGoalProcessor.translateGoal(input, userApiKey);
 
     res.json({
       smart_goal: result.smartGoal,

@@ -102,7 +102,7 @@ export default function MilestonesDisplay({
           Goal: {goal.title}
         </h3>
         <p className="text-indigo-800 dark:text-indigo-200 text-sm">
-          Target: {goal.targetValue} {goal.unit} by {new Date(goal.deadline).toLocaleDateString()}
+          Target: {goal.targetValue} {goal.unit} by {goal.deadline ? new Date(goal.deadline).toLocaleDateString() : 'N/A'}
         </p>
       </div>
 

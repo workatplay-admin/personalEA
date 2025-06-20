@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle, AlertCircle, Clock, Star, BarChart3 } from 'lucide-react'
+import { CheckCircle, AlertCircle, Star, BarChart3 } from 'lucide-react'
 import { WBSTask, TaskEstimation } from '../types'
 import goalAPI from '../services/api'
 

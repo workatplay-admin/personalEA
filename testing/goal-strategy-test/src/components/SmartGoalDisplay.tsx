@@ -3,6 +3,31 @@ import { CheckCircle, AlertCircle, Edit3, Star } from 'lucide-react'
 import { Goal } from '../types'
 import goalAPI from '../services/api'
 
+// Function to clear any cached goal data
+const clearCachedGoalData = () => {
+  console.log('🧹 Clearing any cached goal data...');
+  
+  // Clear localStorage goal-related data
+  const localStorageKeys = Object.keys(localStorage);
+  localStorageKeys.forEach(key => {
+    if (key.includes('goal') || key.includes('smart') || key.includes('gs-') || key.includes('translate')) {
+      console.log(`Removing localStorage key: ${key}`);
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // Clear sessionStorage goal-related data
+  const sessionStorageKeys = Object.keys(sessionStorage);
+  sessionStorageKeys.forEach(key => {
+    if (key.includes('goal') || key.includes('smart') || key.includes('gs-') || key.includes('translate')) {
+      console.log(`Removing sessionStorage key: ${key}`);
+      sessionStorage.removeItem(key);
+    }
+  });
+  
+  console.log('✅ Cache clearing complete');
+};
+
 interface SmartGoalDisplayProps {
   originalGoal: string
   onComplete: (goal: Goal) => void
@@ -21,25 +46,96 @@ export default function SmartGoalDisplay({
   const [rating, setRating] = useState<number>(0)
   const [feedback, setFeedback] = useState<string>('')
 
+  // Track smartGoal state changes
   useEffect(() => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] 🔄 smartGoal state changed:`, smartGoal);
+    console.log(`[${timestamp}] 🆔 smartGoal correlation_id:`, smartGoal?.correlation_id);
+    console.log(`[${timestamp}] 📝 smartGoal title:`, smartGoal?.title);
+  }, [smartGoal])
+
+  useEffect(() => {
+  console.log('SmartGoalDisplay useEffect triggered. originalGoal:', originalGoal);
+  
+  // Check for any cached goal data in browser storage
+  console.log('Checking browser storage for cached goal data...');
+  console.log('localStorage keys:', Object.keys(localStorage));
+  console.log('sessionStorage keys:', Object.keys(sessionStorage));
+  
+  // Check for any goal-related cached data
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.includes('goal') || key.includes('smart') || key.includes('gs-'))) {
+      console.log(`Found potential cached goal data in localStorage[${key}]:`, localStorage.getItem(key));
+    }
+  }
+  
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    if (key && (key.includes('goal') || key.includes('smart') || key.includes('gs-'))) {
+      console.log(`Found potential cached goal data in sessionStorage[${key}]:`, sessionStorage.getItem(key));
+    }
+  }
+  
+  // Clear any cached goal data before making new API calls
+  clearCachedGoalData();
+  
+  if (originalGoal && originalGoal.trim()) {
     translateGoal()
-  }, [originalGoal])
+  }
+}, [originalGoal])
 
   const translateGoal = async () => {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] 🚀 translateGoal called with originalGoal:`, originalGoal);
+    console.log(`[${timestamp}] 📊 Current smartGoal state before API call:`, smartGoal);
+    console.log(`[${timestamp}] 🔍 Current smartGoal correlation_id before API call:`, smartGoal?.correlation_id);
+    
+    // Validate originalGoal before proceeding
+    if (!originalGoal || originalGoal.trim() === '') {
+      console.log(`[${timestamp}] ⚠️ Empty or invalid originalGoal detected:`, originalGoal);
+      setError('No goal provided for translation');
+      return;
+    }
+    
     try {
+      // CRITICAL: Clear the current smartGoal state before making API call
+      console.log(`[${timestamp}] 🧹 Clearing smartGoal state before API call`);
+      setSmartGoal(null);
+      
+      // Add a small delay to ensure state clearing takes effect before API call
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       setIsLoading(true)
       setError(null)
+      console.log(`[${timestamp}] 📡 About to call goalAPI.translateToSmart for goal: "${originalGoal}"`);
       const goal = await goalAPI.translateToSmart(originalGoal)
-      setSmartGoal(goal)
+      console.log(`[${timestamp}] ✅ Received goal from API:`, goal);
+      console.log(`[${timestamp}] 🆔 Goal correlation_id:`, goal?.correlation_id);
+      console.log(`[${timestamp}] 📝 Goal title:`, goal?.title);
+      
+      // Verify the response is valid before setting state
+      if (goal && goal.correlation_id) {
+        console.log(`[${timestamp}] ✅ Valid response received, setting smartGoal state`);
+        setSmartGoal(goal)
+        console.log(`[${timestamp}] 💾 setSmartGoal called with:`, goal);
+        console.log(`[${timestamp}] 🔍 setSmartGoal correlation_id:`, goal?.correlation_id);
+      } else {
+        console.log(`[${timestamp}] ❌ Invalid response received, missing correlation_id`);
+        setError('Invalid response received from server');
+      }
     } catch (err) {
+      console.error(`[${timestamp}] ❌ Error translating goal:`, err);
       setError(err instanceof Error ? err.message : 'Failed to translate goal')
     } finally {
       setIsLoading(false)
+      console.log(`[${timestamp}] 🏁 translateGoal completed`);
     }
   }
 
   const handleContinue = () => {
     if (smartGoal) {
+      console.log('Calling onComplete with smartGoal:', smartGoal);
       onComplete(smartGoal)
     }
   }
@@ -119,7 +215,7 @@ export default function SmartGoalDisplay({
             {smartGoal.title}
           </p>
           <p className="text-indigo-700 dark:text-indigo-300 mt-2 text-sm">
-            {smartGoal.description}
+            {smartGoal.criteria.specific.value}
           </p>
         </div>
       </div>
@@ -135,7 +231,7 @@ export default function SmartGoalDisplay({
               Specific
             </h4>
             <p className="text-blue-800 dark:text-blue-200 text-sm">
-              {smartGoal.specific}
+              {smartGoal.criteria.specific.value}
             </p>
           </div>
 
@@ -144,7 +240,7 @@ export default function SmartGoalDisplay({
               Measurable
             </h4>
             <p className="text-green-800 dark:text-green-200 text-sm">
-              {smartGoal.measurable}
+              {smartGoal.criteria.measurable.value}
             </p>
           </div>
 
@@ -153,7 +249,7 @@ export default function SmartGoalDisplay({
               Achievable
             </h4>
             <p className="text-yellow-800 dark:text-yellow-200 text-sm">
-              {smartGoal.achievable}
+              {smartGoal.criteria.achievable.value}
             </p>
           </div>
 
@@ -162,7 +258,7 @@ export default function SmartGoalDisplay({
               Relevant
             </h4>
             <p className="text-purple-800 dark:text-purple-200 text-sm">
-              {smartGoal.relevant}
+              {smartGoal.criteria.relevant.value}
             </p>
           </div>
 
@@ -171,19 +267,47 @@ export default function SmartGoalDisplay({
               Time-bound
             </h4>
             <p className="text-red-800 dark:text-red-200 text-sm">
-              {smartGoal.timeBound}
+              {smartGoal.criteria.timeBound.value}
             </p>
           </div>
 
           <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4">
             <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-2">
-              Success Metric
+              Missing Criteria
             </h4>
-            <p className="text-indigo-800 dark:text-indigo-200 text-sm">
-              {smartGoal.successMetric}: {smartGoal.targetValue} {smartGoal.unit}
-            </p>
+            <ul className="list-disc list-inside text-indigo-800 dark:text-indigo-200 text-sm">
+              {smartGoal.missingCriteria.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
           </div>
         </div>
+      </div>
+
+      {/* Clarification Questions */}
+      {smartGoal.clarificationQuestions.length > 0 && (
+        <div className="mb-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+          <h3 className="text-xl font-semibold text-yellow-900 dark:text-yellow-100 mb-4">
+            Clarification Needed
+          </h3>
+          <ul className="list-disc list-inside text-yellow-800 dark:text-yellow-200">
+            {smartGoal.clarificationQuestions.map((question, index) => (
+              <li key={index} className="mb-2">
+                {question}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Confidence Score */}
+      <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
+        <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2">
+          Overall Confidence
+        </h4>
+        <p className="text-green-800 dark:text-green-200 text-2xl font-bold">
+          {(smartGoal.confidence * 100).toFixed(0)}%
+        </p>
       </div>
 
       {/* Feedback Section */}
@@ -220,13 +344,35 @@ export default function SmartGoalDisplay({
 
       {/* Action Buttons */}
       <div className="flex justify-between">
-        <button
-          onClick={translateGoal}
-          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          <Edit3 className="w-4 h-4 mr-2" />
-          Regenerate
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={translateGoal}
+            className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <Edit3 className="w-4 h-4 mr-2" />
+            Regenerate
+          </button>
+          
+          <button
+            onClick={() => {
+              const timestamp = new Date().toISOString();
+              console.log(`[${timestamp}] 🧪 Manual Test Goal Translation button clicked`);
+              console.log(`[${timestamp}] 📊 Current originalGoal:`, originalGoal);
+              console.log(`[${timestamp}] 📊 Current smartGoal:`, smartGoal);
+              translateGoal();
+            }}
+            className="flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            🧪 Test Goal Translation
+          </button>
+          
+          <button
+            onClick={clearCachedGoalData}
+            className="flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          >
+            🧹 Clear Cache
+          </button>
+        </div>
 
         <button
           onClick={handleContinue}
