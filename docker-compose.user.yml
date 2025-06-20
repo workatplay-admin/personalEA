@@ -1,0 +1,128 @@
+version: '3.8'
+
+# PersonalEA Docker Compose Configuration (Version [1;33m⚠️ No Git tags found, using default version: v1.0.0[0mv1.0.0)
+# This file defines the production deployment for PersonalEA
+
+services:
+  # PersonalEA Web Interface (Version [1;33m⚠️ No Git tags found, using default version: v1.0.0[0mv1.0.0)
+  personalea-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.user
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://personalea:personalea@db:5432/personalea
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this}
+      - SESSION_SECRET=${SESSION_SECRET:-your-super-secret-session-key-change-this}
+      - EMAIL_ENCRYPTION_KEY=${EMAIL_ENCRYPTION_KEY:-your-32-char-encryption-key-here}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - personalea_data:/app/data
+      - personalea_logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: personalea
+      POSTGRES_USER: personalea
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-personalea}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U personalea -d personalea"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-personalea}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Email Processing Service (Version [1;33m⚠️ No Git tags found, using default version: v1.0.0[0mv1.0.0)
+  email-service:
+    build:
+      context: ./services/email-processing
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://personalea:personalea@db:5432/personalea
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this}
+      - EMAIL_ENCRYPTION_KEY=${EMAIL_ENCRYPTION_KEY:-your-32-char-encryption-key-here}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - personalea_logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Configuration Web UI (Version [1;33m⚠️ No Git tags found, using default version: v1.0.0[0mv1.0.0)
+  config-ui:
+    build:
+      context: ./ui/config
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - API_URL=http://personalea-web:3000
+      - NODE_ENV=production
+    depends_on:
+      - personalea-web
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  personalea_data:
+    driver: local
+  personalea_logs:
+    driver: local
+
+networks:
+  default:
+    name: personalea-network

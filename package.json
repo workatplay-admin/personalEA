@@ -27,10 +27,19 @@
     "test:contract:pact:provider": "jest --testPathPattern=tests/pact/provider",
     "test:contract:pact:consumer": "jest --testPathPattern=tests/pact/consumer",
     "test:contract:mock": "npm run mock:all & sleep 5 && npm run test:contract:api; kill %1",
+    "test:user-install": "npm run test:user-install:setup && npm run test:user-install:health && npm run test:user-install:cleanup",
+    "test:user-install:setup": "cp .env.user.example .env.user && sed -i 's/your-super-secret-jwt-key-change-this/test-jwt-secret-key-for-ci-only/' .env.user && sed -i 's/your-super-secret-session-key-change-this/test-session-secret-key-for-ci-only/' .env.user && sed -i 's/your-32-char-encryption-key-here/test-encryption-key-32-chars-long/' .env.user && docker-compose -f docker-compose.user.yml up -d --build",
+    "test:user-install:health": "sleep 60 && curl -f http://localhost:3000/health && curl -f http://localhost:3001/health",
+    "test:user-install:cleanup": "docker-compose -f docker-compose.user.yml down -v",
+    "test:bootstrap": "bash -n scripts/bootstrap.sh && bash -n scripts/setup-user.sh",
     "prepare": "husky install",
     "precommit": "npm run validate:api",
     "ci:validate": "npm run lint:api && npm run docs:build && echo 'CI validation completed successfully'",
-    "ci:setup": "npm ci && npm run ci:validate"
+    "ci:setup": "npm ci && npm run ci:validate",
+    "ci:test-user-install": "npm run test:user-install",
+    "update-versions": "chmod +x scripts/update-version-tags.sh && ./scripts/update-version-tags.sh",
+    "version:check": "git describe --tags --abbrev=0 2>/dev/null || echo 'v1.0.0'",
+    "version:update": "npm run update-versions"
   },
   "devDependencies": {
     "@stoplight/spectral-cli": "^6.11.0",
