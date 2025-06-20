@@ -108,7 +108,7 @@ export const goalAPI = {
   },
 
   // Clarify SMART Goal
-  async clarifyGoal(goalId: string, clarifications: Record<string, string>): Promise<Goal> {
+  async clarifyGoal(goalId: string, clarifications: Record<string, string>, goalContext?: { title: string; description?: string; originalGoal?: string }): Promise<Goal> {
     try {
       if (!apiConfig) {
         throw new Error('API configuration not set. Please configure authentication credentials.')
@@ -116,6 +116,7 @@ export const goalAPI = {
 
       const response = await api.post<APIResponse<Goal>>(`/goals/${goalId}/clarify`, {
         clarifications,
+        goalContext,
       })
       
       if (!response.data.success || !response.data.data) {

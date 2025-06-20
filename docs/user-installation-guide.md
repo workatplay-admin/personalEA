@@ -177,6 +177,27 @@ After completing the checklist, verify your security:
 
 After installation and security hardening, you'll be guided through a setup wizard to configure:
 
+### 🔑 API Key Setup (Required for AI Features)
+
+PersonalEA uses a centralized configuration system for managing API keys:
+
+1. **Copy the environment template**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Add your OpenAI API key**
+   ```bash
+   # Edit the .env file and replace the placeholder:
+   OPENAI_API_KEY=sk-your-actual-openai-api-key-here
+   ```
+
+3. **How the centralized config works**
+   - The root [`config/default.json`](../config/default.json) file references environment variables
+   - All services automatically inherit API keys from the root configuration
+   - No need to configure keys in individual service files
+   - Single source of truth for all secrets and API keys
+
 ### 1. Email Integration
 - **Gmail**: Connect your Gmail account (most popular)
 - **Outlook**: Connect your Microsoft account
@@ -188,7 +209,7 @@ After installation and security hardening, you'll be guided through a setup wiza
 - **Apple Calendar**: Connect your iCloud calendar
 
 ### 3. AI Services (Optional)
-- **OpenAI**: For advanced email summarization (requires API key)
+- **OpenAI**: For advanced email summarization (API key configured above)
 - **Local AI**: Use built-in AI (no external service needed)
 
 ### 4. Security Settings

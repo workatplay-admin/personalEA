@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = 'test_jwt_secret_key_for_development_minimum_32_characters_long';
 

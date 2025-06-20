@@ -132,3 +132,34 @@ export interface APIResponse<T> {
   error?: string;
   message?: string;
 }
+
+// Interactive Clarification Types
+export interface ClarificationQuestion {
+  id: string;
+  type: 'text' | 'number' | 'date' | 'choice' | 'range';
+  question: string;
+  advice: string;
+  placeholder?: string;
+  options?: string[];
+  validation?: {
+    required: boolean;
+    min?: number;
+    max?: number;
+    pattern?: string;
+  };
+  smartCriterion: 'specific' | 'measurable' | 'achievable' | 'relevant' | 'timeBound';
+}
+
+export interface ClarificationResponse {
+  questionId: string;
+  answer: string | number | Date;
+  confidence: number;
+}
+
+export interface ClarificationSession {
+  goalId: string;
+  questions: ClarificationQuestion[];
+  responses: ClarificationResponse[];
+  currentQuestionIndex: number;
+  isComplete: boolean;
+}

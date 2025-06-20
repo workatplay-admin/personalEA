@@ -66,12 +66,29 @@ check_node() {
 setup_env_files() {
     print_status "Setting up environment files..."
     
+    # Root environment configuration (centralized secrets)
+    if [ ! -f ".env" ]; then
+        cp .env.example .env
+        print_success "Created root .env file for centralized configuration"
+        print_warning "Please edit .env and add your OpenAI API key and other secrets"
+    else
+        print_warning "Root .env file already exists"
+    fi
+    
     # Email Processing Service
     if [ ! -f "services/email-processing/.env" ]; then
         cp services/email-processing/.env.example services/email-processing/.env
         print_success "Created services/email-processing/.env"
     else
         print_warning "services/email-processing/.env already exists"
+    fi
+    
+    # Goal Strategy Service
+    if [ ! -f "services/goal-strategy/.env" ]; then
+        cp services/goal-strategy/.env.example services/goal-strategy/.env
+        print_success "Created services/goal-strategy/.env"
+    else
+        print_warning "services/goal-strategy/.env already exists"
     fi
 }
 
@@ -152,19 +169,24 @@ show_service_info() {
     echo "  • Email Service: localhost:3001 (when started)"
     echo ""
     echo "🚀 Next Steps:"
-    echo "  1. Start the email processing service:"
+    echo "  1. Configure your API keys in the root .env file:"
+    echo "     nano .env  # Add your OpenAI API key and other secrets"
+    echo ""
+    echo "  2. Start the email processing service:"
     echo "     cd services/email-processing && npm run dev"
     echo ""
-    echo "  2. Or start all services with Docker:"
+    echo "  3. Or start all services with Docker:"
     echo "     docker-compose -f docker-compose.dev.yml up"
     echo ""
-    echo "  3. Test the API:"
+    echo "  4. Test the API:"
     echo "     curl http://localhost:3001/health"
     echo ""
-    echo "  4. View API documentation:"
+    echo "  5. View API documentation:"
     echo "     open docs/email-service-docs.html"
     echo ""
     echo "📚 Documentation:"
+    echo "  • Secret Management Guide: docs/secret-management-guide.md"
+    echo "  • Configuration Management: docs/configuration-management-plan.md"
     echo "  • Development Plan: docs/development-plan.md"
     echo "  • API Specs: docs/"
     echo "  • Service README: services/email-processing/README.md"
