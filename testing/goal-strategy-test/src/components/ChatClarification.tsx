@@ -202,15 +202,8 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
         originalGoal: goal.title
       }
       
-      // Add timeout to the API call to prevent hanging
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timeout')), 15000)
-      )
-      
-      const response = await Promise.race([
-        goalAPI.clarifyGoal(goal.id, newClarifications, goalContext),
-        timeoutPromise
-      ]) as Goal | any
+      // Backend now has proper timeout handling, so we don't need frontend timeout
+      const response = await goalAPI.clarifyGoal(goal.id, newClarifications, goalContext) as Goal | any
       
       console.log('ChatClarification: Received API response:', response)
       

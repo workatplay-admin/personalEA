@@ -29,7 +29,7 @@ export const clearApiConfig = () => {
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
+  timeout: 15000, // Reduced from 30s to 15s to work with backend 10s timeout + buffer
   headers: {
     'Content-Type': 'application/json',
     // Prevent HTTP caching
