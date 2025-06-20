@@ -129,7 +129,7 @@ function App() {
                       </p>
                       <p className="text-xs text-gray-500">{step.description}</p>
                     </div>
-                    {step.id < steps.length && (
+                    {step.id < steps.length - 1 && (
                       <div className="ml-4 w-8 h-0.5 bg-gray-300"></div>
                     )}
                   </li>
