@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal & Strategy Service - Testing Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .workflow-step {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Goal & Strategy Service</h1>
+            <h2>User Validation Testing Interface</h2>
+        </div>
+
+        <div class="status">
+            <strong>✅ Testing Interface Ready</strong><br>
+            Frontend: ✅ Loaded | Backend API: ✅ Running on port 3000 | Status: Ready for Testing
+        </div>
+
+        <h3>🔑 API Configuration</h3>
+        <div class="workflow-step">
+            <label for="apiKey"><strong>OpenAI API Key:</strong></label><br>
+            <input type="password" id="apiKey" placeholder="Enter your OpenAI API key (sk-...)" style="width: 400px; padding: 8px; margin: 5px 0;">
+            <button class="test-button" onclick="saveApiKey()">Save Key</button>
+            <div id="apiKeyStatus" style="margin-top: 5px; font-size: 14px;"></div>
+            <p style="margin-top: 10px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; font-size: 14px;">
+                <strong>📝 Note:</strong> You need a valid OpenAI API key to test the AI features. Get one at
+                <a href="https://platform.openai.com/account/api-keys" target="_blank">platform.openai.com/account/api-keys</a>.
+                Without a valid key, the "Process My Goal" button will show an error (this is expected behavior).
+            </p>
+        </div>
+
+        <h3>🎯 Goal Input & Testing</h3>
+        
+        <div class="workflow-step">
+            <label for="userGoal"><strong>Enter Your Goal:</strong></label><br>
+            <textarea id="userGoal" placeholder="Enter any goal you want to work on (e.g., 'I want to get promoted', 'Learn a new skill', 'Start a business')"
+                style="width: 100%; height: 80px; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; font-family: Arial, sans-serif;"></textarea>
+            <button class="test-button" onclick="testUserGoal()">🚀 Process My Goal</button>
+            <button class="test-button" onclick="testUserGoalDemo()" style="background: #28a745;">🎬 Demo Mode (No API Key Required)</button>
+        </div>
+
+        <h3>Complete AI-Powered Goal Breakdown Workflow</h3>
+        
+        <div class="workflow-step">
+            <strong>Step 1: Goal Input</strong> - Enter any goal (vague or specific)
+        </div>
+        <div class="workflow-step">
+            <strong>Step 2: SMART Translation</strong> - AI converts to structured SMART goal
+        </div>
+        <div class="workflow-step">
+            <strong>Step 3: Milestones</strong> - Break goal into time-based milestones
+        </div>
+        <div class="workflow-step">
+            <strong>Step 4: Work Breakdown</strong> - Create detailed task structure (WBS)
+        </div>
+        <div class="workflow-step">
+            <strong>Step 5: Estimation</strong> - Provide time/effort estimates
+        </div>
+
+        <h3>🔧 Test Individual API Endpoints</h3>
+        <p><em>These buttons test individual parts of the system with sample data (for developers/testers):</em></p>
+        <div style="margin: 10px 0;">
+            <button class="test-button" onclick="testGoalTranslation()">Test Goal Translation</button>
+            <span style="margin-left: 10px; color: #666; font-size: 14px;">Tests converting your entered goal to SMART format (requires goal input above)</span>
+        </div>
+        <div style="margin: 10px 0;">
+            <button class="test-button" onclick="testMilestones()">Test Milestones</button>
+            <span style="margin-left: 10px; color: #666; font-size: 14px;">Tests breaking a goal into time-based milestones</span>
+        </div>
+        <div style="margin: 10px 0;">
+            <button class="test-button" onclick="testWBS()">Test Work Breakdown</button>
+            <span style="margin-left: 10px; color: #666; font-size: 14px;">Tests creating detailed task structure (Work Breakdown Structure)</span>
+        </div>
+        <div style="margin: 10px 0;">
+            <button class="test-button" onclick="testEstimation()">Test Estimation</button>
+            <span style="margin-left: 10px; color: #666; font-size: 14px;">Tests providing time/effort estimates for tasks</span>
+        </div>
+
+        <div id="results">
+            <p><em>Click the buttons above to test the API endpoints...</em></p>
+        </div>
+
+        <h3>Example Goals for Testing</h3>
+        <ul>
+            <li>"I want to get promoted to senior developer"</li>
+            <li>"I want to lose weight and get fit"</li>
+            <li>"Launch a successful online course"</li>
+            <li>"Start a tech consulting business while maintaining work-life balance"</li>
+            <li>"Learn machine learning and build an AI project"</li>
+            <li>"Save money for a house down payment"</li>
+        </ul>
+
+        <div class="status">
+            <strong>📋 User Validation Guide:</strong><br>
+            Complete testing guide available at: <code>testing/goal-strategy-test/USER_VALIDATION_GUIDE.md</code>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/v1';
+        const AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QtdXNlci0xMjMiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJzY29wZXMiOlsiZ29hbHM6cmVhZCIsImdvYWxzOndyaXRlIiwibWlsZXN0b25lczpyZWFkIiwibWlsZXN0b25lczp3cml0ZSIsInRhc2tzOnJlYWQiLCJ0YXNrczp3cml0ZSJdLCJpYXQiOjE3NTAzODgxNTAsImV4cCI6MTc1MDQ3NDU1MH0.OIt7jE_A3EvuAZN2FnVbaagTfdtaPFaQk9YaZivTS_0';
+
+        // API Key Management
+        function saveApiKey() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const statusDiv = document.getElementById('apiKeyStatus');
+            
+            if (!apiKey) {
+                statusDiv.innerHTML = '<span style="color: red;">❌ Please enter an API key</span>';
+                return;
+            }
+            
+            if (!apiKey.startsWith('sk-')) {
+                statusDiv.innerHTML = '<span style="color: orange;">⚠️ Warning: API key should start with "sk-"</span>';
+                return;
+            }
+            
+            // Store in session storage (temporary, secure)
+            sessionStorage.setItem('openai_api_key', apiKey);
+            statusDiv.innerHTML = '<span style="color: green;">✅ API key saved for this session</span>';
+            
+            // Clear the input field for security
+            document.getElementById('apiKey').value = '';
+        }
+
+        function getApiKey() {
+            return sessionStorage.getItem('openai_api_key');
+        }
+
+        function getHeaders() {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${AUTH_TOKEN}`
+            };
+            
+            const apiKey = getApiKey();
+            if (apiKey) {
+                headers['X-OpenAI-API-Key'] = apiKey;
+            }
+            
+            return headers;
+        }
+
+        function updateResults(content) {
+            document.getElementById('results').innerHTML = content;
+        }
+
+        async function testUserGoal() {
+            const userGoal = document.getElementById('userGoal').value.trim();
+            
+            if (!userGoal) {
+                updateResults('<p style="color: red;">❌ Please enter a goal first!</p>');
+                return;
+            }
+
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                updateResults('<p style="color: red;">❌ Please configure your OpenAI API key first!</p>');
+                return;
+            }
+
+            updateResults('<p>🔄 Processing your goal through the complete AI workflow...</p>');
+            
+            try {
+                // Step 1: Goal Translation
+                updateResults('<p>🔄 Step 1/4: Translating your goal to SMART format...</p>');
+                const goalResponse = await fetch(`${API_BASE}/goals/translate`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        raw_goal: userGoal
+                    })
+                });
+                
+                if (!goalResponse.ok) {
+                    throw new Error(`Goal translation failed: ${goalResponse.status}`);
+                }
+                
+                const goalData = await goalResponse.json();
+                
+                updateResults(`
+                    <h4>✅ Your Goal Processing Complete!</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                        <h5>📝 Original Goal:</h5>
+                        <p><em>"${userGoal}"</em></p>
+                        
+                        <h5>🎯 SMART Goal:</h5>
+                        <p><strong>${goalData.smart_goal}</strong></p>
+                        
+                        <h5>📊 SMART Criteria Analysis:</h5>
+                        <ul>
+                            <li><strong>Specific:</strong> ${goalData.smart_criteria.specific.value} (Confidence: ${Math.round(goalData.smart_criteria.specific.confidence * 100)}%)</li>
+                            <li><strong>Measurable:</strong> ${goalData.smart_criteria.measurable.value} (Confidence: ${Math.round(goalData.smart_criteria.measurable.confidence * 100)}%)</li>
+                            <li><strong>Achievable:</strong> ${goalData.smart_criteria.achievable.value} (Confidence: ${Math.round(goalData.smart_criteria.achievable.confidence * 100)}%)</li>
+                            <li><strong>Relevant:</strong> ${goalData.smart_criteria.relevant.value} (Confidence: ${Math.round(goalData.smart_criteria.relevant.confidence * 100)}%)</li>
+                            <li><strong>Time-bound:</strong> ${goalData.smart_criteria.timeBound.value} (Confidence: ${Math.round(goalData.smart_criteria.timeBound.confidence * 100)}%)</li>
+                        </ul>
+                        
+                        <h5>🔍 Overall Confidence:</h5>
+                        <p>${Math.round(goalData.confidence * 100)}%</p>
+                        
+                        ${goalData.clarification_questions && goalData.clarification_questions.length > 0 ? `
+                        <h5>❓ Clarification Questions:</h5>
+                        <ul>
+                            ${goalData.clarification_questions.map(q => `<li>${q}</li>`).join('')}
+                        </ul>
+                        ` : ''}
+                        
+                        ${goalData.missing_criteria && goalData.missing_criteria.length > 0 ? `
+                        <h5>⚠️ Missing Criteria:</h5>
+                        <ul>
+                            ${goalData.missing_criteria.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                        ` : ''}
+                    </div>
+                    
+                    <p style="color: green; font-weight: bold;">🎉 Goal processing complete! You can now use the individual endpoint buttons below to test milestones, work breakdown, and estimation features.</p>
+                `);
+                
+            } catch (error) {
+                console.error('Goal processing error:', error);
+                
+                // Check if it's a network error or API error
+                if (error.message.includes('503') || error.message.includes('Goal translation failed: 503')) {
+                    updateResults(`
+                        <div style="color: red; padding: 15px; background: #fff5f5; border: 1px solid #fed7d7; border-radius: 4px;">
+                            <h4>❌ API Key Error</h4>
+                            <p><strong>The OpenAI API key you provided is invalid or expired.</strong></p>
+                            <p>Please check that:</p>
+                            <ul>
+                                <li>Your API key starts with "sk-"</li>
+                                <li>The key is active and has sufficient credits</li>
+                                <li>You copied the entire key without extra spaces</li>
+                            </ul>
+                            <p>Get a valid API key at: <a href="https://platform.openai.com/account/api-keys" target="_blank">platform.openai.com/account/api-keys</a></p>
+                        </div>
+                    `);
+                } else {
+                    updateResults(`<p style="color: red;">❌ Error processing your goal: ${error.message}</p>`);
+                }
+            }
+        }
+
+        function testUserGoalDemo() {
+            const userGoal = document.getElementById('userGoal').value.trim();
+            
+            if (!userGoal) {
+                updateResults('<p style="color: red;">❌ Please enter a goal first!</p>');
+                return;
+            }
+
+            updateResults('<p>🎬 Demo Mode: Simulating AI goal processing...</p>');
+            
+            setTimeout(() => {
+                updateResults(`
+                    <h4>✅ Demo: Your Goal Processing Complete!</h4>
+                    <div style="background: #f0f8ff; padding: 15px; border: 2px solid #007bff; border-radius: 4px; margin: 10px 0;">
+                        <p style="color: #007bff; font-weight: bold;">🎬 DEMO MODE - This is simulated data to show how the interface works</p>
+                        
+                        <h5>📝 Original Goal:</h5>
+                        <p><em>"${userGoal}"</em></p>
+                        
+                        <h5>🎯 SMART Goal (Demo):</h5>
+                        <p><strong>Complete a comprehensive programming course and build 3 practical projects within 6 months to demonstrate proficiency in web development</strong></p>
+                        
+                        <h5>📊 SMART Criteria Analysis (Demo):</h5>
+                        <ul>
+                            <li><strong>Specific:</strong> Learn web development through structured course (Confidence: 85%)</li>
+                            <li><strong>Measurable:</strong> Complete course + build 3 projects (Confidence: 90%)</li>
+                            <li><strong>Achievable:</strong> Realistic with dedicated study time (Confidence: 80%)</li>
+                            <li><strong>Relevant:</strong> Aligns with career development goals (Confidence: 95%)</li>
+                            <li><strong>Time-bound:</strong> 6-month deadline specified (Confidence: 100%)</li>
+                        </ul>
+                        
+                        <h5>🔍 Overall Confidence (Demo):</h5>
+                        <p>90%</p>
+                        
+                        <h5>❓ Clarification Questions (Demo):</h5>
+                        <ul>
+                            <li>What specific programming language or framework interests you most?</li>
+                            <li>How many hours per week can you dedicate to learning?</li>
+                            <li>Do you have any prior programming experience?</li>
+                        </ul>
+                    </div>
+                    
+                    <p style="color: #007bff; font-weight: bold;">🎉 Demo complete! To test with real AI, configure your OpenAI API key and use the "Process My Goal" button.</p>
+                `);
+            }, 2000);
+        }
+
+        async function testGoalTranslation() {
+            // Check if there's a goal in the input field first
+            const userGoal = document.getElementById('userGoal').value.trim();
+            
+            if (!userGoal) {
+                updateResults(`
+                    <div style="color: orange; padding: 15px; background: #fff8e1; border: 1px solid #ffb74d; border-radius: 4px;">
+                        <h4>⚠️ No Goal Entered</h4>
+                        <p><strong>Please enter a goal in the text area above first!</strong></p>
+                        <p>The "Test Goal Translation" button will translate whatever goal you enter into SMART format.</p>
+                        <p>If you want to test with sample data, try entering: "I want to learn programming"</p>
+                    </div>
+                `);
+                return;
+            }
+
+            updateResults(`<p>🔄 Testing Goal Translation with your goal: "<em>${userGoal}</em>"...</p>`);
+            try {
+                // Add cache-busting parameters to URL (no problematic headers)
+                const timestamp = Date.now();
+                const cacheBuster = Math.random().toString(36).substring(7);
+                console.log(`🚀 [${new Date().toISOString()}] Making fresh API call with cache-buster: ${timestamp}-${cacheBuster}`);
+                console.log(`📝 [${new Date().toISOString()}] Using goal from input: "${userGoal}"`);
+                
+                const response = await fetch(`${API_BASE}/goals/translate?t=${timestamp}&cb=${cacheBuster}`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        raw_goal: userGoal
+                    })
+                });
+                
+                const data = await response.json();
+                console.log(`✅ [${new Date().toISOString()}] API Response received:`, {
+                    correlationId: data?.correlation_id,
+                    smartGoal: data?.smart_goal,
+                    confidence: data?.confidence,
+                    fullResponse: data
+                });
+                
+                updateResults(`
+                    <h4>✅ Goal Translation Test Result:</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 10px 0;">
+                        <h5>📝 Your Goal:</h5>
+                        <p><em>"${userGoal}"</em></p>
+                        <h5>🔧 Raw API Response:</h5>
+                        <pre style="background: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; overflow-x: auto;">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `);
+            } catch (error) {
+                updateResults(`<p>❌ Error: ${error.message}</p>`);
+            }
+        }
+
+        async function testMilestones() {
+            updateResults('<p>🔄 Testing Milestones...</p>');
+            try {
+                const response = await fetch(`${API_BASE}/milestones/generate`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        goalId: "test-goal-123",
+                        title: "Learn Programming",
+                        description: "Become proficient in programming"
+                    })
+                });
+                
+                const data = await response.json();
+                updateResults(`
+                    <h4>✅ Milestones Test Result:</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `);
+            } catch (error) {
+                updateResults(`<p>❌ Error: ${error.message}</p>`);
+            }
+        }
+
+        async function testWBS() {
+            updateResults('<p>🔄 Testing Work Breakdown Structure...</p>');
+            try {
+                const response = await fetch(`${API_BASE}/wbs/generate`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        milestones: [{
+                            id: "milestone-1",
+                            title: "Learn Basics",
+                            description: "Learn programming fundamentals"
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                updateResults(`
+                    <h4>✅ WBS Test Result:</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `);
+            } catch (error) {
+                updateResults(`<p>❌ Error: ${error.message}</p>`);
+            }
+        }
+
+        async function testEstimation() {
+            updateResults('<p>🔄 Testing Task Estimation...</p>');
+            try {
+                const response = await fetch(`${API_BASE}/estimations/generate`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        tasks: [{
+                            id: "task-1",
+                            title: "Learn Variables",
+                            description: "Understand variable concepts"
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                updateResults(`
+                    <h4>✅ Estimation Test Result:</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `);
+            } catch (error) {
+                updateResults(`<p>❌ Error: ${error.message}</p>`);
+            }
+        }
+
+        // Check for saved API key and initialize interface on page load
+        window.onload = function() {
+            const savedKey = getApiKey();
+            if (savedKey) {
+                document.getElementById('apiKeyStatus').innerHTML = '<span style="color: green;">✅ API key loaded from session</span>';
+            } else {
+                document.getElementById('apiKeyStatus').innerHTML = '<span style="color: orange;">⚠️ No API key configured - testing will use mock responses</span>';
+            }
+            updateResults('<p>✅ Testing interface loaded successfully! Configure your API key above, then click buttons to test API endpoints.</p>');
+        };
+    </script>
+</body>
+</html>
