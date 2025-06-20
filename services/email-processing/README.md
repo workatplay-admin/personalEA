@@ -1,164 +1,288 @@
 # Email Processing Service
 
-The Email Processing Service is a core component of the PersonalEA system responsible for email synchronization, AI-powered processing, and intelligent analysis.
+A comprehensive microservice for processing, analyzing, and managing emails using AI-powered summarization and action item extraction.
 
-## Features
+## 🚀 Features
 
-- **Email Synchronization**: Connect to multiple email providers (Gmail, IMAP)
-- **AI Processing**: Automatic email summarization and action item extraction
-- **Smart Categorization**: Intelligent email classification and priority detection
-- **RESTful API**: Full CRUD operations following OpenAPI specifications
-- **Authentication**: JWT-based security with granular scopes
-- **Observability**: Comprehensive logging, metrics, and tracing
+### Core Functionality
+- **Gmail Integration**: OAuth2-based authentication and email synchronization
+- **AI Processing**: Intelligent email summarization and action item extraction using OpenAI GPT-4
+- **Async Job Processing**: Background email synchronization with progress tracking
+- **RESTful API**: Complete OpenAPI 3.1 compliant endpoints
+- **Database Integration**: PostgreSQL with Prisma ORM for data persistence
 
-## Quick Start
+### API Endpoints
+
+#### Email Synchronization
+- `POST /api/v1/emails/sync` - Start email synchronization job
+- `GET /api/v1/emails/jobs/{job_id}` - Get sync job status
+
+#### Email Analysis
+- `POST /api/v1/emails/digest` - Generate email digest for time window
+- `GET /api/v1/emails/{email_id}/summary` - Get AI-generated email summary
+- `GET /api/v1/emails/{email_id}/action-items` - Extract action items from email
+
+#### Health Monitoring
+- `GET /health` - Basic health check
+- `GET /health/detailed` - Detailed health status
+- `GET /health/ready` - Readiness probe
+- `GET /health/live` - Liveness probe
+
+## 🏗️ Architecture
+
+### Components
+
+#### 1. Gmail Provider (`src/providers/gmail-provider.ts`)
+- OAuth2 authentication with Google APIs
+- Incremental email synchronization
+- Rate limiting and error handling
+- Message parsing and content extraction
+
+#### 2. AI Processor (`src/services/ai-processor.ts`)
+- OpenAI GPT-4 integration for email analysis
+- Email categorization (urgent, important, informational, etc.)
+- Action item extraction with confidence scoring
+- Key point identification
+
+#### 3. Email Sync Service (`src/services/email-sync.ts`)
+- Orchestrates the complete email synchronization process
+- Background job management with progress tracking
+- Database persistence of emails, summaries, and action items
+- Error handling and retry logic
+
+#### 4. Database Schema (`prisma/schema.prisma`)
+- **Users**: User account management
+- **EmailProviders**: OAuth token storage and provider configuration
+- **Emails**: Email metadata and content
+- **EmailSummaries**: AI-generated summaries and categorization
+- **ActionItems**: Extracted action items with priorities
+- **EmailDigests**: Generated email digests
+- **EmailSyncJobs**: Async job tracking
+
+### Technology Stack
+- **Runtime**: Node.js with TypeScript
+- **Framework**: Express.js with security middleware
+- **Database**: PostgreSQL with Prisma ORM
+- **AI**: OpenAI GPT-4 Turbo
+- **Authentication**: JWT with scope-based authorization
+- **Email Provider**: Gmail API with OAuth2
+- **Logging**: Winston with structured logging
+- **Validation**: Zod for environment and request validation
+
+## 🚦 Getting Started
 
 ### Prerequisites
-
 - Node.js 18+
-- PostgreSQL 14+
-- Redis 6+
-- OpenAI API key (optional, for AI features)
+- PostgreSQL database
+- Gmail OAuth2 credentials
+- OpenAI API key
+
+### Environment Variables
+```bash
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/email_processing
+
+# Gmail OAuth2
+GMAIL_CLIENT_ID=your_gmail_client_id
+GMAIL_CLIENT_SECRET=your_gmail_client_secret
+GMAIL_REDIRECT_URI=http://localhost:8084/auth/gmail/callback
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4-turbo-preview
+
+# JWT
+JWT_SECRET=your_jwt_secret_min_32_chars
+
+# Server
+PORT=8084
+NODE_ENV=development
+```
 
 ### Installation
-
 ```bash
 # Install dependencies
 npm install
 
-# Copy environment template
-cp .env.example .env
+# Generate Prisma client
+npx prisma generate
 
-# Edit environment variables
-nano .env
+# Run database migrations
+npx prisma migrate dev
 
-# Build the service
-npm run build
-
-# Start in development mode
+# Start development server
 npm run dev
 ```
 
-### Environment Variables
-
-See `.env.example` for all required environment variables. Key variables:
-
-- `DATABASE_URL`: PostgreSQL connection string
-- `JWT_SECRET`: Secret key for JWT token signing
-- `OPENAI_API_KEY`: OpenAI API key for AI processing
-- `GMAIL_CLIENT_ID/SECRET`: Google OAuth credentials
-
-## API Documentation
-
-The service follows the OpenAPI specification defined in `docs/email-service-api-v1.yaml`.
-
-### Key Endpoints
-
-- `GET /health` - Health check
-- `GET /api/v1/emails` - List emails
-- `GET /api/v1/emails/:id` - Get specific email
-- `POST /api/v1/emails/sync` - Trigger email sync
-- `POST /api/v1/emails/:id/process` - Process email with AI
-- `GET /api/v1/emails/:id/summary` - Get AI-generated summary
-
-### Authentication
-
-All API endpoints (except health checks) require JWT authentication:
-
-```bash
-curl -H "Authorization: Bearer <jwt-token>" \
-     http://localhost:3001/api/v1/emails
-```
-
-## Development
-
-### Scripts
-
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build TypeScript to JavaScript
-- `npm run start` - Start production server
-- `npm test` - Run test suite
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript type checking
-
-### Project Structure
-
-```
-src/
-├── config/          # Configuration and environment
-├── middleware/      # Express middleware
-├── routes/          # API route handlers
-├── services/        # Business logic services
-├── models/          # Data models and schemas
-├── types/           # TypeScript type definitions
-├── utils/           # Utility functions
-└── index.ts         # Application entry point
-```
-
-### Adding New Features
-
-1. Define API contract in OpenAPI spec
-2. Generate types and validation schemas
-3. Implement route handlers in `routes/`
-4. Add business logic in `services/`
-5. Write tests for new functionality
-
-## Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run specific test file
-npm test -- email.test.ts
-```
-
-## Deployment
-
-### Docker
-
+### Docker Support
 ```bash
 # Build image
-docker build -t personalea/email-processing .
+docker build -t email-processing-service .
 
 # Run container
-docker run -p 3001:3001 \
+docker run -p 8084:8084 \
   -e DATABASE_URL=postgresql://... \
-  -e JWT_SECRET=... \
-  personalea/email-processing
+  -e GMAIL_CLIENT_ID=... \
+  -e OPENAI_API_KEY=... \
+  email-processing-service
 ```
 
+## 📊 API Usage Examples
+
+### Start Email Sync
+```bash
+curl -X POST http://localhost:8084/api/v1/emails/sync \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "user_id": "user_123",
+    "access_token": "gmail_access_token",
+    "sync_options": {
+      "labels": ["INBOX", "IMPORTANT"],
+      "since": "2025-06-19T00:00:00Z",
+      "max_results": 100
+    }
+  }'
+```
+
+### Generate Email Digest
+```bash
+curl -X POST http://localhost:8084/api/v1/emails/digest \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "user_id": "user_123",
+    "time_window": {
+      "start": "2025-06-19T00:00:00Z",
+      "end": "2025-06-19T23:59:59Z"
+    },
+    "categories": ["urgent", "actionable"]
+  }'
+```
+
+### Get Email Summary
+```bash
+curl -X GET http://localhost:8084/api/v1/emails/email_123/summary \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+## 🔒 Security Features
+
+- **JWT Authentication**: Scope-based authorization with `email.read` and `email.write` scopes
+- **Rate Limiting**: 100 requests per 15 minutes per IP
+- **Input Validation**: Comprehensive request validation with Zod schemas
+- **CORS Protection**: Configurable allowed origins
+- **Security Headers**: Helmet.js for security headers
+- **Error Handling**: Structured error responses with correlation IDs
+
+## 📈 Monitoring & Observability
+
+### Logging
+- Structured JSON logging with Winston
+- Correlation ID tracking across requests
+- Performance metrics for AI processing
+- Error tracking with stack traces
+
+### Health Checks
+- Basic health endpoint for load balancers
+- Detailed health with dependency status
+- Kubernetes-ready readiness and liveness probes
+
+### Metrics
+- Email processing performance
+- AI model response times
+- Sync job success/failure rates
+- Database query performance
+
+## 🧪 Testing
+
+### Unit Tests
+```bash
+npm test
+```
+
+### Integration Tests
+```bash
+npm run test:integration
+```
+
+### API Contract Testing
+```bash
+npm run test:contract
+```
+
+## 📝 Development
+
+### Code Structure
+```
+src/
+├── config/          # Environment configuration
+├── middleware/      # Express middleware
+├── providers/       # Email provider integrations
+├── routes/          # API route handlers
+├── services/        # Business logic services
+├── types/           # TypeScript type definitions
+└── utils/           # Utility functions
+
+prisma/
+├── schema.prisma    # Database schema
+└── migrations/      # Database migrations
+```
+
+### Adding New Email Providers
+1. Implement the `EmailProvider` interface
+2. Add provider-specific configuration
+3. Update the sync service to support the new provider
+4. Add tests for the new provider
+
+### Extending AI Processing
+1. Add new processing methods to `AIProcessor`
+2. Update database schema for new data types
+3. Add corresponding API endpoints
+4. Update OpenAPI specification
+
+## 🚀 Deployment
+
 ### Production Considerations
-
-- Set `NODE_ENV=production`
-- Use proper database connection pooling
-- Configure log aggregation
+- Use environment-specific configuration
+- Enable database connection pooling
+- Configure proper logging levels
 - Set up monitoring and alerting
-- Use HTTPS in production
-- Implement proper secret management
+- Use secrets management for sensitive data
 
-## Monitoring
+### Scaling
+- Horizontal scaling with multiple instances
+- Database read replicas for query performance
+- Redis for caching and session storage
+- Message queues for async processing
 
-The service provides several monitoring endpoints:
+## 📋 Roadmap
 
-- `/health` - Basic health check
-- `/health/detailed` - Detailed health with dependencies
-- `/health/ready` - Readiness probe for K8s
-- `/health/live` - Liveness probe for K8s
+### Phase 4.2: Goal & Strategy Service
+- Task management integration
+- Priority scoring algorithms
+- Goal-email relationship analysis
 
-Logs are structured JSON format with correlation IDs for request tracing.
+### Phase 4.3: Calendar Service
+- Calendar integration for scheduling
+- Meeting conflict detection
+- Time-based recommendations
 
-## Contributing
+### Future Enhancements
+- IMAP/SMTP fallback support
+- Multi-language email processing
+- Advanced email filtering
+- Real-time email notifications
+- Email template generation
 
-1. Follow the existing code style
-2. Add tests for new features
-3. Update API documentation
-4. Ensure all linting passes
-5. Add appropriate logging
+## 🤝 Contributing
 
-## License
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
 
-MIT License - see LICENSE file for details.
+## 📄 License
+
+MIT License - see LICENSE file for details
