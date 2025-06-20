@@ -94,10 +94,10 @@ router.use(authenticateJWT);
  * POST /api/v1/goals/translate
  * Convert raw goal to SMART format using AI
  */
-router.post('/translate', requireScopes(['goals:write']), async (req, res, next) => {
+router.post('/translate', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
     const { raw_goal, context } = translateGoalSchema.parse(req.body);
-    const correlationId = req.correlationId;
+    const correlationId = req.correlationId || Math.random().toString(36).substring(7);
     const userApiKey = req.headers['x-openai-api-key'] as string;
 
     logger.info('Goal translation request', {
@@ -106,6 +106,18 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
       rawGoal: raw_goal,
       hasUserApiKey: !!userApiKey
     });
+
+    // Validate API key if provided
+    if (userApiKey && !userApiKey.startsWith('sk-')) {
+      res.status(400).json({
+        error: {
+          code: 'INVALID_API_KEY',
+          message: 'Invalid OpenAI API key format',
+          correlationId
+        }
+      });
+      return;
+    }
 
     const input: RawGoalInput = {
       goal: raw_goal,
@@ -139,10 +151,10 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
  * POST /api/v1/goals/clarify
  * Process clarification answers to improve SMART goal
  */
-router.post('/clarify', requireScopes(['goals:write']), async (req, res, next) => {
+router.post('/clarify', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
     const { goal_id, answers } = clarifyGoalSchema.parse(req.body);
-    const correlationId = req.correlationId;
+    const correlationId = req.correlationId || Math.random().toString(36).substring(7);
 
     logger.info('Goal clarification request', {
       correlationId,
@@ -160,12 +172,13 @@ router.post('/clarify', requireScopes(['goals:write']), async (req, res, next) =
     });
 
     if (!goal) {
-      return res.status(404).json({
+      res.status(404).json({
         error: {
           code: 'GOAL_NOT_FOUND',
           message: 'Goal not found or access denied'
         }
       });
+      return;
     }
 
     const clarificationAnswers: ClarificationAnswer[] = answers.map(a => ({
@@ -185,7 +198,7 @@ router.post('/clarify', requireScopes(['goals:write']), async (req, res, next) =
       where: { id: goal_id },
       data: {
         title: result.smartGoal,
-        smartCriteria: result.smartCriteria,
+        smartCriteria: result.smartCriteria as any,
         updatedAt: new Date()
       }
     });
@@ -224,7 +237,7 @@ router.post('/clarify', requireScopes(['goals:write']), async (req, res, next) =
 router.post('/', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const goalData = createGoalSchema.parse(req.body);
-    const correlationId = req.correlationId;
+    const correlationId = req.correlationId || Math.random().toString(36).substring(7);
 
     logger.info('Goal creation request', {
       correlationId,
@@ -236,10 +249,10 @@ router.post('/', requireScopes(['goals:write']), async (req, res, next) => {
       data: {
         userId: req.user!.id,
         title: goalData.title,
-        description: goalData.description,
+        description: goalData.description || null,
         smartCriteria: goalData.smart_criteria,
         priority: goalData.priority,
-        category: goalData.category,
+        category: goalData.category || null,
         tags: goalData.tags,
         targetDate: goalData.target_date ? new Date(goalData.target_date) : null,
         status: 'DRAFT'
@@ -308,7 +321,7 @@ router.get('/', requireScopes(['goals:read']), async (req, res, next) => {
         total,
         pages: Math.ceil(total / limit)
       },
-      correlation_id: req.correlationId
+      correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
   } catch (error) {
@@ -320,9 +333,9 @@ router.get('/', requireScopes(['goals:read']), async (req, res, next) => {
  * GET /api/v1/goals/:id
  * Get specific goal with full details
  */
-router.get('/:id', requireScopes(['goals:read']), async (req, res, next) => {
+router.get('/:id', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
   try {
-    const goalId = req.params['id'];
+    const goalId = req.params['id']!;
 
     const goal = await prisma.goal.findFirst({
       where: {
@@ -348,17 +361,19 @@ router.get('/:id', requireScopes(['goals:read']), async (req, res, next) => {
     });
 
     if (!goal) {
-      return res.status(404).json({
+      res.status(404).json({
         error: {
           code: 'GOAL_NOT_FOUND',
           message: 'Goal not found or access denied'
         }
       });
+      return;
     }
 
     // Calculate progress
-    const totalTasks = goal.milestones.reduce((sum: number, m: any) => sum + m.tasks.length, 0);
-    const completedTasks = goal.milestones.reduce(
+    const milestones = (goal as any).milestones || [];
+    const totalTasks = milestones.reduce((sum: number, m: any) => sum + m.tasks.length, 0);
+    const completedTasks = milestones.reduce(
       (sum: number, m: any) => sum + m.tasks.filter((t: any) => t.status === 'COMPLETED').length,
       0
     );
@@ -370,10 +385,10 @@ router.get('/:id', requireScopes(['goals:read']), async (req, res, next) => {
         percentage: progressPercentage,
         completed_tasks: completedTasks,
         total_tasks: totalTasks,
-        completed_milestones: goal.milestones.filter((m: any) => m.status === 'COMPLETED').length,
-        total_milestones: goal.milestones.length
+        completed_milestones: milestones.filter((m: any) => m.status === 'COMPLETED').length,
+        total_milestones: milestones.length
       },
-      correlation_id: req.correlationId
+      correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
   } catch (error) {
@@ -385,9 +400,9 @@ router.get('/:id', requireScopes(['goals:read']), async (req, res, next) => {
  * PUT /api/v1/goals/:id
  * Update goal
  */
-router.put('/:id', requireScopes(['goals:write']), async (req, res, next) => {
+router.put('/:id', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
-    const goalId = req.params['id'];
+    const goalId = req.params['id']!;
     const updates = updateGoalSchema.parse(req.body);
 
     const existingGoal = await prisma.goal.findFirst({
@@ -398,22 +413,34 @@ router.put('/:id', requireScopes(['goals:write']), async (req, res, next) => {
     });
 
     if (!existingGoal) {
-      return res.status(404).json({
+      res.status(404).json({
         error: {
           code: 'GOAL_NOT_FOUND',
           message: 'Goal not found or access denied'
         }
       });
+      return;
     }
+
+    const updateData: any = {
+      ...updates,
+      updatedAt: new Date()
+    };
+    
+    if (updates.target_date !== undefined) {
+      updateData.targetDate = updates.target_date ? new Date(updates.target_date) : null;
+    }
+    
+    if (updates.status === 'COMPLETED') {
+      updateData.completedAt = new Date();
+    }
+    
+    // Remove the target_date field as it's not part of the Prisma schema
+    delete updateData.target_date;
 
     const goal = await prisma.goal.update({
       where: { id: goalId },
-      data: {
-        ...updates,
-        targetDate: updates.target_date ? new Date(updates.target_date) : undefined,
-        completedAt: updates.status === 'COMPLETED' ? new Date() : undefined,
-        updatedAt: new Date()
-      },
+      data: updateData,
       include: {
         metrics: true,
         milestones: true
@@ -421,7 +448,7 @@ router.put('/:id', requireScopes(['goals:write']), async (req, res, next) => {
     });
 
     logger.info('Goal updated', {
-      correlationId: req.correlationId,
+      correlationId: req.correlationId || Math.random().toString(36).substring(7),
       userId: req.user?.id,
       goalId,
       updates: Object.keys(updates)
@@ -429,7 +456,7 @@ router.put('/:id', requireScopes(['goals:write']), async (req, res, next) => {
 
     res.json({
       goal,
-      correlation_id: req.correlationId
+      correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
   } catch (error) {
@@ -441,9 +468,9 @@ router.put('/:id', requireScopes(['goals:write']), async (req, res, next) => {
  * DELETE /api/v1/goals/:id
  * Delete goal
  */
-router.delete('/:id', requireScopes(['goals:write']), async (req, res, next) => {
+router.delete('/:id', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
-    const goalId = req.params['id'];
+    const goalId = req.params['id']!;
 
     const existingGoal = await prisma.goal.findFirst({
       where: {
@@ -453,12 +480,13 @@ router.delete('/:id', requireScopes(['goals:write']), async (req, res, next) => 
     });
 
     if (!existingGoal) {
-      return res.status(404).json({
+      res.status(404).json({
         error: {
           code: 'GOAL_NOT_FOUND',
           message: 'Goal not found or access denied'
         }
       });
+      return;
     }
 
     await prisma.goal.delete({
@@ -466,14 +494,14 @@ router.delete('/:id', requireScopes(['goals:write']), async (req, res, next) => 
     });
 
     logger.info('Goal deleted', {
-      correlationId: req.correlationId,
+      correlationId: req.correlationId || Math.random().toString(36).substring(7),
       userId: req.user?.id,
       goalId
     });
 
     res.json({
       success: true,
-      correlation_id: req.correlationId
+      correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
   } catch (error) {
@@ -485,9 +513,9 @@ router.delete('/:id', requireScopes(['goals:write']), async (req, res, next) => 
  * GET /api/v1/goals/:id/smart-analysis
  * Get SMART criteria analysis for goal
  */
-router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res, next) => {
+router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
   try {
-    const goalId = req.params['id'];
+    const goalId = req.params['id']!;
 
     const goal = await prisma.goal.findFirst({
       where: {
@@ -497,23 +525,26 @@ router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res
     });
 
     if (!goal) {
-      return res.status(404).json({
+      res.status(404).json({
         error: {
           code: 'GOAL_NOT_FOUND',
           message: 'Goal not found or access denied'
         }
       });
+      return;
     }
 
+    const userApiKey = req.headers['x-openai-api-key'] as string;
     const analysis = await smartGoalProcessor.analyzeGoalCompleteness(
-      goal.smartCriteria as any
+      goal.smartCriteria as any,
+      userApiKey
     );
 
     res.json({
       goal_id: goalId,
       smart_criteria: goal.smartCriteria,
       analysis,
-      correlation_id: req.correlationId
+      correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
   } catch (error) {
@@ -525,9 +556,9 @@ router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res
  * POST /api/v1/goals/:id/metrics
  * Add success metric to goal
  */
-router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, next) => {
+router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
-    const goalId = req.params['id'];
+    const goalId = req.params['id']!;
     const metricData = createMetricSchema.parse(req.body);
 
     const goal = await prisma.goal.findFirst({
@@ -538,12 +569,13 @@ router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, nex
     });
 
     if (!goal) {
-      return res.status(404).json({
+      res.status(404).json({
         error: {
           code: 'GOAL_NOT_FOUND',
           message: 'Goal not found or access denied'
         }
       });
+      return;
     }
 
     // If this is a primary metric, unset other primary metrics
@@ -560,16 +592,16 @@ router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, nex
         name: metricData.name,
         type: metricData.type,
         targetValue: metricData.target_value,
-        baselineValue: metricData.baseline_value,
-        unit: metricData.unit,
-        measurementFrequency: metricData.measurement_frequency,
+        baselineValue: metricData.baseline_value || null,
+        unit: metricData.unit || null,
+        measurementFrequency: metricData.measurement_frequency || null,
         isPrimary: metricData.is_primary
       }
     });
 
     res.status(201).json({
       metric,
-      correlation_id: req.correlationId
+      correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
   } catch (error) {
@@ -581,9 +613,9 @@ router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, nex
  * GET /api/v1/goals/:id/metrics/tracking
  * Get metric tracking status
  */
-router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, res, next) => {
+router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
   try {
-    const goalId = req.params['id'];
+    const goalId = req.params['id']!;
 
     const goal = await prisma.goal.findFirst({
       where: {
@@ -596,15 +628,17 @@ router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, r
     });
 
     if (!goal) {
-      return res.status(404).json({
+      res.status(404).json({
         error: {
           code: 'GOAL_NOT_FOUND',
           message: 'Goal not found or access denied'
         }
       });
+      return;
     }
 
-    const tracking = goal.metrics.map((metric: any) => ({
+    const metrics = (goal as any).metrics || [];
+    const tracking = metrics.map((metric: any) => ({
       id: metric.id,
       name: metric.name,
       type: metric.type,
@@ -622,7 +656,7 @@ router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, r
     res.json({
       goal_id: goalId,
       metrics: tracking,
-      correlation_id: req.correlationId
+      correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
   } catch (error) {
