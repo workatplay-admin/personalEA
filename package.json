@@ -21,7 +21,7 @@
     "generate:types": "openapi-typescript docs/email-service-api-v1.yaml --output types/email-service.ts && openapi-typescript docs/goal-strategy-service-api-v1.yaml --output types/goal-strategy.ts && openapi-typescript docs/calendar-service-api-v1.yaml --output types/calendar.ts",
     "test:contract": "npm run test:contract:api && npm run test:contract:pact",
     "test:contract:api": "npm run test:contract:schemathesis && npm run test:contract:dredd",
-    "test:contract:schemathesis": "schemathesis run docs/email-service-api-v1.yaml --base-url http://localhost:8083 --hypothesis-max-examples=50 && schemathesis run docs/goal-strategy-service-api-v1.yaml --base-url http://localhost:8085 --hypothesis-max-examples=50 && schemathesis run docs/calendar-service-api-v1.yaml --base-url http://localhost:8086 --hypothesis-max-examples=50",
+    "test:contract:schemathesis": "schemathesis run docs/email-service-api-v1.yaml --url http://localhost:8083 --max-examples=50 && schemathesis run docs/goal-strategy-service-api-v1.yaml --url http://localhost:8085 --max-examples=50 && schemathesis run docs/calendar-service-api-v1.yaml --url http://localhost:8086 --max-examples=50",
     "test:contract:dredd": "dredd docs/email-service-api-v1.yaml http://localhost:8083 && dredd docs/goal-strategy-service-api-v1.yaml http://localhost:8085 && dredd docs/calendar-service-api-v1.yaml http://localhost:8086",
     "test:contract:pact": "npm run test:contract:pact:provider && npm run test:contract:pact:consumer",
     "test:contract:pact:provider": "jest --testPathPattern=tests/pact/provider",
