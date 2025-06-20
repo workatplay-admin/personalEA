@@ -193,22 +193,111 @@ personalEA/
 8. [ ] **Unit and integration tests** with >80% coverage
 9. [ ] **Performance testing** and optimization
 
-### 4.2 Milestone 1.2: Goal & Strategy Service
-**Timeline: 2-3 weeks**
+### 4.2 Milestone 1.2: Goal & Strategy Service 🚧 IN PROGRESS
+**Timeline: 12-15 weeks (6-phase implementation)**
+**Specification: [`docs/goal-strategy-service-specification.md`](docs/goal-strategy-service-specification.md)**
 
-#### Core Features
-- [ ] **Goal Management**
-  - CRUD operations with ETag-based concurrency control
-  - Hierarchical goal structures
-  - Progress tracking and analytics
-- [ ] **Task Management**
-  - Task dependencies and blocking relationships
-  - Priority algorithms with AI suggestions
-  - Context generation for justification
-- [ ] **Strategic Intelligence**
-  - Priority scoring with confidence metrics
-  - Time-based recommendations
-  - Goal-task relationship analysis
+#### 8-Step Sophisticated Workflow Implementation
+Based on the comprehensive technical specification, this milestone implements an advanced goal-setting and strategy workflow that transforms high-level goals into actionable, scheduled tasks.
+
+#### Core Workflow Steps
+- [ ] **Step 1: SMART Goal Translation**
+  - AI-powered conversion of vague goals into SMART objectives
+  - Interactive clarification system for missing specifics
+  - Natural language processing for goal analysis
+- [ ] **Step 2: Critical Success Metric Identification**
+  - Single metric definition with supporting indicators
+  - Measurable outcome specification
+  - Success criteria validation
+- [ ] **Step 3: Milestone Breakdown**
+  - 2-6 measurable mini-wins per quarter
+  - Timeline distribution and progress tracking
+  - Milestone dependency mapping
+- [ ] **Step 4: Work Breakdown Structure (WBS)**
+  - Recursive decomposition to ≤1 day tasks
+  - Completion criteria definition
+  - Task template library and pattern recognition
+- [ ] **Step 5: Dependency Mapping & Sequencing**
+  - Critical path analysis and optimization
+  - Parallel execution identification
+  - Blocking relationship management
+- [ ] **Step 6: Task Estimation Engine**
+  - Multi-method estimation (expert judgment, analogy, three-point PERT)
+  - Historical data learning and pattern recognition
+  - Confidence scoring and uncertainty handling
+- [ ] **Step 7: Calendar Integration & Scheduling**
+  - Constraint-aware scheduling with focus time management
+  - Conflict detection and resolution
+  - Availability analysis and optimization
+- [ ] **Step 8: Capacity Management & Optimization**
+  - Team workload balancing and utilization monitoring
+  - Resource allocation and preference management
+  - Performance analytics and optimization
+
+#### Technical Architecture Components
+- [ ] **SMART Goal Processor** - AI-powered goal analysis and translation
+- [ ] **Milestone Generator** - Intelligent breakdown with pattern recognition
+- [ ] **WBS Engine** - Recursive task decomposition with templates
+- [ ] **Dependency Mapper** - Graph analysis and critical path calculation
+- [ ] **Estimation Engine** - Multi-method estimation with learning system
+- [ ] **Calendar Scheduler** - Constraint solver with conflict resolution
+- [ ] **Capacity Manager** - Workload balancer with preference engine
+
+#### 6-Phase Implementation Roadmap
+**Phase 1: Core Goal Management (Weeks 1-3)**
+- [ ] SMART Goal Translation service
+- [ ] Critical Success Metric identification
+- [ ] Basic goal CRUD operations with AI enhancement
+- [ ] Database schema implementation
+
+**Phase 2: Advanced Planning (Weeks 4-6)**
+- [ ] Milestone breakdown and generation
+- [ ] Work Breakdown Structure engine
+- [ ] Task decomposition with recursive logic
+- [ ] Template library and pattern recognition
+
+**Phase 3: Dependency & Estimation (Weeks 7-9)**
+- [ ] Dependency mapping and graph analysis
+- [ ] Critical path calculation
+- [ ] Multi-method estimation engine
+- [ ] Historical learning system
+
+**Phase 4: Calendar Integration (Weeks 10-12)**
+- [ ] Calendar service integration
+- [ ] Constraint-aware scheduling
+- [ ] Conflict detection and resolution
+- [ ] Focus time management
+
+**Phase 5: Capacity Management (Weeks 13-14)**
+- [ ] Workload balancing algorithms
+- [ ] Resource allocation optimization
+- [ ] Team capacity analysis
+- [ ] Performance monitoring
+
+**Phase 6: Intelligence & Optimization (Week 15)**
+- [ ] AI-powered optimization
+- [ ] Learning system refinement
+- [ ] Advanced analytics and reporting
+- [ ] System integration testing
+
+#### Integration Dependencies
+- [ ] **Calendar Service Integration** - Required for scheduling and availability
+- [ ] **Email Service Integration** - Action item extraction to goal conversion
+- [ ] **AI Service Integration** - Enhanced for SMART translation and optimization
+- [ ] **Shared Database Schema** - Extended for complex goal management entities
+
+#### Database Schema (10+ Core Entities)
+- [ ] Goals, Milestones, Tasks, Dependencies
+- [ ] Schedules, Capacity, Estimations, Templates
+- [ ] Learning data, Analytics, Optimization metrics
+
+#### API Specification (25+ Endpoints)
+- [ ] Goal translation and clarification endpoints
+- [ ] Milestone generation and management
+- [ ] WBS and task decomposition
+- [ ] Dependency mapping and critical path
+- [ ] Estimation and scheduling endpoints
+- [ ] Capacity analysis and optimization
 
 ### 4.3 Milestone 1.3: Calendar Service
 **Timeline: 2-3 weeks**
