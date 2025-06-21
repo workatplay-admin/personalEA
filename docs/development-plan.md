@@ -3,6 +3,30 @@
 ## Overview
 This document outlines the development plan for the personalEA system, following API-first design principles and industry best practices for microservices development.
 
+## 🚨 **CRITICAL: STAGING ENVIRONMENT FOUNDATION**
+
+### **⚠️ MANDATORY READING FOR ALL NEW DEVELOPERS**
+Before starting any development work, ALL team members must review and follow the staging environment architecture:
+
+- **📋 [Staging Environment Plan](staging-environment-plan.md)** - Complete architecture overview
+- **🚀 [Staging Implementation Roadmap](staging-implementation-roadmap.md)** - Detailed implementation steps
+
+### **Key Requirements:**
+- ✅ **Use Staging Environment**: All development MUST use the Docker-based staging environment
+- ✅ **Consistent Ports**: API (3000), Frontend (5173), Email (3001), Calendar (3003)
+- ✅ **User Testing Milestones**: Test after each service completion
+- ✅ **No Ad-hoc Development**: Follow the established staging workflow
+
+### **Current Staging Status:**
+- ✅ **Goal Strategy Service**: Working with timeout fixes implemented
+- ✅ **Frontend Interface**: React testing UI operational
+- 🔄 **Docker Environment**: Ready for implementation (Phase 1)
+- 🔄 **Service Integration**: Incremental rollout planned
+
+**🎯 Next Action**: Implement Phase 1 of staging environment before any new feature development.
+
+---
+
 ## Phase 1: API Contract Foundation ✅ COMPLETED
 
 ### 1.1 OpenAPI Specifications
@@ -203,6 +227,7 @@ personalEA/
 ### 4.2 Milestone 1.2: Goal & Strategy Service ✅ PHASE 1 COMPLETED
 **Timeline: 12-15 weeks (6-phase implementation)**
 **Specification: [`docs/goal-strategy-service-specification.md`](docs/goal-strategy-service-specification.md)**
+**OpenAPI Architecture: [`testing/goal-strategy-test/OPENAPI_ARCHITECTURE_PLAN.md`](../testing/goal-strategy-test/OPENAPI_ARCHITECTURE_PLAN.md)**
 
 #### 8-Step Sophisticated Workflow Implementation
 Based on the comprehensive technical specification, this milestone implements an advanced goal-setting and strategy workflow that transforms high-level goals into actionable, scheduled tasks.
@@ -273,11 +298,12 @@ Based on the comprehensive technical specification, this milestone implements an
 - [x] Historical learning system ✅
 
 **Phase 2.5: Testing & Validation** 🚧 IN PROGRESS
-- [ ] React + Vite testing interface
-- [ ] Core workflow validation (SMART → Milestones → WBS → Estimation)
-- [ ] AI output quality assessment
-- [ ] User experience testing
-- [ ] Performance and accuracy metrics collection
+- [x] React + Vite testing interface ✅
+- [x] Core workflow validation (SMART → Milestones → WBS → Estimation) ✅
+- [x] AI output quality assessment ✅
+- [x] User experience testing ✅
+- [x] Performance and accuracy metrics collection ✅
+- [x] **Timeout Fix Implementation** ✅ COMPLETED - Resolved hanging request issues
 
 **Phase 4: Calendar Integration (Weeks 10-12)** 🔄 NEXT
 - [ ] Calendar service integration
@@ -436,9 +462,10 @@ Based on the comprehensive technical specification, this milestone implements an
 4. ✅ **Create development environment** setup scripts - COMPLETED
 5. ✅ **Setup project structure** for microservices (Phase 3.1) - COMPLETED
 6. ✅ **Create user-friendly installation and configuration** (Phase 3.5) - COMPLETED
-7. **Begin Email Processing Service** implementation (Phase 4.1)
-8. **Setup database schemas and migrations**
-9. **Implement email provider integrations**
-10. **Create configuration web UI** for non-technical users
+7. 🚨 **PRIORITY: Implement Staging Environment** (Phase 1 of staging roadmap)
+8. **Begin Email Processing Service** implementation (Phase 4.1)
+9. **Setup database schemas and migrations**
+10. **Implement email provider integrations**
+11. **Create configuration web UI** for non-technical users
 
 This plan ensures a systematic, best-practice approach to building the personalEA system with high quality, maintainability, and scalability.
