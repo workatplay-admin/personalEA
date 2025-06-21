@@ -10,6 +10,8 @@ Before starting any development work, ALL team members must review and follow th
 
 - **📋 [Staging Environment Plan](staging-environment-plan.md)** - Complete architecture overview
 - **🚀 [Staging Implementation Roadmap](staging-implementation-roadmap.md)** - Detailed implementation steps
+- **🗓️ [Calendar Functionality Architecture Plan](calendar-functionality-architecture-plan.md)** - Complete calendar implementation architecture
+- **✅ [Calendar Implementation Checklist](calendar-implementation-checklist.md)** - Detailed task breakdown for calendar features
 
 ### **Key Requirements:**
 - ✅ **Use Staging Environment**: All development MUST use the Docker-based staging environment
@@ -24,6 +26,18 @@ Before starting any development work, ALL team members must review and follow th
 - 🔄 **Service Integration**: Incremental rollout planned
 
 **🎯 Next Action**: Implement Phase 1 of staging environment before any new feature development.
+
+---
+
+## 🤖 **AI Architecture Principles**
+
+### **⚠️ MANDATORY FOR ALL AI/LLM INTEGRATIONS**
+- **External Configuration**: All AI models, parameters, and prompts must be in external files (JSON/YAML/Markdown)
+- **Provider Independence**: Business logic must work with any AI provider through abstraction layers
+- **No Hardcoding**: Zero tolerance for hardcoded prompts, model names, or AI-specific logic in application code
+
+**📋 See [AI Integration Architecture](ai-integration-architecture.md) for full guidelines.**
+**🔧 See [AI Integration Enforcement](ai-integration-enforcement.md) for lint rules and PR checklist.**
 
 ---
 
@@ -310,6 +324,8 @@ Based on the comprehensive technical specification, this milestone implements an
 - [ ] Constraint-aware scheduling
 - [ ] Conflict detection and resolution
 - [ ] Focus time management
+- **📋 See [Calendar Functionality Architecture Plan](calendar-functionality-architecture-plan.md) for complete implementation details**
+- **✅ See [Calendar Implementation Checklist](calendar-implementation-checklist.md) for detailed task breakdown**
 
 **Phase 5: Capacity Management (Weeks 13-14)**
 - [ ] Workload balancing algorithms
@@ -343,21 +359,46 @@ Based on the comprehensive technical specification, this milestone implements an
 - [ ] Capacity analysis and optimization
 
 ### 4.3 Milestone 1.3: Calendar Service
-**Timeline: 2-3 weeks**
+**Timeline: 6 weeks (3 weeks Goal Service completion + 3 weeks Calendar Service)**
+**Architecture: [`docs/calendar-functionality-architecture-plan.md`](calendar-functionality-architecture-plan.md)**
+**Implementation: [`docs/calendar-implementation-checklist.md`](calendar-implementation-checklist.md)**
+
+#### Implementation Strategy
+Following the established microservices architecture with selective AI integration:
+
+**Phase 4: Goal & Strategy Service Completion (Weeks 1-3)**
+- [ ] **Calendar Integration Foundation** - Planner Service module within Goal Service
+- [ ] **Capacity Management** - Workload balancing and resource allocation
+- [ ] **Intelligence & Optimization** - AI-powered features with external prompts
+
+**Phase 5: Calendar Sync Service Implementation (Weeks 4-6)**
+- [ ] **Calendar Sync Service** - Standalone microservice for calendar operations
+- [ ] **Google Calendar Integration** - OAuth2, real-time sync, webhook handling
+- [ ] **AI Integration & Testing** - Scheduling suggestions, conflict resolution
 
 #### Core Features
-- [ ] **Calendar Integration**
-  - Multi-provider support (Google, Outlook, Apple, CalDAV)
-  - OAuth2 authentication flows
-  - Real-time synchronization
-- [ ] **Intelligent Scheduling**
-  - Availability analysis across calendars
-  - Conflict detection and resolution
-  - AI-powered scheduling suggestions
-- [ ] **Event Management**
-  - Full CRUD operations with provider sync
-  - Recurring event handling
-  - Attendee management and notifications
+- [ ] **Calendar Sync Service (Separate Microservice)**
+  - Google Calendar API integration with OAuth2
+  - Real-time synchronization with webhook support
+  - Batch operations for task scheduling
+- [ ] **Planner Service (Within Goal Service)**
+  - Deterministic slot scoring and task placement (≤2h blocks)
+  - Dependency-aware scheduling with critical path analysis
+  - Multi-day task splitting with parent-child relationships
+- [ ] **AI-Powered Features (External Prompts)**
+  - Schedule optimization suggestions (`prompts/calendar/schedule_advice.md`)
+  - Conflict explanations (`prompts/calendar/conflict_explain.md`)
+  - Fallback to deterministic rules for reliability
+- [ ] **Testing Infrastructure Extension**
+  - Calendar Demo tab in React testing interface
+  - Visual schedule diff with conflict highlighting
+  - Comprehensive test coverage (contract, property-based, E2E)
+
+#### Technical Architecture
+- **Service Separation**: Calendar Sync as microservice, Planner logic in Goal Service
+- **AI Integration**: Selective use for human judgment, deterministic core algorithms
+- **Testing Strategy**: Extend proven React + Vite + enhanced API server pattern
+- **Performance Targets**: <100ms slot scoring, <5s calendar sync, >90% test coverage
 
 ## Phase 5: Integration & System Testing
 
@@ -463,9 +504,16 @@ Based on the comprehensive technical specification, this milestone implements an
 5. ✅ **Setup project structure** for microservices (Phase 3.1) - COMPLETED
 6. ✅ **Create user-friendly installation and configuration** (Phase 3.5) - COMPLETED
 7. 🚨 **PRIORITY: Implement Staging Environment** (Phase 1 of staging roadmap)
-8. **Begin Email Processing Service** implementation (Phase 4.1)
-9. **Setup database schemas and migrations**
-10. **Implement email provider integrations**
-11. **Create configuration web UI** for non-technical users
+8. 🗓️ **NEXT: Complete Goal & Strategy Service Phases 4-6** (Calendar Integration, Capacity Management, Intelligence)
+9. 🗓️ **THEN: Implement Calendar Sync Service** (Standalone microservice with Google Calendar integration)
+10. **Setup database schemas and migrations**
+11. **Implement email provider integrations**
+12. **Create configuration web UI** for non-technical users
+
+### **📋 Calendar Implementation Priority**
+Following the user's direction to complete Goal & Strategy Service phases 4-6 first, then implement Calendar Sync Service:
+- **Week 1-3**: Goal Service Phase 4 (Calendar Integration), Phase 5 (Capacity Management), Phase 6 (Intelligence)
+- **Week 4-6**: Calendar Sync Service implementation with Google Calendar integration
+- **Ongoing**: Extend testing infrastructure and maintain staging environment
 
 This plan ensures a systematic, best-practice approach to building the personalEA system with high quality, maintainability, and scalability.

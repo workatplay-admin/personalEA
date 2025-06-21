@@ -329,6 +329,12 @@ paths:
                     description: A brief explanation of why this task was prioritized.
 ```
 
+**Note**: For the complete OpenAPI-first architecture implementation of the Goal & Strategy Service, see the comprehensive [`OpenAPI Architecture Plan`](../testing/goal-strategy-test/OPENAPI_ARCHITECTURE_PLAN.md) which includes production-ready specifications, NestJS implementation, contract testing, and enterprise-grade patterns.
+
+**Calendar Implementation**: For the complete calendar functionality architecture and implementation plan, see:
+- [`Calendar Functionality Architecture Plan`](calendar-functionality-architecture-plan.md) - Complete technical architecture and design
+- [`Calendar Implementation Checklist`](calendar-implementation-checklist.md) - Detailed task breakdown and timeline
+
 ### 2.5. Technology Stack
 
 - **Backend Services:** Node.js/TypeScript (for consistency with Dialog Gateway), potentially Rust for performance-critical components (e.g., knowledge base indexing).

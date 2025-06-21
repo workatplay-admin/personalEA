@@ -42,6 +42,12 @@ PersonalEA follows a microservices architecture with three core services:
 - **Goal & Strategy Service** - Sophisticated 8-step goal-setting workflow with AI-powered SMART translation, milestone breakdown, work breakdown structure, dependency mapping, task estimation, calendar scheduling, and capacity management
 - **Calendar Service** - Calendar integration, intelligent scheduling, and availability management
 
+### **🗓️ Calendar Implementation Status**
+- **Goal & Strategy Service**: ✅ Phases 1-3 Complete, 🔄 Phases 4-6 In Progress (Calendar Integration, Capacity Management, Intelligence)
+- **Calendar Sync Service**: 🔄 Implementation Planned (Standalone microservice with Google Calendar integration)
+- **Architecture Plan**: ✅ Complete - See [`docs/calendar-functionality-architecture-plan.md`](docs/calendar-functionality-architecture-plan.md)
+- **Implementation Guide**: ✅ Complete - See [`docs/calendar-implementation-checklist.md`](docs/calendar-implementation-checklist.md)
+
 ## 📋 API Specifications
 
 All services are designed with OpenAPI 3.1 specifications following contract-first development:
@@ -422,13 +428,30 @@ See [`docs/development-plan.md`](docs/development-plan.md) for detailed deployme
 
 ## 📚 Documentation
 
+### **Core Documentation**
 - [`docs/personal-ea-prd.md`](docs/personal-ea-prd.md) - Product Requirements Document
 - [`docs/development-plan.md`](docs/development-plan.md) - Detailed development roadmap
+
+### **🗓️ Calendar Implementation (NEW)**
+- [`docs/calendar-functionality-architecture-plan.md`](docs/calendar-functionality-architecture-plan.md) - **Complete calendar implementation architecture**
+- [`docs/calendar-implementation-checklist.md`](docs/calendar-implementation-checklist.md) - **Detailed task breakdown for calendar features**
+
+### **Service Specifications**
 - [`docs/goal-strategy-service-specification.md`](docs/goal-strategy-service-specification.md) - Comprehensive Goal & Strategy Service technical specification
+- [`testing/goal-strategy-test/OPENAPI_ARCHITECTURE_PLAN.md`](testing/goal-strategy-test/OPENAPI_ARCHITECTURE_PLAN.md) - **OpenAPI-First Architecture Plan** - Production-ready OpenAPI implementation with NestJS, contract testing, and enterprise patterns
+
+### **Development & Testing**
 - [`docs/contract-testing.md`](docs/contract-testing.md) - Contract testing guide and best practices
 - [`docs/mock-servers.md`](docs/mock-servers.md) - Enhanced mock server setup and usage guide
+- [`docs/staging-environment-plan.md`](docs/staging-environment-plan.md) - Staging environment architecture
+- [`docs/staging-implementation-roadmap.md`](docs/staging-implementation-roadmap.md) - Staging implementation steps
+
+### **Configuration & Security**
 - [`docs/configuration-management-plan.md`](docs/configuration-management-plan.md) - Configuration management system overview
 - [`docs/secret-management-guide.md`](docs/secret-management-guide.md) - Centralized secret management guide and best practices
+- [`docs/ai-integration-architecture.md`](docs/ai-integration-architecture.md) - AI integration principles and patterns
+
+### **Client Development**
 - [`client-dev-kit/README.md`](client-dev-kit/README.md) - Client development kit documentation
 - [`docs/api-spec.md`](docs/api-spec.md) - API specification guidelines
 - Generated API docs in `docs/*-docs.html`
