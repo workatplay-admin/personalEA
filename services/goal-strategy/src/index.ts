@@ -16,6 +16,7 @@ import wbsRoutes from '@/routes/wbs';
 import dependencyRoutes from '@/routes/dependencies';
 import estimationRoutes from '@/routes/estimations';
 import feedbackRoutes from '@/routes/feedback';
+import plannerRoutes from '@/routes/planner';
 // import taskRoutes from '@/routes/tasks';
 // import capacityRoutes from '@/routes/capacity';
 
@@ -103,6 +104,7 @@ apiRouter.use('/wbs', wbsRoutes);
 apiRouter.use('/dependencies', dependencyRoutes);
 apiRouter.use('/estimations', estimationRoutes);
 apiRouter.use('/feedback', feedbackRoutes);
+apiRouter.use('/planner', plannerRoutes);
 // apiRouter.use('/tasks', taskRoutes);
 // apiRouter.use('/capacity', capacityRoutes);
 
