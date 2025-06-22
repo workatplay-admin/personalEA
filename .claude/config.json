@@ -1,0 +1,15 @@
+{
+  "version": "1.0.72",
+  "project": {
+    "name": "personalEA",
+    "type": "claude-flow",
+    "created": "2025-06-22T15:57:58.018Z"
+  },
+  "features": {
+    "swarm": true,
+    "sparc": false,
+    "memory": true,
+    "terminal": true,
+    "mcp": true
+  }
+}
