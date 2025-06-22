@@ -5,8 +5,18 @@ import OpenAI from 'openai';
 const app = express();
 const PORT = 3000;
 
-// Middleware
-app.use(cors());
+// Middleware - Updated CORS for Codespaces
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests from any origin (including null for file:// urls)
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-OpenAI-API-Key', 'Cache-Control', 'Pragma', 'Expires'],
+  optionsSuccessStatus: 200
+}));
+
 app.use(express.json());
 
 // OpenAI client - will be initialized when API key is provided

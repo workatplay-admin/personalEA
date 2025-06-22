@@ -7,9 +7,15 @@ import goalAPI from '../services/api'
 const clearCachedGoalData = () => {
   console.log('🧹 Clearing any cached goal data...');
   
-  // Clear localStorage goal-related data
+  // Clear localStorage goal-related data (but NOT API keys!)
   const localStorageKeys = Object.keys(localStorage);
   localStorageKeys.forEach(key => {
+    // Skip API key storage - never remove user's configuration
+    if (key === 'goal-strategy-openai-key' || key === 'goal-strategy-jwt-token') {
+      console.log(`🔐 Preserving API configuration: ${key}`);
+      return; // Don't remove API configuration
+    }
+    
     if (key.includes('goal') || key.includes('smart') || key.includes('gs-') || key.includes('translate')) {
       console.log(`Removing localStorage key: ${key}`);
       localStorage.removeItem(key);

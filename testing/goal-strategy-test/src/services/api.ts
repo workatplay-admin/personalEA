@@ -1,7 +1,25 @@
 import axios, { InternalAxiosRequestConfig } from 'axios'
 import { Goal, Milestone, WBSTask, TaskEstimation, APIResponse, FeedbackData } from '../types'
 
-const API_BASE_URL = 'http://localhost:3000/api/v1'
+// Detect if we're in Codespaces and use the correct API URL
+const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')) {
+    // We're in Codespaces - use the forwarded URL
+    const hostname = window.location.hostname.replace('-5174.', '-3000.');
+    return `https://${hostname}/api/v1`;
+  }
+  // Local development
+  return 'http://localhost:3000/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Debug logging
+console.log('🔧 API Configuration:', {
+  detectedUrl: API_BASE_URL,
+  hostname: typeof window !== 'undefined' ? window.location.hostname : 'server-side',
+  isCodespaces: typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')
+});
 
 // API Configuration interface
 interface ApiConfig {
@@ -82,15 +100,33 @@ export const goalAPI = {
   // SMART Goal Translation
   async translateToSmart(originalGoal: string): Promise<Goal> {
     try {
+      console.log('🔍 Checking API configuration...')
+      console.log('API Config exists:', !!apiConfig)
+      console.log('API Config details:', apiConfig ? {
+        hasJwt: !!apiConfig.jwtToken,
+        hasApiKey: !!apiConfig.openaiApiKey,
+        apiKeyFormat: apiConfig.openaiApiKey?.startsWith('sk-') ? 'Valid format' : 'Invalid format',
+        apiKeyLength: apiConfig.openaiApiKey?.length || 0
+      } : 'No config')
+
       if (!apiConfig) {
-        throw new Error('API configuration not set. Please configure authentication credentials.')
+        throw new Error('❌ API configuration not set. Please enter your OpenAI API key in the configuration section.')
+      }
+
+      if (!apiConfig.openaiApiKey) {
+        throw new Error('❌ OpenAI API key missing. Please enter your API key in the configuration section.')
+      }
+
+      if (!apiConfig.openaiApiKey.startsWith('sk-')) {
+        throw new Error('❌ Invalid OpenAI API key format. API key should start with "sk-".')
       }
 
       // Add timestamp to prevent caching
       const timestamp = Date.now()
       const cacheBuster = Math.random().toString(36).substring(7)
       
-      console.log(`🚀 [${new Date().toISOString()}] Making fresh API call with cache-buster: ${timestamp}-${cacheBuster}`)
+      console.log(`🚀 [${new Date().toISOString()}] Making API call with cache-buster: ${timestamp}-${cacheBuster}`)
+      console.log('🔑 Using API key:', apiConfig.openaiApiKey.substring(0, 8) + '...')
 
       const response = await api.post<APIResponse<Goal>>(`/goals/translate?t=${timestamp}&cb=${cacheBuster}`, {
         raw_goal: originalGoal,
@@ -101,9 +137,28 @@ export const goalAPI = {
       }
       
       return response.data.data
-    } catch (error) {
-      console.error('Error translating goal:', error)
-      throw error
+    } catch (error: any) {
+      console.error('❌ Error translating goal:', error)
+      
+      // Better error messages
+      if (error.response) {
+        const status = error.response.status
+        const data = error.response.data
+        
+        if (status === 401) {
+          throw new Error('❌ Invalid or unauthorized API key. Please check your OpenAI API key.')
+        } else if (status === 429) {
+          throw new Error('❌ Rate limit exceeded. Please wait a moment and try again.')
+        } else if (status === 500) {
+          throw new Error('❌ Server error. Please try again in a moment.')
+        } else {
+          throw new Error(`❌ API Error (${status}): ${data?.error || error.message}`)
+        }
+      } else if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+        throw new Error('❌ Network connection failed. Please check your internet connection and try again.')
+      } else {
+        throw error
+      }
     }
   },
 

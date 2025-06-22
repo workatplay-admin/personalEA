@@ -65,6 +65,25 @@ All services are designed with OpenAPI 3.1 specifications following contract-fir
 - Docker and Docker Compose
 - Git
 
+### 🧪 User Testing Setup (Codespaces)
+
+**For immediate user testing in GitHub Codespaces:**
+
+```bash
+# Quick verification that everything is configured correctly
+node verify-setup.js
+```
+
+**📋 Complete Setup Guide:** `RELIABLE_TESTING_SETUP.md`  
+**⚡ Quick Reference:** `QUICK_SETUP_REFERENCE.md`
+
+**Key Requirements:**
+- Port 3000 set to PUBLIC in Codespaces
+- CORS headers properly configured  
+- OpenAI API key set in environment
+
+**User Testing URL:** Codespaces Ports tab → Click 🌐 next to port 5174
+
 ### 🔑 Secret Management Setup
 
 PersonalEA uses a centralized configuration approach for managing API keys and secrets:
