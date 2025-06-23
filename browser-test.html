@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PersonalEA Staging - Browser Connectivity Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .loading { background: #e2e3e5; color: #495057; border: 1px solid #ced4da; }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { background: #0056b3; }
+        .btn.success { background: #28a745; }
+        .btn.success:hover { background: #1e7e34; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 PersonalEA Staging Environment - Browser Test</h1>
+        <p>This page tests connectivity to PersonalEA staging services from your browser.</p>
+        
+        <div id="test-results">
+            <div class="test-result loading">🔄 Testing connectivity...</div>
+        </div>
+        
+        <h2>Service Access Links</h2>
+        <a href="http://localhost:5174" class="btn" target="_blank">🎯 Goal Testing Interface</a>
+        <a href="http://localhost:3000/health" class="btn" target="_blank">📊 API Health Check</a>
+        <button onclick="runTests()" class="btn">🔄 Re-test Connectivity</button>
+        
+        <h2>Manual Verification Steps</h2>
+        <ol>
+            <li><strong>Click "Goal Testing Interface"</strong> - Should open the React testing UI</li>
+            <li><strong>Click "API Health Check"</strong> - Should show JSON health status</li>
+            <li><strong>If both work</strong> - Environment is ready for testing!</li>
+        </ol>
+        
+        <div id="instructions" style="display: none;">
+            <h2>✅ Environment Ready - How to Test</h2>
+            <ol>
+                <li><strong>Open the Goal Testing Interface</strong>: <a href="http://localhost:5174" target="_blank">http://localhost:5174</a></li>
+                <li><strong>Enter your OpenAI API key</strong> in the configuration section</li>
+                <li><strong>Test goal translation</strong>:
+                    <ul>
+                        <li>Enter: "I want to learn Python programming"</li>
+                        <li>Click "Translate to SMART Goal"</li>
+                        <li>Review the generated task breakdown</li>
+                    </ul>
+                </li>
+                <li><strong>Try different goal types</strong>:
+                    <ul>
+                        <li>Professional: "Launch a new product feature by Q2"</li>
+                        <li>Fitness: "Run a marathon in 6 months"</li>
+                        <li>Personal: "Read 12 books this year"</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function testConnectivity(url, name) {
+            try {
+                const response = await fetch(url, { 
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                if (response.ok) {
+                    return { success: true, status: response.status, name };
+                } else {
+                    return { success: false, status: response.status, name, error: `HTTP ${response.status}` };
+                }
+            } catch (error) {
+                return { success: false, name, error: error.message };
+            }
+        }
+
+        async function runTests() {
+            const resultsDiv = document.getElementById('test-results');
+            const instructionsDiv = document.getElementById('instructions');
+            
+            resultsDiv.innerHTML = '<div class="test-result loading">🔄 Testing connectivity...</div>';
+            
+            const tests = [
+                { url: 'http://localhost:3000/health', name: 'API Server' },
+                { url: 'http://localhost:5174', name: 'Frontend Interface' }
+            ];
+            
+            const results = await Promise.all(
+                tests.map(test => testConnectivity(test.url, test.name))
+            );
+            
+            let allPassed = true;
+            let html = '<h3>🧪 Connectivity Test Results</h3>';
+            
+            results.forEach(result => {
+                if (result.success) {
+                    html += `<div class="test-result success">✅ ${result.name}: Connected (HTTP ${result.status})</div>`;
+                } else {
+                    html += `<div class="test-result error">❌ ${result.name}: ${result.error}</div>`;
+                    allPassed = false;
+                }
+            });
+            
+            if (allPassed) {
+                html += '<div class="test-result success">🎉 All services are accessible from your browser!</div>';
+                instructionsDiv.style.display = 'block';
+            } else {
+                html += '<div class="test-result warning">⚠️ Some services are not accessible. Try restarting the environment.</div>';
+                instructionsDiv.style.display = 'none';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Auto-run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

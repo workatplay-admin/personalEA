@@ -1,0 +1,13 @@
+{
+  "objective": "readthrough the project documents and suggest a course of action for next steps",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-06-22T16:02:40.632Z",
+  "id": "swarm-auto-centralized-1750608160632"
+}
