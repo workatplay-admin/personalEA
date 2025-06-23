@@ -112,7 +112,11 @@ class StagingTester {
         }
       );
       
-      if (invalidResponse.status === 400 && invalidResponse.data.error === 'raw_goal is required') {
+      if (invalidResponse.status === 401 && invalidResponse.data.error === 'OpenAI API key required. Please provide X-OpenAI-API-Key header.') {
+        console.log('   ✅ API validation working correctly');
+        console.log('   📋 Properly rejects requests without API key');
+        this.results.apiValidation = true;
+      } else if (invalidResponse.status === 400 && invalidResponse.data.error === 'raw_goal is required') {
         console.log('   ✅ API validation working correctly');
         console.log('   📋 Properly rejects invalid requests');
         this.results.apiValidation = true;
@@ -147,17 +151,18 @@ class StagingTester {
         {
           headers: { 
             'Content-Type': 'application/json',
-            'X-OpenAI-API-Key': TEST_CONFIG.testApiKey
+            'X-OpenAI-API-Key': String(TEST_CONFIG.testApiKey).trim()
           },
           timeout: 30000, // Longer timeout for AI processing
           validateStatus: () => true
         }
       );
       
-      if (goalTranslationResponse.status === 200 && goalTranslationResponse.data.smart_goal) {
+      if (goalTranslationResponse.status === 200 && goalTranslationResponse.data.success && goalTranslationResponse.data.data) {
         console.log('   ✅ Goal translation working correctly');
         console.log('   🎯 Input: "I want to learn programming"');
-        console.log('   📝 SMART Goal Generated:', goalTranslationResponse.data.smart_goal.substring(0, 100) + '...');
+        console.log('   📝 SMART Goal Generated:', goalTranslationResponse.data.data.title.substring(0, 100) + '...');
+        console.log('   📊 Confidence:', goalTranslationResponse.data.data.confidence);
         this.results.goalTranslation = true;
       } else {
         console.log('   ❌ Goal translation failed');

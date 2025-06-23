@@ -1,0 +1,30 @@
+{
+  "name": "personalea-conversation-quality",
+  "version": "1.0.0", 
+  "description": "PersonalEA Phase 2: LLM-First Testing Framework with AI-validates-AI conversation quality",
+  "type": "module",
+  "main": "runPhase2Tests.js",
+  "scripts": {
+    "test": "node runPhase2Tests.js quick",
+    "test:full": "node runPhase2Tests.js full",
+    "test:collaborative": "node runPhase2Tests.js collaborative", 
+    "test:resistant": "node runPhase2Tests.js resistant",
+    "test:baseline": "node runPhase2Tests.js baseline"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "keywords": [
+    "personalea",
+    "conversation-quality",
+    "ai-testing",
+    "llm-validation", 
+    "smart-goals"
+  ],
+  "author": "PersonalEA Development Team",
+  "license": "MIT"
+}

@@ -14,12 +14,14 @@
     "test-env-openai": "concurrently \"npm run openai-api\" \"npm run dev\""
   },
   "dependencies": {
-    "axios": "^1.6.0",
+    "axios": "^1.10.0",
+    "better-queue": "^3.8.12",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "lucide-react": "^0.294.0",
     "openai": "^5.5.1",
+    "opossum": "^9.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

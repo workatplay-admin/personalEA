@@ -47,7 +47,7 @@ export const clearApiConfig = () => {
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // Reduced from 30s to 15s to work with backend 10s timeout + buffer
+  timeout: 10000, // 10s to match backend 8s + buffer
   headers: {
     'Content-Type': 'application/json',
     // Prevent HTTP caching
@@ -163,7 +163,7 @@ export const goalAPI = {
   },
 
   // Clarify SMART Goal
-  async clarifyGoal(goalId: string, clarifications: Record<string, string>, goalContext?: { title: string; description?: string; originalGoal?: string }): Promise<Goal> {
+  async clarifyGoal(goalId: string, clarifications: Record<string, string>, goalContext?: { title: string; description?: string; originalGoal?: string }, conversationHistory?: Array<{ role: string; content: string }>): Promise<Goal> {
     try {
       if (!apiConfig) {
         throw new Error('API configuration not set. Please configure authentication credentials.')
@@ -172,6 +172,7 @@ export const goalAPI = {
       const response = await api.post<APIResponse<Goal>>(`/goals/${goalId}/clarify`, {
         clarifications,
         goalContext,
+        conversationHistory,
       })
       
       if (!response.data.success || !response.data.data) {
@@ -286,6 +287,112 @@ export const goalAPI = {
       return response.data.data
     } catch (error) {
       console.error('Error estimating tasks:', error)
+      throw error
+    }
+  },
+
+  // Generate Contextual Help with Conversation History
+  async generateContextualHelp(
+    goalTitle: string,
+    componentKey: string,
+    conversationHistory: Array<{ role: string; content: string }>,
+    goal: Goal
+  ): Promise<{ helpMessage: string }> {
+    try {
+      console.log('API: generateContextualHelp called with:', {
+        goalTitle,
+        componentKey,
+        conversationHistoryLength: conversationHistory.length
+      })
+      
+      if (!apiConfig) {
+        throw new Error('API configuration not set. Please configure authentication credentials.')
+      }
+
+      if (!apiConfig.openaiApiKey) {
+        throw new Error('OpenAI API key missing. Please enter your API key in the configuration section.')
+      }
+
+      const requestData = {
+        goalTitle,
+        componentKey,
+        conversationHistory,
+        goalContext: goal
+      }
+      
+      console.log('API: Making request to /goals/contextual-help with conversation history')
+
+      const response = await api.post<APIResponse<{ helpMessage: string }>>('/goals/contextual-help', requestData)
+      
+      console.log('API: Received contextual help response:', response.data)
+      
+      if (!response.data.success || !response.data.data) {
+        throw new Error(response.data.error || 'Failed to generate contextual help')
+      }
+      
+      return response.data.data
+    } catch (error: any) {
+      console.error('Error in generateContextualHelp:', error)
+      if (error.response) {
+        console.error('Response status:', error.response.status)
+        console.error('Response data:', error.response.data)
+      }
+      throw error
+    }
+  },
+
+  // Generate Component Question
+  async generateComponentQuestion(
+    goalTitle: string,
+    componentKey: string,
+    currentValue: string,
+    confidence: number,
+    isHighConfidence: boolean,
+    goal: Goal
+  ): Promise<{ question: string }> {
+    try {
+      console.log('API: generateComponentQuestion called with:', {
+        goalTitle,
+        componentKey,
+        currentValue,
+        confidence,
+        isHighConfidence
+      })
+      
+      if (!apiConfig) {
+        throw new Error('API configuration not set. Please configure authentication credentials.')
+      }
+
+      if (!apiConfig.openaiApiKey) {
+        throw new Error('OpenAI API key missing. Please enter your API key in the configuration section.')
+      }
+
+      const requestData = {
+        goalTitle,
+        componentKey,
+        currentValue,
+        confidence,
+        isHighConfidence,
+        goalContext: goal
+      }
+      
+      console.log('API: Making request to /goals/component-question with:', requestData)
+
+      const response = await api.post<APIResponse<{ question: string }>>('/goals/component-question', requestData)
+      
+      console.log('API: Received response from component-question:', response.data)
+      
+      if (!response.data.success || !response.data.data) {
+        throw new Error(response.data.error || 'Failed to generate component question')
+      }
+      
+      return response.data.data
+    } catch (error: any) {
+      console.error('Error in generateComponentQuestion:', error)
+      if (error.response) {
+        console.error('Response status:', error.response.status)
+        console.error('Response data:', error.response.data)
+      }
       throw error
     }
   },

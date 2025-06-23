@@ -6,6 +6,39 @@ interface SmartGoalViewerProps {
 }
 
 export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
+  // Safety check - if goal is malformed, show error state
+  if (!goal || typeof goal !== 'object') {
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="flex items-center space-x-2">
+          <AlertTriangle className="w-5 h-5 text-red-600" />
+          <p className="text-red-800 dark:text-red-200">Error: Invalid goal data</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Provide safe defaults for missing properties
+  const safeGoal = {
+    title: goal.title || 'Untitled Goal',
+    confidence: typeof goal.confidence === 'number' ? goal.confidence : 0,
+    criteria: goal.criteria || {},
+    missingCriteria: Array.isArray(goal.missingCriteria) ? goal.missingCriteria : [],
+    clarificationQuestions: Array.isArray(goal.clarificationQuestions) ? goal.clarificationQuestions : [],
+    targetValue: goal.targetValue,
+    unit: goal.unit,
+    deadline: goal.deadline
+  }
+
+  // Ensure criteria has safe defaults
+  const safeCriteria = {
+    specific: safeGoal.criteria.specific || { value: 'Not specified', confidence: 0, missing: [] },
+    measurable: safeGoal.criteria.measurable || { value: 'Not specified', confidence: 0, missing: [] },
+    achievable: safeGoal.criteria.achievable || { value: 'Not specified', confidence: 0, missing: [] },
+    relevant: safeGoal.criteria.relevant || { value: 'Not specified', confidence: 0, missing: [] },
+    timeBound: safeGoal.criteria.timeBound || { value: 'Not specified', confidence: 0, missing: [] }
+  }
+
   const getConfidenceColor = (confidence: number) => {
     if (confidence >= 0.8) return 'text-green-600 bg-green-50 border-green-200'
     if (confidence >= 0.6) return 'text-yellow-600 bg-yellow-50 border-yellow-200'
@@ -26,12 +59,12 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
         </div>
         <div className="flex-1">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            {goal.title}
+            {safeGoal.title}
           </h2>
-          <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm border ${getConfidenceColor(goal.confidence)}`}>
-            {getConfidenceIcon(goal.confidence)}
+          <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm border ${getConfidenceColor(safeGoal.confidence)}`}>
+            {getConfidenceIcon(safeGoal.confidence)}
             <span>
-              {Math.round(goal.confidence * 100)}% Confidence
+              {Math.round(safeGoal.confidence * 100)}% Confidence
             </span>
           </div>
         </div>
@@ -44,18 +77,18 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
             <h4 className="font-semibold text-blue-900 dark:text-blue-100">
               Specific
             </h4>
-            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(goal.criteria.specific.confidence)}`}>
-              {Math.round(goal.criteria.specific.confidence * 100)}%
+            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(safeCriteria.specific.confidence)}`}>
+              {Math.round(safeCriteria.specific.confidence * 100)}%
             </span>
           </div>
           <p className="text-blue-800 dark:text-blue-200 text-sm">
-            {goal.criteria.specific.value}
+            {safeCriteria.specific.value}
           </p>
-          {goal.criteria.specific.missing && goal.criteria.specific.missing.length > 0 && (
+          {safeCriteria.specific.missing && safeCriteria.specific.missing.length > 0 && (
             <div className="mt-2">
               <p className="text-xs text-blue-600 dark:text-blue-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-blue-600 dark:text-blue-300 list-disc list-inside">
-                {goal.criteria.specific.missing.map((item, index) => (
+                {safeCriteria.specific.missing.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
@@ -68,18 +101,18 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
             <h4 className="font-semibold text-green-900 dark:text-green-100">
               Measurable
             </h4>
-            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(goal.criteria.measurable.confidence)}`}>
-              {Math.round(goal.criteria.measurable.confidence * 100)}%
+            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(safeCriteria.measurable.confidence)}`}>
+              {Math.round(safeCriteria.measurable.confidence * 100)}%
             </span>
           </div>
           <p className="text-green-800 dark:text-green-200 text-sm">
-            {goal.criteria.measurable.value}
+            {safeCriteria.measurable.value}
           </p>
-          {goal.criteria.measurable.missing && goal.criteria.measurable.missing.length > 0 && (
+          {safeCriteria.measurable.missing && safeCriteria.measurable.missing.length > 0 && (
             <div className="mt-2">
               <p className="text-xs text-green-600 dark:text-green-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-green-600 dark:text-green-300 list-disc list-inside">
-                {goal.criteria.measurable.missing.map((item, index) => (
+                {safeCriteria.measurable.missing.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
@@ -92,18 +125,18 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
             <h4 className="font-semibold text-yellow-900 dark:text-yellow-100">
               Achievable
             </h4>
-            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(goal.criteria.achievable.confidence)}`}>
-              {Math.round(goal.criteria.achievable.confidence * 100)}%
+            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(safeCriteria.achievable.confidence)}`}>
+              {Math.round(safeCriteria.achievable.confidence * 100)}%
             </span>
           </div>
           <p className="text-yellow-800 dark:text-yellow-200 text-sm">
-            {goal.criteria.achievable.value}
+            {safeCriteria.achievable.value}
           </p>
-          {goal.criteria.achievable.missing && goal.criteria.achievable.missing.length > 0 && (
+          {safeCriteria.achievable.missing && safeCriteria.achievable.missing.length > 0 && (
             <div className="mt-2">
               <p className="text-xs text-yellow-600 dark:text-yellow-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-yellow-600 dark:text-yellow-300 list-disc list-inside">
-                {goal.criteria.achievable.missing.map((item, index) => (
+                {safeCriteria.achievable.missing.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
@@ -116,18 +149,18 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
             <h4 className="font-semibold text-purple-900 dark:text-purple-100">
               Relevant
             </h4>
-            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(goal.criteria.relevant.confidence)}`}>
-              {Math.round(goal.criteria.relevant.confidence * 100)}%
+            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(safeCriteria.relevant.confidence)}`}>
+              {Math.round(safeCriteria.relevant.confidence * 100)}%
             </span>
           </div>
           <p className="text-purple-800 dark:text-purple-200 text-sm">
-            {goal.criteria.relevant.value}
+            {safeCriteria.relevant.value}
           </p>
-          {goal.criteria.relevant.missing && goal.criteria.relevant.missing.length > 0 && (
+          {safeCriteria.relevant.missing && safeCriteria.relevant.missing.length > 0 && (
             <div className="mt-2">
               <p className="text-xs text-purple-600 dark:text-purple-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-purple-600 dark:text-purple-300 list-disc list-inside">
-                {goal.criteria.relevant.missing.map((item, index) => (
+                {safeCriteria.relevant.missing.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
@@ -140,18 +173,18 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
             <h4 className="font-semibold text-red-900 dark:text-red-100">
               Time-bound
             </h4>
-            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(goal.criteria.timeBound.confidence)}`}>
-              {Math.round(goal.criteria.timeBound.confidence * 100)}%
+            <span className={`text-xs px-2 py-1 rounded ${getConfidenceColor(safeCriteria.timeBound.confidence)}`}>
+              {Math.round(safeCriteria.timeBound.confidence * 100)}%
             </span>
           </div>
           <p className="text-red-800 dark:text-red-200 text-sm">
-            {goal.criteria.timeBound.value}
+            {safeCriteria.timeBound.value}
           </p>
-          {goal.criteria.timeBound.missing && goal.criteria.timeBound.missing.length > 0 && (
+          {safeCriteria.timeBound.missing && safeCriteria.timeBound.missing.length > 0 && (
             <div className="mt-2">
               <p className="text-xs text-red-600 dark:text-red-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-red-600 dark:text-red-300 list-disc list-inside">
-                {goal.criteria.timeBound.missing.map((item, index) => (
+                {safeCriteria.timeBound.missing.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
@@ -165,27 +198,27 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
             Status
           </h4>
           <div className="space-y-2">
-            {goal.missingCriteria.length > 0 && (
+            {safeGoal.missingCriteria.length > 0 && (
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Missing:</p>
                 <p className="text-xs text-gray-700 dark:text-gray-300">
-                  {goal.missingCriteria.join(', ')}
+                  {safeGoal.missingCriteria.join(', ')}
                 </p>
               </div>
             )}
-            {goal.targetValue && (
+            {safeGoal.targetValue && (
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Target:</p>
                 <p className="text-xs text-gray-700 dark:text-gray-300">
-                  {goal.targetValue} {goal.unit || ''}
+                  {safeGoal.targetValue} {safeGoal.unit || ''}
                 </p>
               </div>
             )}
-            {goal.deadline && (
+            {safeGoal.deadline && (
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Deadline:</p>
                 <p className="text-xs text-gray-700 dark:text-gray-300">
-                  {goal.deadline}
+                  {safeGoal.deadline}
                 </p>
               </div>
             )}
@@ -194,14 +227,14 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
       </div>
 
       {/* Clarification Questions */}
-      {goal.clarificationQuestions.length > 0 && (
+      {safeGoal.clarificationQuestions.length > 0 && (
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
           <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2 flex items-center">
             <AlertTriangle className="w-4 h-4 mr-2" />
             Clarification Needed
           </h4>
           <ul className="text-sm text-amber-800 dark:text-amber-200 space-y-1">
-            {goal.clarificationQuestions.map((question, index) => (
+            {safeGoal.clarificationQuestions.map((question, index) => (
               <li key={index} className="flex items-start">
                 <span className="text-amber-600 dark:text-amber-400 mr-2">•</span>
                 {question}

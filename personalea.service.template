@@ -1,0 +1,15 @@
+[Unit]
+Description=PersonalEA Goal Strategy Service
+After=network.target
+
+[Service]
+Type=forking
+User=codespace
+WorkingDirectory=/workspaces/personalEA
+ExecStart=/workspaces/personalEA/start-production.sh
+ExecStop=/workspaces/personalEA/server-manager.sh stop
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

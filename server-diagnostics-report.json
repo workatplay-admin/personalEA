@@ -1,0 +1,131 @@
+{
+  "timestamp": "2025-06-23T12:00:00Z",
+  "agent": "Server Diagnostics Engineer",
+  "swarmId": "swarm-analysis-distributed-1750689131000",
+  "issues": [
+    {
+      "id": "issue-1",
+      "file": "openai-api-server.js:107-110",
+      "issueType": "timeout",
+      "code": "request.setTimeout(8000, () => {\n  request.destroy();\n  reject(new Error('Request timeout'));\n});",
+      "cause": "Request timeout without proper cleanup - promise may hang after destroy()",
+      "impact": "Server request handlers can accumulate hanging promises, causing memory leaks and eventual server freeze",
+      "fix": "Add request.abort() before destroy(), implement proper error recovery, and ensure promise resolution in all cases"
+    },
+    {
+      "id": "issue-2", 
+      "file": "simple-api-test.js:100",
+      "issueType": "hang",
+      "code": "EOF < /dev/null",
+      "cause": "Syntax error - EOF heredoc terminator with stdin redirect",
+      "impact": "Script execution hangs indefinitely waiting for input",
+      "fix": "Remove line 100 completely - it appears to be accidental text after the script end"
+    },
+    {
+      "id": "issue-3",
+      "file": "simple-start.sh:21,34",
+      "issueType": "hang",
+      "code": "nohup node openai-api-server.js > /dev/null 2>&1 &",
+      "cause": "nohup with /dev/null redirection can cause process hanging if output buffer fills",
+      "impact": "Background processes may hang when trying to write output, causing server freeze",
+      "fix": "Use proper log files instead of /dev/null: nohup node openai-api-server.js > backend.log 2>&1 &"
+    },
+    {
+      "id": "issue-4",
+      "file": "server-manager.sh:74,104",
+      "issueType": "error",
+      "code": "nohup node openai-api-server.js > \"$LOG_DIR/backend.log\" 2>&1 &\nlocal pid=$!",
+      "cause": "No error checking after starting process - PID might be captured even if process fails immediately",
+      "impact": "Script reports success even when server fails to start, leading to confusion and hanging operations",
+      "fix": "Add wait and process validation: if ! kill -0 $pid 2>/dev/null; then return 1; fi"
+    },
+    {
+      "id": "issue-5",
+      "file": "health-monitor.sh:116",
+      "issueType": "hang",
+      "code": "nohup $0 monitor > \"$LOG_DIR/health-monitor.log\" 2>&1 &",
+      "cause": "Recursive self-execution without proper process management",
+      "impact": "Can create multiple monitor processes that interfere with each other, causing system instability",
+      "fix": "Check for existing monitor process before starting: if pgrep -f 'health-monitor.sh monitor' > /dev/null; then exit 1; fi"
+    },
+    {
+      "id": "issue-6",
+      "file": "openai-api-server.js:521-528",
+      "issueType": "error",
+      "code": "app.use((error, req, res, next) => {\n  console.error('Server Error:', error);\n  res.status(500).json({...});\n});",
+      "cause": "Basic error handler doesn't handle async errors or uncaught rejections",
+      "impact": "Unhandled promise rejections can cause server to hang or crash unexpectedly",
+      "fix": "Add process handlers: process.on('unhandledRejection', ...) and process.on('uncaughtException', ...)"
+    },
+    {
+      "id": "issue-7",
+      "file": "test-openai-direct.js:29-31",
+      "issueType": "timeout",
+      "code": "new Promise((_, reject) =>\n  setTimeout(() => reject(new Error('OpenAI API timeout')), 10000)\n)",
+      "cause": "Promise.race timeout pattern without cleanup of original promise",
+      "impact": "Original API call continues running even after timeout, consuming resources",
+      "fix": "Implement proper cancellation using AbortController or cleanup the original request"
+    },
+    {
+      "id": "issue-8",
+      "file": "server-manager.sh:137-138",
+      "issueType": "hang",
+      "code": "pkill -f \"vite\" 2>/dev/null || true\npkill -f \"npm run\" 2>/dev/null || true",
+      "cause": "Broad process killing pattern can kill unrelated processes and leave orphaned children",
+      "impact": "Incomplete cleanup leaves zombie processes that consume resources and ports",
+      "fix": "Use specific process tracking with PID files and kill process trees: kill -TERM -$pid"
+    },
+    {
+      "id": "issue-9",
+      "file": "openai-api-server.js:multiple",
+      "issueType": "timeout",
+      "code": "Multiple identical timeout patterns at lines 107, 231, 347, 470",
+      "cause": "Repeated timeout handling code without centralized error management",
+      "impact": "Inconsistent timeout behavior across endpoints, difficult to maintain and debug",
+      "fix": "Create a centralized request wrapper function with proper timeout and error handling"
+    },
+    {
+      "id": "issue-10",
+      "file": "test-openai-integration.js:4, simple-api-test.js:4",
+      "issueType": "error",
+      "code": "const API_KEY = 'sk-proj-...'",
+      "cause": "Hardcoded API keys in test files (security issue)",
+      "impact": "Exposed credentials, but also indicates tests may fail and hang when keys are invalid",
+      "fix": "Use environment variables: const API_KEY = process.env.OPENAI_API_KEY"
+    }
+  ],
+  "finalDiagnosis": {
+    "hangCauses": [
+      "HTTP request timeouts without proper cleanup (openai-api-server.js)",
+      "Syntax errors causing infinite wait (simple-api-test.js:100)",
+      "Process output buffer overflow with /dev/null redirection",
+      "Recursive process spawning without checks (health-monitor.sh)",
+      "Zombie processes from improper pkill usage",
+      "Unhandled promise rejections in async operations"
+    ],
+    "criticalFiles": [
+      "openai-api-server.js - needs comprehensive error handling",
+      "simple-api-test.js - has syntax error causing hang",
+      "simple-start.sh - improper process management",
+      "server-manager.sh - incomplete error checking",
+      "health-monitor.sh - recursive execution issue"
+    ],
+    "codePatterns": "Repeated timeout patterns without cleanup, nohup with /dev/null, broad pkill commands, missing error boundaries",
+    "errorHandling": "Minimal error handling, no uncaught exception handlers, no proper async error management, timeouts don't clean up resources",
+    "solutions": {
+      "immediate": [
+        "Remove syntax error in simple-api-test.js line 100",
+        "Replace /dev/null with proper log files in all nohup commands",
+        "Add process existence check in health-monitor.sh before starting",
+        "Add uncaughtException and unhandledRejection handlers to openai-api-server.js"
+      ],
+      "longTerm": [
+        "Implement centralized error handling middleware",
+        "Use proper process management with systemd or PM2",
+        "Replace manual timeout handling with axios or fetch with AbortController",
+        "Implement proper logging infrastructure",
+        "Add comprehensive health checks with circuit breakers"
+      ]
+    }
+  }
+}

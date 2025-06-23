@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { CheckCircle, AlertCircle, Edit3, Star } from 'lucide-react'
+import { CheckCircle, AlertCircle, Edit3, Star, MessageSquare, Target, Sparkles } from 'lucide-react'
 import { Goal } from '../types'
 import goalAPI from '../services/api'
+import ChatClarification from './ChatClarification'
+import SmartGoalViewer from './SmartGoalViewer'
 
 // Function to clear any cached goal data
 const clearCachedGoalData = () => {
@@ -45,12 +47,15 @@ export default function SmartGoalDisplay({
   originalGoal, 
   onComplete, 
   setIsLoading, 
-  isLoading 
+  isLoading
 }: SmartGoalDisplayProps) {
   const [smartGoal, setSmartGoal] = useState<Goal | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [rating, setRating] = useState<number>(0)
   const [feedback, setFeedback] = useState<string>('')
+  const [showChat, setShowChat] = useState(true)
+  const [originalSmartGoal, setOriginalSmartGoal] = useState<Goal | null>(null)
+  const [chatCompleted, setChatCompleted] = useState(false)
 
   // Track smartGoal state changes
   useEffect(() => {
@@ -59,6 +64,7 @@ export default function SmartGoalDisplay({
     console.log(`[${timestamp}] 🆔 smartGoal correlation_id:`, smartGoal?.correlation_id);
     console.log(`[${timestamp}] 📝 smartGoal title:`, smartGoal?.title);
   }, [smartGoal])
+
 
   useEffect(() => {
   console.log('SmartGoalDisplay useEffect triggered. originalGoal:', originalGoal);
@@ -124,6 +130,7 @@ export default function SmartGoalDisplay({
       if (goal && goal.correlation_id) {
         console.log(`[${timestamp}] ✅ Valid response received, setting smartGoal state`);
         setSmartGoal(goal)
+        setOriginalSmartGoal(goal) // Store original for comparison
         console.log(`[${timestamp}] 💾 setSmartGoal called with:`, goal);
         console.log(`[${timestamp}] 🔍 setSmartGoal correlation_id:`, goal?.correlation_id);
       } else {
@@ -144,6 +151,40 @@ export default function SmartGoalDisplay({
       console.log('Calling onComplete with smartGoal:', smartGoal);
       onComplete(smartGoal)
     }
+  }
+
+  const shouldShowChatOption = () => {
+    if (!smartGoal) return false
+    
+    // Show chat if overall confidence is low
+    if (smartGoal.confidence < 0.7) return true
+    
+    // Show chat if any individual criteria has low confidence
+    const hasLowConfidence = Object.values(smartGoal.criteria).some(criterion => 
+      criterion.confidence < 0.7
+    )
+    if (hasLowConfidence) return true
+    
+    // Show chat if there are clarification questions
+    if (smartGoal.clarificationQuestions && smartGoal.clarificationQuestions.length > 0) return true
+    
+    // Show chat if there are missing criteria
+    if (smartGoal.missingCriteria && smartGoal.missingCriteria.length > 0) return true
+    
+    return false
+  }
+
+  const handleStartChat = () => {
+    setShowChat(true)
+  }
+
+  const handleGoalUpdate = (updatedGoal: Goal) => {
+    setSmartGoal(updatedGoal)
+  }
+
+  const handleChatComplete = () => {
+    setShowChat(false)
+    setChatCompleted(true)
   }
 
   const handleRating = (value: number) => {
@@ -186,10 +227,178 @@ export default function SmartGoalDisplay({
     )
   }
 
+
   if (!smartGoal) {
     return null
   }
 
+  // Always use side-by-side layout for chat-based refinement
+  const useSideBySideLayout = true
+
+  if (useSideBySideLayout) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="text-center">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <CheckCircle className="w-8 h-8 text-green-500" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              SMART Goal Generated
+            </h2>
+          </div>
+          <p className="text-gray-600 dark:text-gray-300">
+            {showChat && !chatCompleted 
+              ? "Working with AI to refine your SMART goal. The goal will update in real-time as we chat."
+              : chatCompleted
+              ? "Your SMART goal has been refined through our conversation. You can continue or restart the chat."
+              : "Your SMART goal is ready for milestone planning."
+            }
+          </p>
+        </div>
+
+        {/* Side-by-Side Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Side - SMART Goal Display */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Target className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Your SMART Goal
+              </h3>
+              {showChat && (
+                <div className="flex items-center space-x-1 text-sm text-indigo-600">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Updating in real-time</span>
+                </div>
+              )}
+            </div>
+            <SmartGoalViewer goal={smartGoal} />
+            
+            {/* Progress Summary */}
+            {(showChat || chatCompleted) && originalSmartGoal && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
+                  📊 Improvement Progress
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {Object.entries(smartGoal.criteria).map(([key, criterion]) => {
+                    const originalCriterion = originalSmartGoal.criteria[key as keyof typeof originalSmartGoal.criteria]
+                    const improvement = originalCriterion ? criterion.confidence - originalCriterion.confidence : 0
+                    
+                    return (
+                      <div key={key} className="text-center">
+                        <div className="text-xs font-medium text-blue-700 dark:text-blue-300 capitalize mb-1">
+                          {key === 'timeBound' ? 'Time-bound' : key}
+                        </div>
+                        <div className="text-sm font-bold text-blue-800 dark:text-blue-200">
+                          {Math.round(criterion.confidence * 100)}%
+                        </div>
+                        {improvement > 0 && (
+                          <div className="text-xs text-green-600 dark:text-green-400">
+                            +{Math.round(improvement * 100)}%
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Side - Chat Interface */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <MessageSquare className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                AI Clarification Assistant
+              </h3>
+            </div>
+            
+            {!chatCompleted ? (
+              <ChatClarification
+                goal={smartGoal}
+                onGoalUpdate={handleGoalUpdate}
+                onComplete={handleChatComplete}
+                isVisible={true}
+              />
+            ) : (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-96 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  <MessageSquare className="w-16 h-16 text-gray-400 mx-auto" />
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      Chat Completed!
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-400 max-w-sm">
+                      Your SMART goal has been refined through our conversation. You can continue to milestones or restart the refinement chat.
+                    </p>
+                  </div>
+                  {originalSmartGoal && (
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4">
+                      <p className="text-sm text-green-800 dark:text-green-200">
+                        🎯 <strong>Goal Improved!</strong> Confidence increased from {Math.round(originalSmartGoal.confidence * 100)}% to {Math.round(smartGoal.confidence * 100)}%
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between pt-6">
+          <div className="flex space-x-2">
+            <button
+              onClick={translateGoal}
+              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <Edit3 className="w-4 h-4 mr-2" />
+              Regenerate Goal
+            </button>
+            
+            {!showChat && shouldShowChatOption() && (
+              <button
+                onClick={handleStartChat}
+                className="flex items-center px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-300 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Improve with AI Chat
+              </button>
+            )}
+            
+            {chatCompleted && (
+              <button
+                onClick={handleStartChat}
+                className="flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Start New Chat Session
+              </button>
+            )}
+            
+            <button
+              onClick={clearCachedGoalData}
+              className="flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              🧹 Clear Cache
+            </button>
+          </div>
+
+          <button
+            onClick={handleContinue}
+            className="flex items-center px-6 py-2 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Continue to Milestones
+            <CheckCircle className="w-5 h-5 ml-2" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Original compact layout for high-confidence goals
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
       <div className="text-center mb-6">
@@ -357,19 +566,6 @@ export default function SmartGoalDisplay({
           >
             <Edit3 className="w-4 h-4 mr-2" />
             Regenerate
-          </button>
-          
-          <button
-            onClick={() => {
-              const timestamp = new Date().toISOString();
-              console.log(`[${timestamp}] 🧪 Manual Test Goal Translation button clicked`);
-              console.log(`[${timestamp}] 📊 Current originalGoal:`, originalGoal);
-              console.log(`[${timestamp}] 📊 Current smartGoal:`, smartGoal);
-              translateGoal();
-            }}
-            className="flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            🧪 Test Goal Translation
           </button>
           
           <button

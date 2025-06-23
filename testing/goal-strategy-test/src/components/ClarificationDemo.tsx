@@ -196,7 +196,6 @@ export default function ClarificationDemo() {
           </h3>
           <div className="space-y-2">
             {completedResponses.map((response, index) => {
-              const question = sampleQuestions.find(q => q.id === response.questionId)
               return (
                 <div key={response.questionId} className="text-sm">
                   <span className="font-medium text-green-700 dark:text-green-300">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MessageCircle, ArrowRight, ArrowLeft, CheckCircle, X } from 'lucide-react'
+import { MessageCircle, ArrowRight, ArrowLeft, X } from 'lucide-react'
 import { ClarificationQuestion, ClarificationResponse, Goal } from '../types'
 import QuestionCard from './QuestionCard'
 
