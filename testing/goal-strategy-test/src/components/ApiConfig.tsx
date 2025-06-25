@@ -9,21 +9,38 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
   const [openaiApiKey, setOpenaiApiKey] = useState('')
   const [isConfigured, setIsConfigured] = useState(false)
   const [showKey, setShowKey] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Test backend connectivity
+  const testBackendConnection = async (): Promise<boolean> => {
+    try {
+      // Always use the proxied endpoint to avoid CSP issues in Codespaces
+      console.log('🔧 Testing backend connection via proxy...');
+      
+      const response = await fetch('/api/v1/health', {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
+      
+      if (!response.ok) {
+        console.error('🔧 Backend health check failed:', response.status);
+        return false;
+      }
+      
+      console.log('🔧 Backend connection successful');
+      return true;
+    } catch (error) {
+      console.error('🔧 Backend connection test failed:', error);
+      return false;
+    }
+  }
 
   // Generate proper JWT token via backend API call
   const generateTestJwt = async (): Promise<string> => {
     try {
-      // Get proper API base URL
-      const getApiBaseUrl = () => {
-        if (typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')) {
-          const hostname = window.location.hostname.replace('-5174.', '-8086.');
-          return `https://${hostname}`;
-        }
-        return 'http://localhost:8086';
-      };
-      
-      const apiBaseUrl = getApiBaseUrl();
-      const response = await fetch(`${apiBaseUrl}/api/v1/auth/test-token`);
+      // Use proxied endpoint to avoid CSP issues
+      const response = await fetch('/api/v1/auth/test-token');
       const data = await response.json();
       
       if (!response.ok || !data.success) {
@@ -51,21 +68,8 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
       try {
         console.log('🔧 Checking backend environment configuration...')
         
-        // Get proper API base URL (same logic as api.ts)
-        const getApiBaseUrl = () => {
-          if (typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')) {
-            // We're in Codespaces - use the forwarded URL for backend port 8086
-            const hostname = window.location.hostname.replace('-5174.', '-8086.');
-            return `https://${hostname}`;
-          }
-          // Local development - use backend goal-strategy service on port 8086
-          return 'http://localhost:8086';
-        };
-        
-        const apiBaseUrl = getApiBaseUrl();
-        console.log('🔧 Using API base URL:', apiBaseUrl);
-        
-        const response = await fetch(`${apiBaseUrl}/api/v1/config/environment`)
+        // Use proxied endpoint to avoid CSP issues
+        const response = await fetch('/api/v1/config/environment')
         const data = await response.json()
         
         if (data.success && data.data.environmentConfigured) {
@@ -126,18 +130,26 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
 
   const handleSaveConfiguration = async () => {
     if (!openaiApiKey.trim()) {
-      alert('Please provide your OpenAI API key')
+      setErrorMessage('Please provide your OpenAI API key')
       return
     }
 
     if (!validateApiKey(openaiApiKey)) {
-      alert('Invalid OpenAI API key format. Keys should start with "sk-" and be at least 20 characters long.')
+      setErrorMessage('Invalid OpenAI API key format. Keys should start with "sk-" and be at least 20 characters long.')
       return
     }
 
     try {
+      setIsChecking(true)
+      setErrorMessage(null)
       console.log('🔧 Saving API configuration...')
       console.log('API Key format valid:', validateApiKey(openaiApiKey))
+
+      // First test backend connection
+      const isBackendAvailable = await testBackendConnection()
+      if (!isBackendAvailable) {
+        throw new Error('Cannot connect to backend service. Please ensure the Goal Strategy service is running on port 8085.')
+      }
 
       // Save to localStorage
       localStorage.setItem('goal-strategy-openai-key', openaiApiKey.trim())
@@ -158,9 +170,11 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
 
       setIsConfigured(true)
       onConfigured()
-    } catch (error) {
+    } catch (error: any) {
       console.error('🔧 Failed to save API configuration:', error)
-      alert('Failed to configure API. Please try again.')
+      setErrorMessage(error.message || 'Failed to configure API. Please ensure the backend service is running and try again.')
+    } finally {
+      setIsChecking(false)
     }
   }
 
@@ -256,12 +270,32 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
           </label>
         </div>
 
+        {errorMessage && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{errorMessage}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex space-x-3 pt-2">
           <button
             onClick={handleSaveConfiguration}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            disabled={isChecking}
+            className={`${
+              isChecking
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+            } text-white px-4 py-2 rounded-md text-sm font-medium`}
           >
-            Configure API
+            {isChecking ? 'Configuring...' : 'Configure API'}
           </button>
         </div>
 

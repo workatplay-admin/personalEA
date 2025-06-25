@@ -4,8 +4,8 @@ import { Goal, Milestone, WBSTask, TaskEstimation, APIResponse, FeedbackData } f
 // Detect if we're in Codespaces and use the correct API URL
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')) {
-    // We're in Codespaces - use the forwarded URL for backend port 8086 (OpenAI API server)
-    const hostname = window.location.hostname.replace('-5174.', '-8086.');
+    // We're in Codespaces - use the forwarded URL for backend port 8085 (Goal Strategy service)
+    const hostname = window.location.hostname.replace('-5174.', '-8085.');
     return `https://${hostname}/api/v1`;
   }
   // Local development - use relative URL to leverage Vite proxy
@@ -20,10 +20,10 @@ console.log('🔧 API Configuration:', {
   hostname: typeof window !== 'undefined' ? window.location.hostname : 'server-side',
   isCodespaces: typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev'),
   frontendPort: typeof window !== 'undefined' ? window.location.port : 'unknown',
-  backendPort: '8086',
+  backendPort: '8085',
   expectedBackendUrl: typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev') 
-    ? `https://${window.location.hostname.replace('-5174.', '-8086.')}/api/v1`
-    : '/api/v1 (proxied to http://localhost:8086/api/v1)'
+    ? `https://${window.location.hostname.replace('-5174.', '-8085.')}/api/v1`
+    : '/api/v1 (proxied to http://localhost:8085/api/v1)'
 });
 
 // API Configuration interface
@@ -71,10 +71,11 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.headers['Authorization'] = `Bearer ${apiConfig.jwtToken}`
     
     // Only add API key header if not using environment configuration
-    if (apiConfig.openaiApiKey !== 'ENVIRONMENT_CONFIGURED') {
+    if (apiConfig.openaiApiKey && apiConfig.openaiApiKey !== 'ENVIRONMENT_CONFIGURED') {
       config.headers['X-OpenAI-API-Key'] = apiConfig.openaiApiKey
+      console.log('🔧 Using user-provided OpenAI API key')
     } else {
-      console.log('🔧 Using backend environment API key configuration')
+      console.log('🔧 Using backend environment API key configuration (no header sent)')
     }
   }
   
@@ -141,15 +142,24 @@ export const goalAPI = {
       } : 'No config')
 
       if (!apiConfig) {
-        throw new Error('❌ API configuration not set. Please enter your OpenAI API key in the configuration section.')
+        const error = new Error('API configuration not set')
+        ;(error as any).userMessage = 'Please configure your OpenAI API key first. Click the "Reconfigure" button in the API Configuration section above.'
+        throw error
       }
 
-      if (!apiConfig.openaiApiKey) {
-        throw new Error('❌ OpenAI API key missing. Please enter your API key in the configuration section.')
-      }
+      // Skip API key validation if using environment configuration
+      if (apiConfig.openaiApiKey !== 'ENVIRONMENT_CONFIGURED') {
+        if (!apiConfig.openaiApiKey) {
+          const error = new Error('OpenAI API key missing')
+          ;(error as any).userMessage = 'Your API configuration is incomplete. Please enter your OpenAI API key in the configuration section.'
+          throw error
+        }
 
-      if (apiConfig.openaiApiKey !== 'ENVIRONMENT_CONFIGURED' && !apiConfig.openaiApiKey.startsWith('sk-')) {
-        throw new Error('❌ Invalid OpenAI API key format. API key should start with "sk-".')
+        if (!apiConfig.openaiApiKey.startsWith('sk-')) {
+          const error = new Error('Invalid OpenAI API key format')
+          ;(error as any).userMessage = 'The provided API key appears to be invalid. OpenAI API keys should start with "sk-". Please check your key and try again.'
+          throw error
+        }
       }
 
       // Add timestamp to prevent caching
@@ -157,7 +167,7 @@ export const goalAPI = {
       const cacheBuster = Math.random().toString(36).substring(7)
       
       console.log(`🚀 [${new Date().toISOString()}] Making API call with cache-buster: ${timestamp}-${cacheBuster}`)
-      console.log('🔑 Using API key:', apiConfig.openaiApiKey.substring(0, 8) + '...')
+      console.log('🔑 API key configuration:', apiConfig.openaiApiKey === 'ENVIRONMENT_CONFIGURED' ? 'Using backend environment' : apiConfig.openaiApiKey.substring(0, 8) + '...')
 
       const response = await api.post<APIResponse<Goal>>(`/goals/translate?t=${timestamp}&cb=${cacheBuster}`, {
         raw_goal: originalGoal,
@@ -177,26 +187,51 @@ export const goalAPI = {
         const data = error.response.data
         
         if (status === 401) {
-          throw new Error('❌ Invalid or unauthorized API key. Please check your OpenAI API key.')
+          const error = new Error('Authentication failed')
+          ;(error as any).userMessage = 'Your OpenAI API key appears to be invalid or unauthorized. Please check your API key and reconfigure.'
+          throw error
         } else if (status === 429) {
-          throw new Error('❌ Rate limit exceeded. Please wait a moment and try again.')
+          const error = new Error('Rate limit exceeded')
+          ;(error as any).userMessage = 'You\'ve exceeded the OpenAI rate limit. Please wait a moment and try again.'
+          throw error
         } else if (status === 500) {
-          throw new Error('❌ Server error. Please try again in a moment.')
+          const error = new Error('Server error')
+          ;(error as any).userMessage = 'The server encountered an error. This is usually temporary - please try again in a moment.'
+          throw error
         } else if (status === 502 || status === 503) {
-          throw new Error('❌ Service temporarily unavailable. Please try again in a few seconds.')
+          const error = new Error('Service unavailable')
+          ;(error as any).userMessage = 'The Goal Strategy service is temporarily unavailable. Please try again in a few seconds.'
+          throw error
         } else if (status === 504) {
-          throw new Error('❌ Request timed out. The service is taking longer than expected. Please try again.')
+          const error = new Error('Request timeout')
+          ;(error as any).userMessage = 'The request timed out. The AI is taking longer than expected to process your goal. Please try again with a simpler goal description.'
+          throw error
         } else {
-          throw new Error(`❌ API Error (${status}): ${data?.error || data?.message || error.message}`)
+          const error = new Error(`API Error (${status})`)
+          ;(error as any).userMessage = data?.error || data?.message || `An unexpected error occurred (${status}). Please try again.`
+          throw error
         }
       } else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-        throw new Error('❌ Request timed out. The operation is taking longer than expected. Please try again.')
+        const err = new Error('Request timeout')
+        ;(err as any).userMessage = 'The request timed out. Try simplifying your goal description or check your internet connection.'
+        throw err
       } else if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
-        throw new Error('❌ Network connection failed. Please check your internet connection and try again.')
+        const err = new Error('Network error')
+        ;(err as any).userMessage = 'Network connection failed. Please check your internet connection and ensure the Goal Strategy service is running on port 8085.'
+        throw err
       } else if (error.code === 'ERR_NETWORK') {
-        throw new Error('❌ Unable to connect to the server. Please check if the backend service is running.')
+        const err = new Error('Connection failed')
+        ;(err as any).userMessage = 'Unable to connect to the Goal Strategy service. Please ensure the backend service is running on port 8085.'
+        throw err
       } else {
-        throw error
+        // If the error already has a userMessage, preserve it
+        if ((error as any).userMessage) {
+          throw error
+        }
+        // Otherwise, provide a generic message
+        const err = new Error(error.message)
+        ;(err as any).userMessage = `An unexpected error occurred: ${error.message}. Please try again or reconfigure your API settings.`
+        throw err
       }
     }
   },

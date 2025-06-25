@@ -281,7 +281,7 @@ export default function SmartGoalDisplay({
                   📊 Improvement Progress
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {Object.entries(smartGoal.criteria).map(([key, criterion]) => {
+                  {smartGoal.criteria && Object.entries(smartGoal.criteria).map(([key, criterion]) => {
                     const originalCriterion = originalSmartGoal.criteria[key as keyof typeof originalSmartGoal.criteria]
                     const improvement = originalCriterion ? criterion.confidence - originalCriterion.confidence : 0
                     

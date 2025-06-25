@@ -103,37 +103,29 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
     const isHighConfidence = hasBeenClarified ? false : criterion.confidence >= 0.7
 
     try {
-      console.log('ChatClarification: Generating component question for:', {
-        goalTitle: goal.title,
-        componentKey: component.key,
-        criterionValue: criterion.value,
-        confidence: confidence,
-        isHighConfidence: isHighConfidence
-      })
+      console.log('ChatClarification: Component question generation disabled - endpoint not implemented')
       
-      // Let the LLM generate contextually appropriate questions for this specific goal and component
-      const response = await goalAPI.generateComponentQuestion(
-        goal.title,
-        component.key,
-        criterion.value,
-        confidence,
-        isHighConfidence,
-        goal
-      )
-
-      console.log('ChatClarification: Received component question response:', response)
+      // TODO: Re-enable when /goals/component-question endpoint is implemented
+      // For now, use a default question based on the component
+      const defaultQuestions: Record<string, string> = {
+        specific: `Let's make your goal more specific. ${criterion.value} - What specific aspects would you like to clarify?`,
+        measurable: `How would you measure progress? ${criterion.value} - What metrics would work best for you?`,
+        achievable: `Let's ensure this is achievable. ${criterion.value} - What resources or support do you have?`,
+        relevant: `Why is this goal important to you? ${criterion.value} - How does it align with your priorities?`,
+        timeBound: `Let's refine the timeline. ${criterion.value} - What milestones would help track progress?`
+      }
 
       const message: ChatMessage = {
         id: `component-${component.key}`,
         type: 'bot',
-        content: response.question,
+        content: defaultQuestions[component.key] || `How can we improve the ${component.name} aspect of your goal?`,
         timestamp: new Date(),
         smartComponent: component.key
       }
 
       setMessages(prev => [...prev, message])
     } catch (error: any) {
-      console.error('Error generating component question:', error)
+      console.error('Error in chat component:', error)
       console.error('Error details:', error.message)
       
       // System should fail cleanly - no fake responses
