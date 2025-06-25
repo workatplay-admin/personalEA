@@ -1,0 +1,32 @@
+
+🎯 GOAL TRANSLATION API VERIFICATION REPORT
+==========================================
+
+🌐 API Status:
+- Available: ✅ YES
+- Health Check: PASSED
+
+
+📊 Test Results:
+- Total Tests: 3
+- Passed: 0
+- Failed: 3
+- Success Rate: 0.00%
+- Average Duration: 1.00ms
+
+🧪 Individual Test Results:
+- simple-goal: ❌ FAILED (2ms) - Error: Invalid character in header content ["X-OpenAI-API-Key"]
+- detailed-goal: ❌ FAILED (0ms) - Error: Invalid character in header content ["X-OpenAI-API-Key"]
+- personal-goal: ❌ FAILED (1ms) - Error: Invalid character in header content ["X-OpenAI-API-Key"]
+
+
+❌ Error Summary:
+- simple-goal: UNKNOWN - Invalid character in header content ["X-OpenAI-API-Key"]
+- detailed-goal: UNKNOWN - Invalid character in header content ["X-OpenAI-API-Key"]
+- personal-goal: UNKNOWN - Invalid character in header content ["X-OpenAI-API-Key"]
+
+
+🎯 Transform to SMART Goal API Status:
+⚠️ Issues detected - API may need attention
+
+Generated: 2025-06-24T15:02:59.992Z

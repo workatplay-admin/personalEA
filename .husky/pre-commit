@@ -1,0 +1,77 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run existing lint-staged
+npx lint-staged
+
+# Check if documentation needs updating
+echo "📝 Checking documentation..."
+
+# Get list of staged files
+STAGED_FILES=$(git diff --cached --name-only)
+
+# Check if any code files are being changed
+CODE_CHANGED=false
+for file in $STAGED_FILES; do
+  if [[ "$file" =~ \.(js|ts|jsx|tsx)$ ]] && [[ ! "$file" =~ node_modules ]]; then
+    CODE_CHANGED=true
+    break
+  fi
+done
+
+# If code changed, validate documentation
+if [ "$CODE_CHANGED" = true ]; then
+  echo "🔍 Validating documentation for code changes..."
+  
+  # Run documentation validation
+  node scripts/doc-validation.js
+  if [ $? -ne 0 ]; then
+    echo "❌ Documentation validation failed. Please update documentation."
+    exit 1
+  fi
+  
+  # Check if service files changed without README updates
+  SERVICE_CHANGED=false
+  SERVICE_NAME=""
+  
+  for file in $STAGED_FILES; do
+    if [[ "$file" =~ ^services/([^/]+)/.+\.(js|ts)$ ]]; then
+      SERVICE_CHANGED=true
+      SERVICE_NAME=$(echo "$file" | sed -E 's|^services/([^/]+)/.*|\1|')
+      
+      # Check if corresponding README is also staged
+      README_STAGED=false
+      for staged in $STAGED_FILES; do
+        if [[ "$staged" == "services/$SERVICE_NAME/README.md" ]]; then
+          README_STAGED=true
+          break
+        fi
+      done
+      
+      if [ "$README_STAGED" = false ]; then
+        echo "⚠️  Warning: Service '$SERVICE_NAME' modified without updating README.md"
+        echo "Consider updating the service documentation."
+      fi
+    fi
+  done
+fi
+
+# Check for API spec changes
+API_CHANGED=false
+for file in $STAGED_FILES; do
+  if [[ "$file" =~ ^docs/.*-api.*\.yaml$ ]]; then
+    API_CHANGED=true
+    break
+  fi
+done
+
+if [ "$API_CHANGED" = true ]; then
+  echo "📘 API specifications changed, regenerating documentation..."
+  node scripts/doc-generator.js
+  
+  # Stage the generated documentation
+  git add docs/api/*.md
+  echo "✅ API documentation updated and staged"
+fi
+
+echo "✅ Documentation checks passed"

@@ -1,0 +1,13 @@
+{
+  "objective": "Plesae stand up the servers for user testing.",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-06-24T17:31:52.234Z",
+  "id": "swarm-auto-centralized-1750786312234"
+}

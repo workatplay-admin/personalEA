@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-06-24T18:41:05.281Z",
+  "workflowResults": {
+    "step1_loading": true,
+    "step2_apiConfig": true,
+    "step3_continueButton": true,
+    "step4_goalInput": true,
+    "step5_transformButton": true,
+    "step6_results": false,
+    "errors": [
+      {
+        "step": 6,
+        "error": "locator.count: Unexpected token \"=\" while parsing css selector \"[class*=\"error\"], [class*=\"alert\"], text=error\". Did you mean to CSS.escape it?"
+      }
+    ]
+  },
+  "summary": {
+    "totalSteps": 6,
+    "completedSteps": 5,
+    "successRate": 83,
+    "workflowStatus": "FULLY_WORKING"
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "analysisId": "config-audit-1750820411349",
+  "timestamp": "2025-06-25T08:55:00.000Z",
+  "agent": "Configuration Analysis Agent",
+  
+  "criticalFindings": {
+    "portMisconfigurations": [
+      {
+        "issue": "Port Mismatch Between Services",
+        "severity": "CRITICAL",
+        "details": "Multiple services using inconsistent ports",
+        "found": {
+          "frontend_expects": "8085 (in vite proxy)",
+          "openai_server_runs": "8086",
+          "goal_strategy_service": "8085 (environment.ts)",
+          "ecosystem_config": "3000 (for api), 5174 (for frontend)",
+          "health_monitor": "3001, 5173, 3002 (incorrect ports)"
+        },
+        "impact": "Services cannot communicate, causing API configuration failures",
+        "fix": "Standardize all services to use consistent port numbers"
+      },
+      {
+        "issue": "Hardcoded localhost URLs",
+        "severity": "HIGH",
+        "locations": [
+          "/testing/goal-strategy-test/vite.config.ts:12 - 'http://localhost:8085'",
+          "/ecosystem.config.js:58-59 - hardcoded localhost URLs",
+          "/health-monitor.js:47-51 - hardcoded localhost ports",
+          "/services/goal-strategy/src/config/environment.ts:40-41 - localhost service URLs"
+        ],
+        "impact": "Will fail in container/cloud deployments",
+        "fix": "Use environment variables for all service URLs"
+      }
+    ],
+    
+    "timeoutIssues": [
+      {
+        "issue": "Insufficient API Timeout",
+        "severity": "HIGH",
+        "found": {
+          "api.ts": "30000ms (30s)",
+          "openai-api-server.js": "10000ms (10s) for OpenAI calls",
+          "actual_ai_response_time": "~18-20 seconds"
+        },
+        "impact": "OpenAI requests may timeout before completion",
+        "fix": "Increase OpenAI timeout to at least 30 seconds"
+      }
+    ],
+    
+    "environmentVariableIssues": [
+      {
+        "issue": "OpenAI API Key Configuration Confusion",
+        "severity": "MEDIUM",
+        "details": "Multiple ways to configure API key causing confusion",
+        "found": {
+          "goal-strategy/.env": "Uses ${OPENAI_API_KEY} placeholder",
+          "frontend": "Expects user to provide key",
+          "backend": "Can use environment variable OR header"
+        },
+        "recommendation": "Standardize to single configuration method"
+      },
+      {
+        "issue": "Missing Critical Environment Variables",
+        "severity": "HIGH",
+        "missing": [
+          "DATABASE_URL (using file:./dev.db default)",
+          "REDIS_PASSWORD (empty in .env)",
+          "JWT_SECRET (using insecure default)"
+        ]
+      }
+    ],
+    
+    "corsConfiguration": [
+      {
+        "issue": "Inconsistent CORS Origins",
+        "severity": "MEDIUM",
+        "found": {
+          "goal-strategy/.env": "http://localhost:5174,https://localhost:5174",
+          "goal-strategy/.env.example": "http://localhost:3000,http://localhost:8080",
+          ".env.staging.example": "http://localhost:5173,http://localhost:5174,http://localhost:8080"
+        },
+        "impact": "Frontend may be blocked from accessing API",
+        "fix": "Consolidate and standardize CORS origins"
+      }
+    ]
+  },
+  
+  "configurationMap": {
+    "services": {
+      "goal-strategy-service": {
+        "port": 8085,
+        "configFile": "/services/goal-strategy/src/config/environment.ts",
+        "envFile": "/services/goal-strategy/.env",
+        "issues": ["Port mismatch with frontend proxy"]
+      },
+      "openai-api-server": {
+        "port": 8086,
+        "configFile": "/testing/goal-strategy-test/openai-api-server.js",
+        "issues": ["Timeout too short", "Different port than goal-strategy"]
+      },
+      "frontend": {
+        "devPort": 5174,
+        "configFile": "/testing/goal-strategy-test/vite.config.ts",
+        "issues": ["Proxy points to wrong backend port"]
+      },
+      "ecosystem": {
+        "apiPort": 3000,
+        "frontendPort": 5174,
+        "configFile": "/ecosystem.config.js",
+        "issues": ["Uses different ports than actual services"]
+      }
+    }
+  },
+  
+  "recommendedConfiguration": {
+    "standardPorts": {
+      "frontend": 5174,
+      "backend_api": 8086,
+      "openai_proxy": 8086,
+      "database": 5432,
+      "redis": 6379
+    },
+    "environmentTemplate": {
+      "NODE_ENV": "development",
+      "PORT": 8086,
+      "FRONTEND_URL": "http://localhost:5174",
+      "API_URL": "http://localhost:8086",
+      "DATABASE_URL": "postgresql://user:password@localhost:5432/personalea",
+      "REDIS_URL": "redis://localhost:6379",
+      "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+      "JWT_SECRET": "generate-secure-32-char-minimum-secret",
+      "CORS_ORIGINS": "http://localhost:5174,http://localhost:3000",
+      "API_TIMEOUT": 30000,
+      "OPENAI_TIMEOUT": 30000
+    },
+    "viteProxyConfig": {
+      "target": "http://localhost:8086",
+      "changeOrigin": true,
+      "secure": false,
+      "timeout": 30000
+    }
+  },
+  
+  "actionItems": [
+    {
+      "priority": 1,
+      "action": "Standardize all services to use port 8086 for backend API",
+      "files": [
+        "/testing/goal-strategy-test/vite.config.ts",
+        "/services/goal-strategy/src/config/environment.ts",
+        "/ecosystem.config.js"
+      ]
+    },
+    {
+      "priority": 2,
+      "action": "Increase all OpenAI-related timeouts to 30 seconds",
+      "files": [
+        "/testing/goal-strategy-test/openai-api-server.js",
+        "/testing/goal-strategy-test/src/services/api.ts"
+      ]
+    },
+    {
+      "priority": 3,
+      "action": "Create centralized .env.template with all required variables",
+      "reason": "Reduce configuration confusion and ensure all variables are set"
+    },
+    {
+      "priority": 4,
+      "action": "Update health monitoring scripts to use correct ports",
+      "files": [
+        "/health-monitor.js",
+        "/integration-health-check.js",
+        "/system-health-check.js"
+      ]
+    },
+    {
+      "priority": 5,
+      "action": "Replace hardcoded URLs with environment variables",
+      "locations": "All service configuration files"
+    }
+  ],
+  
+  "completedAnalysis": {
+    "filesAnalyzed": 25,
+    "configFilesFound": 15,
+    "hardcodedValuesFound": 88,
+    "misconfigurations": 12,
+    "criticalIssues": 4,
+    "estimatedFixTime": "2-3 hours"
+  }
+}

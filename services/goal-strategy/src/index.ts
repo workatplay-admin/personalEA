@@ -10,6 +10,7 @@ import { errorHandler, notFoundHandler } from '@/middleware/error-handler';
 
 // Import routes
 import healthRoutes from '@/routes/health';
+import authRoutes from '@/routes/auth';
 import goalRoutes from '@/routes/goals';
 import milestoneRoutes from '@/routes/milestones';
 import wbsRoutes from '@/routes/wbs';
@@ -96,8 +97,20 @@ app.get('/health', (req, res) => {
 // API routes
 const apiRouter = express.Router();
 
+// Environment configuration endpoint for frontend
+apiRouter.get('/config/environment', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      environmentConfigured: !!env.OPENAI_API_KEY,
+      message: env.OPENAI_API_KEY ? 'OpenAI API key configured in environment' : 'No environment API key configured'
+    }
+  });
+});
+
 // Mount API routes
 apiRouter.use('/health', healthRoutes);
+apiRouter.use('/auth', authRoutes);
 apiRouter.use('/goals', goalRoutes);
 apiRouter.use('/milestones', milestoneRoutes);
 apiRouter.use('/wbs', wbsRoutes);

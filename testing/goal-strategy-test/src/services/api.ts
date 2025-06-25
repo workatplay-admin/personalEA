@@ -4,12 +4,12 @@ import { Goal, Milestone, WBSTask, TaskEstimation, APIResponse, FeedbackData } f
 // Detect if we're in Codespaces and use the correct API URL
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')) {
-    // We're in Codespaces - use the forwarded URL
-    const hostname = window.location.hostname.replace('-5174.', '-3000.');
+    // We're in Codespaces - use the forwarded URL for backend port 8086 (OpenAI API server)
+    const hostname = window.location.hostname.replace('-5174.', '-8086.');
     return `https://${hostname}/api/v1`;
   }
-  // Local development
-  return 'http://localhost:3000/api/v1';
+  // Local development - use relative URL to leverage Vite proxy
+  return '/api/v1';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -18,7 +18,12 @@ const API_BASE_URL = getApiBaseUrl();
 console.log('🔧 API Configuration:', {
   detectedUrl: API_BASE_URL,
   hostname: typeof window !== 'undefined' ? window.location.hostname : 'server-side',
-  isCodespaces: typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')
+  isCodespaces: typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev'),
+  frontendPort: typeof window !== 'undefined' ? window.location.port : 'unknown',
+  backendPort: '8086',
+  expectedBackendUrl: typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev') 
+    ? `https://${window.location.hostname.replace('-5174.', '-8086.')}/api/v1`
+    : '/api/v1 (proxied to http://localhost:8086/api/v1)'
 });
 
 // API Configuration interface
@@ -47,7 +52,7 @@ export const clearApiConfig = () => {
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, // 10s to match backend 8s + buffer
+  timeout: 30000, // 30s for complex goal processing with better buffer
   headers: {
     'Content-Type': 'application/json',
     // Prevent HTTP caching
@@ -64,13 +69,19 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Add authentication headers if config is available
   if (apiConfig && config.headers) {
     config.headers['Authorization'] = `Bearer ${apiConfig.jwtToken}`
-    config.headers['X-OpenAI-API-Key'] = apiConfig.openaiApiKey
+    
+    // Only add API key header if not using environment configuration
+    if (apiConfig.openaiApiKey !== 'ENVIRONMENT_CONFIGURED') {
+      config.headers['X-OpenAI-API-Key'] = apiConfig.openaiApiKey
+    } else {
+      console.log('🔧 Using backend environment API key configuration')
+    }
   }
   
   return config
 })
 
-// Add response interceptor for logging
+// Add response interceptor for logging and error handling
 api.interceptors.response.use(
   (response) => {
     const timestamp = new Date().toISOString();
@@ -89,9 +100,29 @@ api.interceptors.response.use(
     
     return response
   },
-  (error) => {
+  async (error) => {
     const timestamp = new Date().toISOString();
     console.error(`[${timestamp}] API Error:`, error.response?.data || error.message)
+    
+    // Handle timeout errors with retry logic
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      const config = error.config;
+      const maxRetries = 3;
+      const retryCount = config.__retryCount || 0;
+      
+      if (retryCount < maxRetries) {
+        config.__retryCount = retryCount + 1;
+        const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
+        
+        console.log(`[${timestamp}] Timeout error, retrying in ${delay}ms (attempt ${retryCount + 1}/${maxRetries})...`);
+        
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        // Retry the request
+        return api(config);
+      }
+    }
+    
     return Promise.reject(error)
   }
 )
@@ -117,7 +148,7 @@ export const goalAPI = {
         throw new Error('❌ OpenAI API key missing. Please enter your API key in the configuration section.')
       }
 
-      if (!apiConfig.openaiApiKey.startsWith('sk-')) {
+      if (apiConfig.openaiApiKey !== 'ENVIRONMENT_CONFIGURED' && !apiConfig.openaiApiKey.startsWith('sk-')) {
         throw new Error('❌ Invalid OpenAI API key format. API key should start with "sk-".')
       }
 
@@ -140,7 +171,7 @@ export const goalAPI = {
     } catch (error: any) {
       console.error('❌ Error translating goal:', error)
       
-      // Better error messages
+      // Better error messages with specific handling
       if (error.response) {
         const status = error.response.status
         const data = error.response.data
@@ -151,11 +182,19 @@ export const goalAPI = {
           throw new Error('❌ Rate limit exceeded. Please wait a moment and try again.')
         } else if (status === 500) {
           throw new Error('❌ Server error. Please try again in a moment.')
+        } else if (status === 502 || status === 503) {
+          throw new Error('❌ Service temporarily unavailable. Please try again in a few seconds.')
+        } else if (status === 504) {
+          throw new Error('❌ Request timed out. The service is taking longer than expected. Please try again.')
         } else {
-          throw new Error(`❌ API Error (${status}): ${data?.error || error.message}`)
+          throw new Error(`❌ API Error (${status}): ${data?.error || data?.message || error.message}`)
         }
+      } else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        throw new Error('❌ Request timed out. The operation is taking longer than expected. Please try again.')
       } else if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
         throw new Error('❌ Network connection failed. Please check your internet connection and try again.')
+      } else if (error.code === 'ERR_NETWORK') {
+        throw new Error('❌ Unable to connect to the server. Please check if the backend service is running.')
       } else {
         throw error
       }

@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-06-24T15:37:49.906Z",
+  "tests": [
+    {
+      "name": "Backend Health",
+      "passed": true,
+      "message": "Backend healthy: OpenAI-powered Goal Strategy API",
+      "details": null
+    },
+    {
+      "name": "Environment Config",
+      "passed": true,
+      "message": "Auto-config: true, API Key: true",
+      "details": null
+    },
+    {
+      "name": "Goal Translation",
+      "passed": true,
+      "message": "Goal translated with 60% confidence: \"I want to complete an online Python programming course within the next 6 months to enhance my programming skills and qualify for more advanced job opportunities in my field\"",
+      "details": null
+    },
+    {
+      "name": "Goal Type: I want to lose 20 po...",
+      "passed": true,
+      "message": "Confidence: 70%",
+      "details": null
+    },
+    {
+      "name": "Goal Type: Start a profitable o...",
+      "passed": true,
+      "message": "Confidence: 40%",
+      "details": null
+    },
+    {
+      "name": "Goal Type: Learn to play guitar...",
+      "passed": true,
+      "message": "Confidence: 70%",
+      "details": null
+    },
+    {
+      "name": "Empty Goal Handling",
+      "passed": true,
+      "message": "Properly rejected empty goal with 400 status",
+      "details": null
+    },
+    {
+      "name": "Response Time",
+      "passed": true,
+      "message": "Response time: 853ms (target: <5000ms)",
+      "details": null
+    }
+  ],
+  "passed": 8,
+  "failed": 0,
+  "status": "READY_FOR_USER_TESTING"
+}

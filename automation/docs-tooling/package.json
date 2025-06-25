@@ -1,0 +1,46 @@
+{
+  "name": "personalea-docs-tooling",
+  "version": "1.0.0",
+  "description": "Documentation tooling and automation for PersonalEA project",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "generate-docs": "node src/generators/docs-generator.js",
+    "update-docs": "node src/automation/update-docs.js",
+    "search": "node src/cli/search.js",
+    "browse": "node src/cli/browser.js",
+    "dev-assist": "node src/cli/dev-assistant.js",
+    "lint-docs": "node src/linter/docs-linter.js",
+    "index-docs": "node src/indexer/build-index.js",
+    "test": "vitest"
+  },
+  "bin": {
+    "pea-docs": "./src/cli/index.js"
+  },
+  "dependencies": {
+    "@types/node": "^20.11.5",
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "cosmiconfig": "^9.0.0",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
+    "gray-matter": "^4.0.3",
+    "inquirer": "^9.2.12",
+    "jsdoc-api": "^8.0.0",
+    "lunr": "^2.3.9",
+    "marked": "^11.1.1",
+    "marked-terminal": "^6.2.0",
+    "minipass": "^7.0.4",
+    "ora": "^8.0.1",
+    "typescript": "^5.3.3",
+    "unified": "^11.0.4",
+    "unist-util-visit": "^5.0.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "vitest": "^1.1.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-06-24T21:50:42.181Z",
+  "flowSteps": [
+    {
+      "step": "JWT Token Generation",
+      "status": "PASS",
+      "hasToken": true
+    },
+    {
+      "step": "Environment Configuration Check",
+      "status": "PASS",
+      "environmentConfigured": true
+    },
+    {
+      "step": "Authenticated Goal Translation",
+      "status": "PASS",
+      "responseTimeMs": 18409,
+      "hasSmartGoal": true,
+      "goalTitle": "Learn JavaScript to a proficient level and build 3 distinct projects using JavaScript within a 6-month period"
+    },
+    {
+      "step": "API Flow Test",
+      "status": "FAIL",
+      "error": "Request failed with status code 404",
+      "statusCode": 404,
+      "isTimeout": false,
+      "isAuthError": false,
+      "isConnectionError": false
+    }
+  ],
+  "overallStatus": "FAIL",
+  "errors": [
+    "Request failed with status code 404"
+  ]
+}

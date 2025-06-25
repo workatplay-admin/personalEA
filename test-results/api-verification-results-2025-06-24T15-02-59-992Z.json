@@ -1,0 +1,61 @@
+{
+  "timestamp": "2025-06-24T15:02:55.996Z",
+  "tests": [
+    {
+      "id": "simple-goal",
+      "input": "Increase our monthly revenue",
+      "success": false,
+      "duration": 2,
+      "error": "Invalid character in header content [\"X-OpenAI-API-Key\"]",
+      "errorType": "UNKNOWN",
+      "timestamp": "2025-06-24T15:02:56.023Z"
+    },
+    {
+      "id": "detailed-goal",
+      "input": "Increase our monthly recurring revenue by 25% from $50,000 to $62,500 within 6 months by expanding our enterprise customer base",
+      "success": false,
+      "duration": 0,
+      "error": "Invalid character in header content [\"X-OpenAI-API-Key\"]",
+      "errorType": "UNKNOWN",
+      "timestamp": "2025-06-24T15:02:57.024Z"
+    },
+    {
+      "id": "personal-goal",
+      "input": "Learn Python programming and get certified within 8 months",
+      "success": false,
+      "duration": 1,
+      "error": "Invalid character in header content [\"X-OpenAI-API-Key\"]",
+      "errorType": "UNKNOWN",
+      "timestamp": "2025-06-24T15:02:58.027Z"
+    }
+  ],
+  "apiStatus": {
+    "available": true,
+    "status": 200,
+    "data": {
+      "status": "OK",
+      "timestamp": "2025-06-24T15:02:56.017Z",
+      "service": "OpenAI-powered Goal Strategy API"
+    }
+  },
+  "totalTests": 3,
+  "passedTests": 0,
+  "failedTests": 3,
+  "errors": [
+    {
+      "test": "simple-goal",
+      "error": "Invalid character in header content [\"X-OpenAI-API-Key\"]",
+      "errorType": "UNKNOWN"
+    },
+    {
+      "test": "detailed-goal",
+      "error": "Invalid character in header content [\"X-OpenAI-API-Key\"]",
+      "errorType": "UNKNOWN"
+    },
+    {
+      "test": "personal-goal",
+      "error": "Invalid character in header content [\"X-OpenAI-API-Key\"]",
+      "errorType": "UNKNOWN"
+    }
+  ]
+}

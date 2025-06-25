@@ -3,7 +3,11 @@ import cors from 'cors';
 import https from 'https';
 
 const app = express();
-const PORT = 3000;
+const PORT = 8086;
+
+// Startup time tracking
+const startTime = Date.now();
+console.log(`🚀 Starting OpenAI API server at ${new Date(startTime).toISOString()}`);
 
 // Middleware - Updated CORS for Codespaces
 app.use(cors({
@@ -19,22 +23,52 @@ app.use(cors({
 
 app.use(express.json());
 
-// Simple API key validation middleware  
+// Enhanced API key validation with environment fallback
 const requireOpenAI = (req, res, next) => {
-  const apiKey = req.headers['x-openai-api-key'];
+  // Try header first, then environment variable for automated testing
+  const headerApiKey = req.headers['x-openai-api-key'];
+  const envApiKey = process.env.OPENAI_API_KEY;
+  const apiKey = headerApiKey || envApiKey;
   
   if (!apiKey) {
     return res.status(401).json({
       success: false,
-      error: 'OpenAI API key required. Please provide X-OpenAI-API-Key header.'
+      error: 'OpenAI API key required. Please provide X-OpenAI-API-Key header or set OPENAI_API_KEY environment variable.'
     });
   }
   
-  // Store API key for use in endpoints
-  req.openaiApiKey = apiKey;
+  // Store API key for use in endpoints (trim whitespace)
+  req.openaiApiKey = apiKey.trim();
+  
+  // Log key source for debugging (first 10 chars only)
+  const keySource = headerApiKey ? 'header' : 'environment';
+  console.log(`🔑 Using OpenAI API key from ${keySource}: ${req.openaiApiKey.substring(0, 10)}...`);
+  
   next();
 };
 
+
+// Retry helper function with exponential backoff
+const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
+  let lastError;
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      console.log(`Attempt ${i + 1} failed:`, error.message);
+      
+      if (i < maxRetries - 1) {
+        const delay = baseDelay * Math.pow(2, i);
+        console.log(`Waiting ${delay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError;
+};
 
 // SMART Goal Translation endpoint
 app.post('/api/v1/goals/translate', requireOpenAI, async (req, res) => {
@@ -50,10 +84,11 @@ app.post('/api/v1/goals/translate', requireOpenAI, async (req, res) => {
       });
     }
 
-    // Direct HTTPS call to OpenAI (avoids SDK container issues)
-    console.log('Making direct HTTPS call to OpenAI...');
-    
-    const requestBody = JSON.stringify({
+    // Use retry logic for API call
+    const makeOpenAIRequest = async () => {
+      console.log('Making direct HTTPS call to OpenAI...');
+      
+      const requestBody = JSON.stringify({
       model: "gpt-3.5-turbo",
       messages: [
         {
@@ -77,45 +112,91 @@ app.post('/api/v1/goals/translate', requireOpenAI, async (req, res) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${req.openaiApiKey}`,
+          'Authorization': `Bearer ${req.openaiApiKey.trim()}`,
           'Content-Length': Buffer.byteLength(requestBody)
         }
       };
 
+      console.log('Making OpenAI request with options:', {
+        hostname: options.hostname,
+        path: options.path,
+        method: options.method,
+        contentLength: options.headers['Content-Length'],
+        apiKeyPrefix: req.openaiApiKey.substring(0, 10) + '...'
+      });
+
       const request = https.request(options, (response) => {
+        console.log('OpenAI response status:', response.statusCode);
+        console.log('OpenAI response headers:', response.headers);
+        
         let data = '';
-        response.on('data', (chunk) => { data += chunk; });
+        response.on('data', (chunk) => { 
+          data += chunk;
+          console.log('Received chunk, total data length:', data.length);
+        });
+        
         response.on('end', () => {
+          console.log('Response completed. Full data:', data.substring(0, 500) + (data.length > 500 ? '...' : ''));
+          
           try {
             const parsed = JSON.parse(data);
+            console.log('Successfully parsed JSON response');
+            
             if (response.statusCode === 200) {
-              resolve(parsed);
+              if (parsed.choices && parsed.choices[0] && parsed.choices[0].message) {
+                console.log('Valid OpenAI response structure confirmed');
+                resolve(parsed);
+              } else {
+                console.error('Invalid response structure:', parsed);
+                reject(new Error(`Invalid OpenAI response structure: ${JSON.stringify(parsed)}`));
+              }
             } else {
-              reject(new Error(`OpenAI API error: ${data}`));
+              console.error('OpenAI API returned error status:', response.statusCode);
+              reject(new Error(`OpenAI API error (${response.statusCode}): ${data}`));
             }
           } catch (e) {
-            reject(new Error(`Failed to parse response: ${data}`));
+            console.error('Failed to parse JSON response:', e.message);
+            console.error('Raw response data:', data);
+            reject(new Error(`Failed to parse response: ${e.message}. Raw data: ${data.substring(0, 200)}`));
           }
         });
       });
 
       request.on('error', (error) => {
+        console.error('Request error:', error);
         reject(new Error(`Network error: ${error.message}`));
       });
 
-      // Add timeout
-      request.setTimeout(8000, () => {
+      // Add timeout with better logging - increased to 30 seconds to match frontend
+      request.setTimeout(30000, () => {
+        console.error('Request timed out after 30 seconds');
         request.destroy();
-        reject(new Error('Request timeout'));
+        reject(new Error('Request timeout after 30 seconds'));
       });
 
+      console.log('Sending request body:', requestBody.substring(0, 200) + '...');
       request.write(requestBody);
       request.end();
     });
 
     console.log('Raw OpenAI content:', completion.choices[0].message.content);
-    const aiResponse = JSON.parse(completion.choices[0].message.content);
-    console.log('Parsed AI Response:', JSON.stringify(aiResponse, null, 2));
+    
+    let aiResponse;
+    try {
+      aiResponse = JSON.parse(completion.choices[0].message.content);
+      console.log('Parsed AI Response:', JSON.stringify(aiResponse, null, 2));
+    } catch (parseError) {
+      console.error('Failed to parse AI response as JSON:', parseError.message);
+      console.error('Raw content:', completion.choices[0].message.content);
+      
+      // Fallback: create a basic response if AI didn't return valid JSON
+      aiResponse = {
+        title: `Enhanced goal: ${raw_goal}`,
+        confidence: 0.5,
+        missing: ['specificity', 'timeline']
+      };
+      console.log('Using fallback response:', aiResponse);
+    }
     
     // Simple transformation to Goal format - all values from AI
     const goal = {
@@ -140,11 +221,29 @@ app.post('/api/v1/goals/translate', requireOpenAI, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('OpenAI API Error:', error);
+    console.error('OpenAI API Error:', error.message);
+    console.error('Full error:', error);
     
-    res.status(500).json({
+    // Provide more specific error messages
+    let errorMessage = 'AI service unavailable';
+    let statusCode = 500;
+    
+    if (error.message.includes('timeout')) {
+      errorMessage = 'Request timed out - OpenAI service may be slow';
+      statusCode = 504;
+    } else if (error.message.includes('Network error')) {
+      errorMessage = 'Network connection failed';
+      statusCode = 503;
+    } else if (error.message.includes('API error')) {
+      errorMessage = 'OpenAI API returned an error';
+      statusCode = 502;
+    }
+    
+    res.status(statusCode).json({
       success: false,
-      error: 'AI service unavailable: ' + error.message
+      error: errorMessage,
+      details: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });
@@ -202,7 +301,7 @@ app.post('/api/v1/goals/component-question', requireOpenAI, async (req, res) => 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${req.openaiApiKey}`,
+          'Authorization': `Bearer ${req.openaiApiKey.trim()}`,
           'Content-Length': Buffer.byteLength(requestBody)
         }
       };
@@ -317,7 +416,7 @@ app.post('/api/v1/goals/contextual-help', requireOpenAI, async (req, res) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${req.openaiApiKey}`,
+          'Authorization': `Bearer ${req.openaiApiKey.trim()}`,
           'Content-Length': Buffer.byteLength(requestBody)
         }
       };
@@ -441,7 +540,7 @@ app.post('/api/v1/goals/:goalId/clarify', requireOpenAI, async (req, res) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${req.openaiApiKey}`,
+          'Authorization': `Bearer ${req.openaiApiKey.trim()}`,
           'Content-Length': Buffer.byteLength(requestBody)
         }
       };
@@ -517,6 +616,30 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Environment configuration endpoint - helps frontend auto-configure
+app.get('/api/v1/config/environment', (req, res) => {
+  const hasEnvironmentKey = !!process.env.OPENAI_API_KEY;
+  const keyLength = process.env.OPENAI_API_KEY?.length || 0;
+  const keyPrefix = process.env.OPENAI_API_KEY?.substring(0, 10) || '';
+  
+  console.log('Environment config requested - API key available:', hasEnvironmentKey);
+  
+  res.json({
+    success: true,
+    data: {
+      environmentConfigured: hasEnvironmentKey,
+      openaiKeyAvailable: hasEnvironmentKey,
+      keyFormat: hasEnvironmentKey ? 'sk-***' : null,
+      keyLength: hasEnvironmentKey ? keyLength : null,
+      keyPrefix: hasEnvironmentKey ? keyPrefix + '...' : null,
+      message: hasEnvironmentKey 
+        ? 'Backend is configured with environment API key' 
+        : 'Backend requires API key configuration',
+      autoConfigurationSupported: hasEnvironmentKey
+    }
+  });
+});
+
 // Error handling middleware
 app.use((error, req, res, next) => {
   console.error('Server Error:', error);
@@ -527,13 +650,70 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🤖 OpenAI-powered API Server running on http://localhost:${PORT}`);
-  console.log(`📋 Available endpoints:`);
-  console.log(`   POST /api/v1/goals/translate (requires X-OpenAI-API-Key header)`);
-  console.log(`   POST /api/v1/goals/component-question (requires X-OpenAI-API-Key header)`);
-  console.log(`   POST /api/v1/goals/contextual-help (requires X-OpenAI-API-Key header)`);
-  console.log(`   POST /api/v1/goals/:goalId/clarify (requires X-OpenAI-API-Key header)`);
-  console.log(`   GET  /health`);
-  console.log(`\n🔑 Don't forget to provide your OpenAI API key in the X-OpenAI-API-Key header!`);
-});
+// Optimize startup with async initialization
+const startServer = async () => {
+  try {
+    // Pre-warm the HTTPS agent to reduce first request latency
+    console.log('⚡ Pre-warming HTTPS connections...');
+    const preWarmConnection = new Promise((resolve) => {
+      const options = {
+        hostname: 'api.openai.com',
+        port: 443,
+        path: '/',
+        method: 'HEAD'
+      };
+      
+      const req = https.request(options, (res) => {
+        console.log('✅ HTTPS connection pre-warmed');
+        resolve();
+      });
+      
+      req.on('error', () => {
+        console.log('⚠️ Could not pre-warm connection, continuing anyway');
+        resolve();
+      });
+      
+      req.setTimeout(3000, () => {
+        req.destroy();
+        resolve();
+      });
+      
+      req.end();
+    });
+    
+    await preWarmConnection;
+    
+    // Start the server
+    const server = app.listen(PORT, () => {
+      const duration = Date.now() - startTime;
+      console.log(`🤖 OpenAI-powered API Server running on http://localhost:${PORT}`);
+      console.log(`📋 Available endpoints:`);
+      console.log(`   POST /api/v1/goals/translate (requires X-OpenAI-API-Key header)`);
+      console.log(`   POST /api/v1/goals/component-question (requires X-OpenAI-API-Key header)`);
+      console.log(`   POST /api/v1/goals/contextual-help (requires X-OpenAI-API-Key header)`);
+      console.log(`   POST /api/v1/goals/:goalId/clarify (requires X-OpenAI-API-Key header)`);
+      console.log(`   GET  /health`);
+      console.log(`   GET  /api/v1/config/environment (for frontend auto-configuration)`);
+      console.log(`\n🔑 Backend environment API key: ${process.env.OPENAI_API_KEY ? 'CONFIGURED ✅' : 'NOT SET ❌'}`);
+      console.log(`🔧 Frontend can auto-configure if environment key is available`);
+      console.log(`⏱️ Startup completed in ${duration}ms`);
+      console.log('✅ Ready to receive requests!');
+    });
+    
+    // Graceful shutdown handling
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, shutting down gracefully...');
+      server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+      });
+    });
+    
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the server
+startServer();

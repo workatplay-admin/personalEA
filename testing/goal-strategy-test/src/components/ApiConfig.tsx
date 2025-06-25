@@ -10,32 +10,112 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
   const [isConfigured, setIsConfigured] = useState(false)
   const [showKey, setShowKey] = useState(false)
 
-  // Auto-generate JWT for testing (backend doesn't actually validate it)
-  const generateTestJwt = () => {
-    return 'testing-jwt-' + Date.now()
+  // Generate proper JWT token via backend API call
+  const generateTestJwt = async (): Promise<string> => {
+    try {
+      // Get proper API base URL
+      const getApiBaseUrl = () => {
+        if (typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')) {
+          const hostname = window.location.hostname.replace('-5174.', '-8086.');
+          return `https://${hostname}`;
+        }
+        return 'http://localhost:8086';
+      };
+      
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/api/v1/auth/test-token`);
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error?.message || 'Failed to generate test token');
+      }
+      
+      return data.data.token;
+    } catch (error) {
+      console.error('Failed to generate JWT token:', error);
+      throw error;
+    }
   }
 
   useEffect(() => {
-    // Check if configuration already exists
-    const existingConfig = getApiConfig()
-    if (existingConfig) {
-      setOpenaiApiKey(existingConfig.openaiApiKey)
-      setIsConfigured(true)
-    } else {
-      // Try to load from localStorage
+    const checkConfiguration = async () => {
+      // Check if configuration already exists
+      const existingConfig = getApiConfig()
+      if (existingConfig) {
+        setOpenaiApiKey(existingConfig.openaiApiKey)
+        setIsConfigured(true)
+        return
+      }
+
+      // Check if backend has environment configuration
+      try {
+        console.log('🔧 Checking backend environment configuration...')
+        
+        // Get proper API base URL (same logic as api.ts)
+        const getApiBaseUrl = () => {
+          if (typeof window !== 'undefined' && window.location.hostname.includes('.app.github.dev')) {
+            // We're in Codespaces - use the forwarded URL for backend port 8086
+            const hostname = window.location.hostname.replace('-5174.', '-8086.');
+            return `https://${hostname}`;
+          }
+          // Local development - use backend goal-strategy service on port 8086
+          return 'http://localhost:8086';
+        };
+        
+        const apiBaseUrl = getApiBaseUrl();
+        console.log('🔧 Using API base URL:', apiBaseUrl);
+        
+        const response = await fetch(`${apiBaseUrl}/api/v1/config/environment`)
+        const data = await response.json()
+        
+        if (data.success && data.data.environmentConfigured) {
+          console.log('🔧 Backend environment configuration found:', data.data.message)
+          
+          try {
+            // Auto-configure with backend environment
+            const jwtToken = await generateTestJwt();
+            const config = {
+              jwtToken: jwtToken,
+              openaiApiKey: 'ENVIRONMENT_CONFIGURED' // Placeholder since backend handles it
+            }
+            
+            setApiConfig(config)
+            setOpenaiApiKey('ENVIRONMENT_CONFIGURED')
+            setIsConfigured(true)
+            // Do not auto-advance - user must explicitly proceed
+            return
+          } catch (error) {
+            console.error('🔧 Failed to generate JWT token during auto-config:', error)
+            // Fall through to manual configuration
+          }
+        }
+      } catch (error: any) {
+        console.log('🔧 Could not check backend environment configuration:', error.message)
+      }
+
+      // Fall back to localStorage check
       const savedOpenaiApiKey = localStorage.getItem('goal-strategy-openai-key')
       
       if (savedOpenaiApiKey) {
         setOpenaiApiKey(savedOpenaiApiKey)
-        // Auto-configure if we have the key
-        setApiConfig({
-          jwtToken: generateTestJwt(),
-          openaiApiKey: savedOpenaiApiKey
-        })
-        setIsConfigured(true)
-        onConfigured()
+        try {
+          // Auto-configure if we have the key
+          const jwtToken = await generateTestJwt();
+          setApiConfig({
+            jwtToken: jwtToken,
+            openaiApiKey: savedOpenaiApiKey
+          })
+          setIsConfigured(true)
+          // Do not auto-advance - user must explicitly proceed
+        } catch (error) {
+          console.error('🔧 Failed to generate JWT token for saved API key:', error)
+          // Still show the saved key but don't auto-configure
+          setIsConfigured(false)
+        }
       }
     }
+    
+    checkConfiguration()
   }, [])
 
   const validateApiKey = (key: string): boolean => {
@@ -44,7 +124,7 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
     return trimmedKey.startsWith('sk-') && trimmedKey.length >= 20
   }
 
-  const handleSaveConfiguration = () => {
+  const handleSaveConfiguration = async () => {
     if (!openaiApiKey.trim()) {
       alert('Please provide your OpenAI API key')
       return
@@ -55,27 +135,33 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
       return
     }
 
-    console.log('🔧 Saving API configuration...')
-    console.log('API Key format valid:', validateApiKey(openaiApiKey))
+    try {
+      console.log('🔧 Saving API configuration...')
+      console.log('API Key format valid:', validateApiKey(openaiApiKey))
 
-    // Save to localStorage
-    localStorage.setItem('goal-strategy-openai-key', openaiApiKey.trim())
+      // Save to localStorage
+      localStorage.setItem('goal-strategy-openai-key', openaiApiKey.trim())
 
-    // Set API configuration with auto-generated JWT
-    const config = {
-      jwtToken: generateTestJwt(),
-      openaiApiKey: openaiApiKey.trim()
+      // Set API configuration with auto-generated JWT
+      const jwtToken = await generateTestJwt();
+      const config = {
+        jwtToken: jwtToken,
+        openaiApiKey: openaiApiKey.trim()
+      }
+      
+      console.log('🔧 Setting API config:', { ...config, openaiApiKey: config.openaiApiKey.substring(0, 8) + '...' })
+      setApiConfig(config)
+      
+      // Verify it was set
+      const verifyConfig = getApiConfig()
+      console.log('🔧 Verified API config:', verifyConfig ? 'Set successfully' : 'Failed to set')
+
+      setIsConfigured(true)
+      onConfigured()
+    } catch (error) {
+      console.error('🔧 Failed to save API configuration:', error)
+      alert('Failed to configure API. Please try again.')
     }
-    
-    console.log('🔧 Setting API config:', { ...config, openaiApiKey: config.openaiApiKey.substring(0, 8) + '...' })
-    setApiConfig(config)
-    
-    // Verify it was set
-    const verifyConfig = getApiConfig()
-    console.log('🔧 Verified API config:', verifyConfig ? 'Set successfully' : 'Failed to set')
-
-    setIsConfigured(true)
-    onConfigured()
   }
 
   const handleReconfigure = () => {
@@ -108,6 +194,12 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
             </div>
           </div>
           <div className="flex space-x-2">
+            <button
+              onClick={onConfigured}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium"
+            >
+              Continue
+            </button>
             <button
               onClick={handleReconfigure}
               className="bg-green-100 hover:bg-green-200 text-green-800 text-sm px-3 py-1 rounded"

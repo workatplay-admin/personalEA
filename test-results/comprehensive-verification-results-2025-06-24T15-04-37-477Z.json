@@ -1,0 +1,98 @@
+{
+  "timestamp": "2025-06-24T15:04:36.266Z",
+  "apiStatus": {
+    "available": true,
+    "status": 200,
+    "service": "OpenAI-powered Goal Strategy API",
+    "timestamp": "2025-06-24T15:04:36.284Z"
+  },
+  "functionalityTests": [
+    {
+      "name": "API Availability",
+      "success": true,
+      "duration": 22,
+      "error": null,
+      "details": {
+        "available": true,
+        "service": "OpenAI-powered Goal Strategy API"
+      },
+      "category": "functionality",
+      "timestamp": "2025-06-24T15:04:36.289Z"
+    },
+    {
+      "name": "Transform Button Basic Functionality",
+      "success": false,
+      "duration": 2,
+      "error": "Invalid character in header content [\"X-OpenAI-API-Key\"]",
+      "details": null,
+      "category": "functionality",
+      "timestamp": "2025-06-24T15:04:36.291Z"
+    }
+  ],
+  "errorHandlingTests": [
+    {
+      "name": "Input Validation (Empty Goal)",
+      "success": true,
+      "duration": 3,
+      "error": null,
+      "details": {
+        "validation": "WORKING",
+        "message": "Empty goal properly rejected"
+      },
+      "category": "errorHandling",
+      "timestamp": "2025-06-24T15:04:36.294Z"
+    },
+    {
+      "name": "Missing API Key Handling",
+      "success": false,
+      "duration": 842,
+      "error": "Request without API key should be rejected",
+      "details": null,
+      "category": "errorHandling",
+      "timestamp": "2025-06-24T15:04:37.136Z"
+    },
+    {
+      "name": "Invalid API Key Handling",
+      "success": true,
+      "duration": 121,
+      "error": null,
+      "details": {
+        "keyValidation": "WORKING",
+        "message": "Invalid API key properly rejected by OpenAI"
+      },
+      "category": "errorHandling",
+      "timestamp": "2025-06-24T15:04:37.257Z"
+    },
+    {
+      "name": "Large Input Handling",
+      "success": false,
+      "duration": 145,
+      "error": "Request failed with status code 502",
+      "details": null,
+      "category": "errorHandling",
+      "timestamp": "2025-06-24T15:04:37.402Z"
+    }
+  ],
+  "performanceTests": [
+    {
+      "name": "API Response Performance",
+      "success": true,
+      "duration": 75,
+      "error": null,
+      "details": {
+        "responseTime": 74,
+        "performance": "GOOD"
+      },
+      "category": "performance",
+      "timestamp": "2025-06-24T15:04:37.477Z"
+    }
+  ],
+  "summary": {
+    "totalTests": 7,
+    "passedTests": 4,
+    "failedTests": 3,
+    "apiAvailable": true,
+    "transformButtonFunctional": false,
+    "errorHandlingWorking": false
+  }
+}

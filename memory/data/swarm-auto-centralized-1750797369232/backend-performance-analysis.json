@@ -1,0 +1,89 @@
+{
+  "step": "Backend Performance Analysis",
+  "timestamp": "2025-06-24T20:00:00.000Z",
+  "findings": {
+    "slowOperations": [
+      "OpenAI API calls in smartGoalProcessor.translateGoal() - up to 30 seconds timeout",
+      "Complex database queries with multiple joins in GET /goals/:id endpoint",
+      "Sequential Promise.all operations in clarification processing",
+      "Blocking synchronous JSON parsing in AI response handling"
+    ],
+    "databaseQueries": {
+      "performance_issues": [
+        "Goal fetching with nested includes (metrics, milestones, tasks, estimates, schedules, progress, clarifications)",
+        "No database indexing visible on userId fields",
+        "SQLite database may not be optimized for production workloads",
+        "Multiple sequential database operations in /clarify endpoint",
+        "Progress calculation done in application layer instead of database"
+      ],
+      "problematic_queries": [
+        "Line 362-383: Complex nested includes in goal detail fetch",
+        "Line 317-333: Parallel queries in goal listing with potential N+1 issues",
+        "Line 216-226: Sequential goal clarification inserts using Promise.all"
+      ]
+    },
+    "externalDependencies": [
+      "OpenAI API calls blocking main thread - fetch() calls in smart-goal-processor.ts",
+      "No circuit breaker pattern for external API failures",
+      "AI_TIMEOUT_MS set to 30000ms (30 seconds) which is too long for web requests",
+      "No retry logic with exponential backoff for failed API calls"
+    ],
+    "asyncIssues": [
+      "All database operations are properly async",
+      "AI response parsing is synchronous but could be optimized",
+      "Progress calculation (lines 396-402) done synchronously in application"
+    ]
+  },
+  "criticalBottlenecks": [
+    {
+      "location": "services/goal-strategy/src/services/smart-goal-processor.ts:264-285",
+      "issue": "OpenAI API calls with 30-second timeout blocking request",
+      "severity": "critical",
+      "impact": "Primary cause of 10+ second response times"
+    },
+    {
+      "location": "services/goal-strategy/src/routes/goals.ts:362-383",
+      "issue": "Complex nested database queries with deep includes",
+      "severity": "high",
+      "impact": "Secondary performance bottleneck"
+    },
+    {
+      "location": "services/goal-strategy/prisma/schema.prisma:8-11",
+      "issue": "SQLite database not optimized for production",
+      "severity": "medium",
+      "impact": "Database performance limitations"
+    }
+  ],
+  "optimizations": [
+    "Implement request timeout middleware with 10-second limit",
+    "Add database connection pooling and optimize queries",
+    "Implement circuit breaker pattern for OpenAI API calls",
+    "Add response caching for frequently accessed goals",
+    "Optimize database queries by reducing nested includes",
+    "Move progress calculations to database layer using SQL aggregations",
+    "Add database indexing on userId and frequently queried fields",
+    "Implement API call retry logic with exponential backoff",
+    "Consider database migration from SQLite to PostgreSQL for production",
+    "Add request/response compression for large payloads"
+  ],
+  "recommendations": {
+    "immediate": [
+      "Set request timeout to 10 seconds maximum",
+      "Reduce OpenAI API timeout from 30s to 10s",
+      "Add database indexes on userId fields",
+      "Optimize goal detail query by limiting includes"
+    ],
+    "short_term": [
+      "Implement response caching strategy",
+      "Add circuit breaker for OpenAI API",
+      "Move progress calculations to database",
+      "Add API retry logic"
+    ],
+    "long_term": [
+      "Migrate to PostgreSQL with proper indexing",
+      "Implement background job processing for AI calls",
+      "Add comprehensive performance monitoring",
+      "Consider microservice architecture for AI processing"
+    ]
+  }
+}

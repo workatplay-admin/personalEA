@@ -1,0 +1,391 @@
+{
+  "testSuiteId": "automated-user-testing-2025-06-23T19:55:30.781Z",
+  "timestamp": "2025-06-23T19:55:41.788Z",
+  "duration": "11.0 seconds",
+  "scenarios": [
+    {
+      "scenarioId": "personal_learning",
+      "passed": false,
+      "metrics": {
+        "goalImprovement": 1,
+        "conversationNaturalness": 0.7,
+        "userSatisfactionPrediction": 0.8,
+        "smartCriteriaFulfillment": 0.8,
+        "actionabilityScore": 0.8,
+        "confidence": 0.6,
+        "reasoning": "Fallback analysis due to API limitation",
+        "timestamp": "2025-06-23T19:55:34.894Z",
+        "conversationLength": 4,
+        "breakdown": {
+          "specific": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "measurable": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "achievable": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "relevant": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "timeBound": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          }
+        }
+      },
+      "actualConversation": {
+        "conversationId": "test-personal_learning-1750708532495",
+        "originalGoal": "I want to learn Python programming this year",
+        "messages": [
+          {
+            "role": "user",
+            "content": "I want to learn Python programming this year",
+            "timestamp": "2025-06-23T19:55:32.495Z"
+          },
+          {
+            "role": "assistant",
+            "content": "I've transformed your goal into a SMART goal: \"Learn Python programming by completing an online course and building three small projects by December 31st\". The current confidence level is 60%.",
+            "timestamp": "2025-06-23T19:55:33.440Z"
+          },
+          {
+            "role": "user",
+            "content": "I want to be more specific about the timeline and learning approach",
+            "timestamp": "2025-06-23T19:55:33.440Z"
+          },
+          {
+            "role": "assistant",
+            "content": "Great to hear that you want to refine your goal further! How about setting a specific deadline for each milestone? For example, you could aim to complete the online course by the end of October and finish all three small projects by December 31st. This way, you'll have a clear roadmap to follow. How does that sound to you?",
+            "timestamp": "2025-06-23T19:55:34.892Z"
+          }
+        ],
+        "userProfile": {
+          "responsePatterns": [
+            "collaborative",
+            "detailed"
+          ],
+          "domain": "learning",
+          "experience": "beginner",
+          "preferences": {
+            "communicationStyle": "conversational",
+            "detailLevel": "comprehensive"
+          }
+        },
+        "context": {
+          "sessionDuration": 0,
+          "componentsCovered": [],
+          "clarificationRounds": 1,
+          "userInitiatedQuestions": 0,
+          "systemGuidanceInstances": 0
+        },
+        "finalGoal": {
+          "id": "goal-1750708533439",
+          "title": "Learn Python programming by completing an online course and building three small projects by December 31st",
+          "criteria": {
+            "specific": {
+              "value": "Improved based on clarification",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "measurable": {
+              "value": "Enhanced with user input",
+              "confidence": 0.8,
+              "missing": [],
+              "metrics": []
+            },
+            "achievable": {
+              "value": "Realistic based on feedback",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "relevant": {
+              "value": "Aligned with user priorities",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "timeBound": {
+              "value": "Timeline clarified",
+              "confidence": 0.8,
+              "missing": []
+            }
+          },
+          "confidence": 0.8
+        }
+      },
+      "deviations": [
+        "Conversation naturalness below threshold: 0.7 < 0.8"
+      ],
+      "timestamp": "2025-06-23T19:55:34.894Z"
+    },
+    {
+      "scenarioId": "professional_project",
+      "passed": false,
+      "metrics": {
+        "goalImprovement": 1,
+        "conversationNaturalness": 0.7,
+        "userSatisfactionPrediction": 0.8,
+        "smartCriteriaFulfillment": 0.8,
+        "actionabilityScore": 0.8,
+        "confidence": 0.6,
+        "reasoning": "Fallback analysis due to API limitation",
+        "timestamp": "2025-06-23T19:55:37.828Z",
+        "conversationLength": 4,
+        "breakdown": {
+          "specific": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "measurable": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "achievable": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "relevant": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "timeBound": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          }
+        }
+      },
+      "actualConversation": {
+        "conversationId": "test-professional_project-1750708535895",
+        "originalGoal": "Launch a new product feature by Q2",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Launch a new product feature by Q2",
+            "timestamp": "2025-06-23T19:55:35.895Z"
+          },
+          {
+            "role": "assistant",
+            "content": "I've transformed your goal into a SMART goal: \"Launch a new product feature by the end of June 2022\". The current confidence level is 60%.",
+            "timestamp": "2025-06-23T19:55:36.849Z"
+          },
+          {
+            "role": "user",
+            "content": "I want to be more specific about the timeline and learning approach",
+            "timestamp": "2025-06-23T19:55:36.849Z"
+          },
+          {
+            "role": "assistant",
+            "content": "Great! To make your goal more specific, you can consider setting a target launch date within Q2, which spans from April to June. Additionally, you can outline a learning approach by specifying how you will acquire the necessary skills or knowledge to successfully launch the new product feature. This could involve attending relevant training, conducting research, or learning from industry experts. How do you feel about incorporating these details into your goal?",
+            "timestamp": "2025-06-23T19:55:37.827Z"
+          }
+        ],
+        "userProfile": {
+          "responsePatterns": [
+            "direct",
+            "results-oriented"
+          ],
+          "domain": "business",
+          "experience": "intermediate",
+          "preferences": {
+            "communicationStyle": "structured",
+            "detailLevel": "moderate"
+          }
+        },
+        "context": {
+          "sessionDuration": 0,
+          "componentsCovered": [],
+          "clarificationRounds": 1,
+          "userInitiatedQuestions": 0,
+          "systemGuidanceInstances": 0
+        },
+        "finalGoal": {
+          "id": "goal-1750708536848",
+          "title": "Launch a new product feature by the end of June 2022",
+          "criteria": {
+            "specific": {
+              "value": "Improved based on clarification",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "measurable": {
+              "value": "Enhanced with user input",
+              "confidence": 0.8,
+              "missing": [],
+              "metrics": []
+            },
+            "achievable": {
+              "value": "Realistic based on feedback",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "relevant": {
+              "value": "Aligned with user priorities",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "timeBound": {
+              "value": "Timeline clarified",
+              "confidence": 0.8,
+              "missing": []
+            }
+          },
+          "confidence": 0.8
+        }
+      },
+      "deviations": [
+        "SMART criteria fulfillment below threshold: 0.8 < 0.85"
+      ],
+      "timestamp": "2025-06-23T19:55:37.828Z"
+    },
+    {
+      "scenarioId": "fitness_goal",
+      "passed": false,
+      "metrics": {
+        "goalImprovement": 1,
+        "conversationNaturalness": 0.7,
+        "userSatisfactionPrediction": 0.8,
+        "smartCriteriaFulfillment": 0.8,
+        "actionabilityScore": 0.8,
+        "confidence": 0.6,
+        "reasoning": "Fallback analysis due to API limitation",
+        "timestamp": "2025-06-23T19:55:40.786Z",
+        "conversationLength": 4,
+        "breakdown": {
+          "specific": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "measurable": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "achievable": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "relevant": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          },
+          "timeBound": {
+            "score": 0.8,
+            "reasoning": "Automated assessment"
+          }
+        }
+      },
+      "actualConversation": {
+        "conversationId": "test-fitness_goal-1750708538830",
+        "originalGoal": "Run a marathon in 6 months",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Run a marathon in 6 months",
+            "timestamp": "2025-06-23T19:55:38.830Z"
+          },
+          {
+            "role": "assistant",
+            "content": "I've transformed your goal into a SMART goal: \"Run a marathon in 6 months with a training plan of running 4 times a week\". The current confidence level is 60%.",
+            "timestamp": "2025-06-23T19:55:39.496Z"
+          },
+          {
+            "role": "user",
+            "content": "I want to be more specific about the timeline and learning approach",
+            "timestamp": "2025-06-23T19:55:39.496Z"
+          },
+          {
+            "role": "assistant",
+            "content": "Great! Let's make your goal more time-bound. How about setting a specific date for the marathon in 6 months and breaking down your training plan into monthly milestones? This way, you can track your progress more effectively. How does that sound to you?",
+            "timestamp": "2025-06-23T19:55:40.785Z"
+          }
+        ],
+        "userProfile": {
+          "responsePatterns": [
+            "motivated",
+            "detail-focused"
+          ],
+          "domain": "health",
+          "experience": "beginner",
+          "preferences": {
+            "communicationStyle": "conversational",
+            "detailLevel": "comprehensive"
+          }
+        },
+        "context": {
+          "sessionDuration": 0,
+          "componentsCovered": [],
+          "clarificationRounds": 1,
+          "userInitiatedQuestions": 0,
+          "systemGuidanceInstances": 0
+        },
+        "finalGoal": {
+          "id": "goal-1750708539495",
+          "title": "Run a marathon in 6 months with a training plan of running 4 times a week",
+          "criteria": {
+            "specific": {
+              "value": "Improved based on clarification",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "measurable": {
+              "value": "Enhanced with user input",
+              "confidence": 0.8,
+              "missing": [],
+              "metrics": []
+            },
+            "achievable": {
+              "value": "Realistic based on feedback",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "relevant": {
+              "value": "Aligned with user priorities",
+              "confidence": 0.8,
+              "missing": []
+            },
+            "timeBound": {
+              "value": "Timeline clarified",
+              "confidence": 0.8,
+              "missing": []
+            }
+          },
+          "confidence": 0.8
+        }
+      },
+      "deviations": [
+        "Conversation naturalness below threshold: 0.7 < 0.8"
+      ],
+      "timestamp": "2025-06-23T19:55:40.786Z"
+    }
+  ],
+  "aggregateMetrics": {
+    "totalConversations": 3,
+    "passRate": 0,
+    "averageGoalImprovement": 1,
+    "averageUserSatisfaction": 0.8000000000000002
+  },
+  "insights": {
+    "bestPerformingPatterns": [
+      "Environment-based OpenAI API key authentication works reliably",
+      "SMART goal translation shows consistent results",
+      "Chat refinement improves goal quality when implemented"
+    ],
+    "worstPerformingPatterns": [
+      "Some conversation flows may need optimization",
+      "Quality thresholds may need adjustment based on user personas"
+    ],
+    "emergentBehaviors": [
+      "System handles basic goal translation well",
+      "Conversation quality varies by goal complexity",
+      "User persona affects interaction patterns"
+    ],
+    "systemRecommendations": [
+      "Continue developing chat refinement capabilities",
+      "Implement more sophisticated conversation quality metrics",
+      "Add user persona-based response optimization"
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+COMPREHENSIVE AUTOMATED TESTING REPORT
+Generated: Tue Jun 24 18:21:33 UTC 2025
+========================================
+
+Suite: Phase 1 Goal to SMART
+Browser: chromium
+Result: FAILED
+Duration: 1268ms
+Stdout: /workspaces/personalEA/test-results/Phase_1_Goal_to_SMART_chromium_stdout.log
+Stderr: /workspaces/personalEA/test-results/Phase_1_Goal_to_SMART_chromium_stderr.log
+----------------------------------------
+Suite: Error Scenarios
+Browser: chromium
+Result: FAILED
+Duration: 1232ms
+Stdout: /workspaces/personalEA/test-results/Error_Scenarios_chromium_stdout.log
+Stderr: /workspaces/personalEA/test-results/Error_Scenarios_chromium_stderr.log
+----------------------------------------
+Suite: Network Timeout
+Browser: chromium
+Result: FAILED
+Duration: 1240ms
+Stdout: /workspaces/personalEA/test-results/Network_Timeout_chromium_stdout.log
+Stderr: /workspaces/personalEA/test-results/Network_Timeout_chromium_stderr.log
+----------------------------------------
+Suite: Edge Cases
+Browser: chromium
+Result: FAILED
+Duration: 1166ms
+Stdout: /workspaces/personalEA/test-results/Edge_Cases_chromium_stdout.log
+Stderr: /workspaces/personalEA/test-results/Edge_Cases_chromium_stderr.log
+----------------------------------------
+Suite: Cross Browser Firefox
+Browser: firefox
+Result: FAILED
+Duration: 1162ms
+Stdout: /workspaces/personalEA/test-results/Cross_Browser_Firefox_firefox_stdout.log
+Stderr: /workspaces/personalEA/test-results/Cross_Browser_Firefox_firefox_stderr.log
+----------------------------------------
+Suite: Cross Browser WebKit
+Browser: webkit
+Result: FAILED
+Duration: 1242ms
+Stdout: /workspaces/personalEA/test-results/Cross_Browser_WebKit_webkit_stdout.log
+Stderr: /workspaces/personalEA/test-results/Cross_Browser_WebKit_webkit_stderr.log
+----------------------------------------

@@ -33,18 +33,10 @@ function App() {
     { id: 5, name: 'Estimation', icon: Clock, description: 'Estimate time & effort' },
   ]
 
-  // Check if API is configured on component mount
+  // Always start with API configuration as requested
   useEffect(() => {
-    console.log('App useEffect: Checking API config');
-    
-    const config = getApiConfig()
-    if (config) {
-      setCurrentStep(1) // Skip to goal input if already configured
-      console.log('App useEffect: API config found, setting step to 1');
-    } else {
-      setCurrentStep(0) // Start with API configuration
-      console.log('App useEffect: No API config, starting at step 0');
-    }
+    console.log('App useEffect: Starting at API config step');
+    setCurrentStep(0) // Always start with API configuration
   }, [])
 
   const handleApiConfigured = () => {

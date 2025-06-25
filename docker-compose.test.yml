@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # Frontend service
+  frontend:
+    build:
+      context: ./testing/goal-strategy-test
+      dockerfile: Dockerfile.test
+    ports:
+      - "5174:5174"
+    environment:
+      - VITE_API_URL=http://backend:8085
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5174"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Backend service
+  backend:
+    build:
+      context: ./services/goal-strategy
+      dockerfile: Dockerfile.test
+    ports:
+      - "8085:8085"
+    environment:
+      - NODE_ENV=test
+      - PORT=8085
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-test-key}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    depends_on:
+      mockapi:
+        condition: service_healthy
+
+  # Mock API service
+  mockapi:
+    build:
+      context: ./testing/goal-strategy-test
+      dockerfile: Dockerfile.mockapi
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Test runner service
+  test-runner:
+    image: mcr.microsoft.com/playwright:v1.40.0-focal
+    volumes:
+      - ./:/workspace
+      - ./test-results:/test-results
+    environment:
+      - CI=${CI:-false}
+      - HEADLESS=${HEADLESS:-true}
+    working_dir: /workspace
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    command: ["bash", "./run-simple-tests.sh"]

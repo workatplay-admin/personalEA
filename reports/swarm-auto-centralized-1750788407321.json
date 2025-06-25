@@ -1,0 +1,13 @@
+{
+  "objective": "A couple of things. 1. You said this is ready for user testing and the product breaks immediatley after entering a goal and clicking Transform into SMART \n  Goal. The app always starts goal input rather than API config. We should start at API config for now. We will change late. You can use the API in secrets \n  to use for testing so that you NEVER EVER ask me to do user testing on a feature that cleary does not work if you did automated user testing. Please - \n  Properly streamline standing up a server for testing so it is quick and reliable and 2 ensure automated user test using a appropariate testing suite \n  suitabke for mimicking actual users. Then ONLY then ask me to use this with actual users. If it fails to work after you tell me it's ready I will fire \n  you.",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-06-24T18:06:47.321Z",
+  "id": "swarm-auto-centralized-1750788407321"
+}

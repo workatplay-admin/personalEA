@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-06-24T18:24:45.761Z",
+  "testResults": {
+    "health": {
+      "backend": true,
+      "api": true,
+      "frontend": true
+    },
+    "api": {
+      "envConfig": true,
+      "goalTranslation": true,
+      "goalData": {
+        "success": true,
+        "data": {
+          "id": "goal-1750789485042",
+          "correlation_id": "corr-1750789485042",
+          "title": "I want to complete an online Python course by December 31st this year",
+          "criteria": {
+            "specific": {
+              "value": "I want to learn Python this year",
+              "confidence": 0.3,
+              "missing": []
+            },
+            "measurable": {
+              "value": "To be determined",
+              "confidence": 0.2,
+              "missing": [],
+              "metrics": []
+            },
+            "achievable": {
+              "value": "To be assessed",
+              "confidence": 0.5,
+              "missing": []
+            },
+            "relevant": {
+              "value": "To be clarified",
+              "confidence": 0.4,
+              "missing": []
+            },
+            "timeBound": {
+              "value": "To be specified",
+              "confidence": 0.1,
+              "missing": []
+            }
+          },
+          "missingCriteria": [
+            "Measurable",
+            "Achievable",
+            "Relevant"
+          ],
+          "clarificationQuestions": [
+            "Measurable",
+            "Achievable",
+            "Relevant"
+          ],
+          "confidence": 0.6
+        }
+      }
+    },
+    "errors": {
+      "emptyGoal": "raw_goal is required",
+      "missingParam": "raw_goal is required"
+    },
+    "performance": {
+      "responseTime": 710,
+      "performanceGood": true
+    }
+  },
+  "summary": {
+    "totalTests": 8,
+    "passedTests": 8,
+    "successRate": 100,
+    "overallStatus": "READY"
+  }
+}

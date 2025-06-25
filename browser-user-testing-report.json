@@ -1,0 +1,183 @@
+{
+  "testSuiteId": "browser-user-testing-2025-06-23T19:56:45.264Z",
+  "timestamp": "2025-06-23T19:56:56.222Z",
+  "duration": "11.0 seconds",
+  "summary": {
+    "totalTests": 3,
+    "successfulTests": 0,
+    "successRate": "0.0",
+    "failedTests": 3
+  },
+  "testResults": [
+    {
+      "scenarioId": "learning_goal",
+      "scenarioName": "Learning Goal Test",
+      "steps": [
+        {
+          "step": "frontend_access",
+          "success": false,
+          "error": "Missing UI elements: API Configuration, Goal Input, Transform to SMART Goal",
+          "timestamp": "2025-06-23T19:56:45.287Z"
+        },
+        {
+          "step": "goal_input",
+          "success": true,
+          "result": {
+            "goalTranslated": true,
+            "originalGoal": "I want to learn JavaScript programming",
+            "smartGoalTitle": "I want to complete an online JavaScript programming course within the next 3 months",
+            "confidence": 0.6,
+            "criteriaCount": 5
+          },
+          "timestamp": "2025-06-23T19:56:46.241Z"
+        },
+        {
+          "step": "smart_generation",
+          "success": true,
+          "result": {
+            "allCriteriaPresent": true,
+            "confidence": 0.7,
+            "hasTitle": true,
+            "hasClarificationQuestions": true
+          },
+          "timestamp": "2025-06-23T19:56:47.236Z"
+        },
+        {
+          "step": "user_interaction",
+          "success": true,
+          "result": {
+            "chatRefinementWorks": true,
+            "responseHasFeedback": true
+          },
+          "timestamp": "2025-06-23T19:56:47.849Z"
+        }
+      ],
+      "overallSuccess": false,
+      "timestamp": "2025-06-23T19:56:45.266Z"
+    },
+    {
+      "scenarioId": "business_goal",
+      "scenarioName": "Business Goal Test",
+      "steps": [
+        {
+          "step": "frontend_access",
+          "success": false,
+          "error": "Missing UI elements: API Configuration, Goal Input, Transform to SMART Goal",
+          "timestamp": "2025-06-23T19:56:47.854Z"
+        },
+        {
+          "step": "goal_input",
+          "success": true,
+          "result": {
+            "goalTranslated": true,
+            "originalGoal": "Increase sales by improving customer experience",
+            "smartGoalTitle": "Increase online sales by 15% within the next quarter through a 10% increase in customer satisfaction ratings",
+            "confidence": 0.4,
+            "criteriaCount": 5
+          },
+          "timestamp": "2025-06-23T19:56:49.567Z"
+        },
+        {
+          "step": "smart_generation",
+          "success": true,
+          "result": {
+            "allCriteriaPresent": true,
+            "confidence": 0.4,
+            "hasTitle": true,
+            "hasClarificationQuestions": true
+          },
+          "timestamp": "2025-06-23T19:56:50.253Z"
+        },
+        {
+          "step": "user_interaction",
+          "success": true,
+          "result": {
+            "chatRefinementWorks": true,
+            "responseHasFeedback": true
+          },
+          "timestamp": "2025-06-23T19:56:51.373Z"
+        }
+      ],
+      "overallSuccess": false,
+      "timestamp": "2025-06-23T19:56:47.849Z"
+    },
+    {
+      "scenarioId": "personal_goal",
+      "scenarioName": "Personal Goal Test",
+      "steps": [
+        {
+          "step": "frontend_access",
+          "success": false,
+          "error": "Missing UI elements: API Configuration, Goal Input, Transform to SMART Goal",
+          "timestamp": "2025-06-23T19:56:51.378Z"
+        },
+        {
+          "step": "goal_input",
+          "success": true,
+          "result": {
+            "goalTranslated": true,
+            "originalGoal": "Get healthier and more active",
+            "smartGoalTitle": "Improve cardiovascular health by running 3 times a week for 30 minutes",
+            "confidence": 0.6,
+            "criteriaCount": 5
+          },
+          "timestamp": "2025-06-23T19:56:52.215Z"
+        },
+        {
+          "step": "smart_generation",
+          "success": true,
+          "result": {
+            "allCriteriaPresent": true,
+            "confidence": 0.6,
+            "hasTitle": true,
+            "hasClarificationQuestions": true
+          },
+          "timestamp": "2025-06-23T19:56:52.841Z"
+        },
+        {
+          "step": "user_interaction",
+          "success": true,
+          "result": {
+            "chatRefinementWorks": true,
+            "responseHasFeedback": true
+          },
+          "timestamp": "2025-06-23T19:56:53.627Z"
+        }
+      ],
+      "overallSuccess": false,
+      "timestamp": "2025-06-23T19:56:51.373Z"
+    }
+  ],
+  "insights": {
+    "strengths": [
+      "Frontend application is accessible and functional",
+      "API endpoints respond correctly",
+      "SMART goal generation works as expected",
+      "System handles various goal types appropriately"
+    ],
+    "weaknesses": [
+      "frontend_access: Missing UI elements: API Configuration, Goal Input, Transform to SMART Goal",
+      "frontend_access: Missing UI elements: API Configuration, Goal Input, Transform to SMART Goal",
+      "frontend_access: Missing UI elements: API Configuration, Goal Input, Transform to SMART Goal"
+    ],
+    "recommendations": [
+      "Continue monitoring API response times",
+      "Consider implementing real browser automation with Playwright",
+      "Add more sophisticated user interaction testing",
+      "Implement visual regression testing"
+    ]
+  },
+  "additionalTests": {
+    "cors": {
+      "corsWorking": true
+    },
+    "performance": {
+      "apiResponseTimes": [
+        800,
+        832,
+        953
+      ],
+      "frontendLoadTime": 7
+    }
+  }
+}

@@ -1,0 +1,1947 @@
+{
+  "config": {
+    "configFile": "/workspaces/personalEA/playwright.config.ts",
+    "rootDir": "/workspaces/personalEA/tests/playwright",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/workspaces/personalEA/tests/playwright/global-setup.ts",
+    "globalTeardown": "/workspaces/personalEA/tests/playwright/global-teardown.ts",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/workspaces/personalEA/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/workspaces/personalEA/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspaces/personalEA/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/workspaces/personalEA/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspaces/personalEA/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/workspaces/personalEA/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspaces/personalEA/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "/workspaces/personalEA/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/workspaces/personalEA/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-safari",
+        "name": "mobile-safari",
+        "testDir": "/workspaces/personalEA/tests/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.53.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "user-flow-test.spec.ts",
+      "file": "user-flow-test.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PersonalEA User Flow Testing",
+          "file": "user-flow-test.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete Goal to SMART Transformation Flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13291,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🚀 Starting complete user flow test...\n"
+                        },
+                        {
+                          "text": "✅ Page loaded successfully\n"
+                        },
+                        {
+                          "text": "   Title present: true\n"
+                        },
+                        {
+                          "text": "   Input elements: true\n"
+                        },
+                        {
+                          "text": "   Buttons: true\n"
+                        },
+                        {
+                          "text": "   Content length: 575 chars\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "✅ API key configured\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "✅ Goal entered: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "✅ Goal submitted for transformation\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ SMART goal generated successfully\n"
+                        },
+                        {
+                          "text": "   Title: \"I've analyzed your goal \"I want to improve my problem-solving skills in software development by completing at least one coding challenge per week\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Confidence: 60%\n"
+                        },
+                        {
+                          "text": "   Criteria present: {\n  specific: \u001b[33mtrue\u001b[39m,\n  measurable: \u001b[33mtrue\u001b[39m,\n  achievable: \u001b[33mtrue\u001b[39m,\n  relevant: \u001b[33mtrue\u001b[39m,\n  time: \u001b[33mtrue\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "💬 Starting chat refinement: \"Can you make this goal more specific with concrete milestones?\"\n"
+                        },
+                        {
+                          "text": "⚠️ Chat refinement not available (UI not present)\n"
+                        },
+                        {
+                          "text": "🎉 Complete user flow test passed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:14:07.797Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-617d5a14f45b8332f100",
+              "file": "user-flow-test.spec.ts",
+              "line": 10,
+              "column": 7
+            },
+            {
+              "title": "Multiple Goal Types Testing",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30488,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/workspaces/personalEA/tests/playwright/user-flow-test.spec.ts",
+                            "column": 90,
+                            "line": 121
+                          },
+                          "message": "Error: Health goal should generate visible result\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  119 |       \n  120 |       // Validate result\n> 121 |       expect(result.visible, `${testCase.category} goal should generate visible result`).toBeTruthy();\n      |                                                                                          ^\n  122 |       expect(result.confidence, `${testCase.category} goal should have reasonable confidence`).toBeGreaterThan(20);\n  123 |       \n  124 |       console.log(`   ✅ Generated: \"${result.title}\"`);\n    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:121:90"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Learning goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development through online courses and complete at least 3 projects\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 60%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Business goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning algorithms and develop an AI application\" and it currently has a 40% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 40%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Health goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "No SMART goal content detected\n"
+                        },
+                        {
+                          "text": "Error extracting SMART goal result: page.textContent: Target page, context or browser has been closed\n    at GoalStrategyPage.getSmartGoalResult \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:188:43\u001b[90m)\u001b[39m\n    at GoalStrategyPage.waitForSmartGoalGeneration \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:175:23\u001b[90m)\u001b[39m\n    at \u001b[90m/workspaces/personalEA/\u001b[39mtests/playwright/user-flow-test.spec.ts:118:22 {\n  [\u001b[32mSymbol(step)\u001b[39m]: {\n    stepId: \u001b[32m'pw:api@50'\u001b[39m,\n    location: {\n      file: \u001b[32m'/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts'\u001b[39m,\n      line: \u001b[33m188\u001b[39m,\n      column: \u001b[33m43\u001b[39m,\n      function: \u001b[32m'GoalStrategyPage.getSmartGoalResult'\u001b[39m\n    },\n    category: \u001b[32m'pw:api'\u001b[39m,\n    title: \u001b[32m\"Get text content locator('body')\"\u001b[39m,\n    apiName: \u001b[32m'page.textContent'\u001b[39m,\n    params: { selector: \u001b[32m'body'\u001b[39m, timeout: \u001b[33m10000\u001b[39m },\n    boxedStack: \u001b[90mundefined\u001b[39m,\n    steps: [],\n    attachmentIndices: [],\n    info: TestStepInfoImpl {\n      annotations: [],\n      _testInfo: \u001b[36m[TestInfoImpl]\u001b[39m,\n      _stepId: \u001b[32m'pw:api@50'\u001b[39m\n    },\n    complete: \u001b[36m[Function: complete]\u001b[39m,\n    endWallTime: \u001b[33m1750774491698\u001b[39m,\n    error: {\n      message: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed'\u001b[39m,\n      stack: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.getSmartGoalResult (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:188:43)\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.waitForSmartGoalGeneration (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:175:23)\\n'\u001b[39m +\n        \u001b[32m'    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:118:22'\u001b[39m,\n      cause: \u001b[90mundefined\u001b[39m\n    }\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:14:21.277Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-b90faca7533371f3bcfe",
+              "file": "user-flow-test.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "Error Handling and Edge Cases",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1318,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📝 Entering goal: \"\"\n"
+                        },
+                        {
+                          "text": "⚠️ Empty goal submission behavior: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"win\"\n"
+                        },
+                        {
+                          "text": "⚠️ Short goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a highly skilled software developer who specializes in artificial intelligence and machine learning while also building a successful startup company that helps people achieve their personal and professional goals through technology-enabled coaching and mentoring services that leverage the latest advances in natural language processing and conversational AI to provide personalized guidance and support to users around the world\"\n"
+                        },
+                        {
+                          "text": "⚠️ Long goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "🎉 Error handling test completed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:14:52.791Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-0ee65e68af516c2991ad",
+              "file": "user-flow-test.spec.ts",
+              "line": 137,
+              "column": 7
+            },
+            {
+              "title": "Performance and Responsiveness",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14549,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "⚡ Testing performance and responsiveness...\n"
+                        },
+                        {
+                          "text": "✅ Page load time: 478ms\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn data science and analytics\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ Goal processing time: 10179ms\n"
+                        },
+                        {
+                          "text": "✅ Processing result: \"I've analyzed your goal \"Complete an online data science and analytics course to gain proficiency in statistical analysis and data visualization techniques\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Testing: clicking multiple buttons quickly\n"
+                        },
+                        {
+                          "text": "   Testing: rapid text input\n"
+                        },
+                        {
+                          "text": "   Testing: UI state changes\n"
+                        },
+                        {
+                          "text": "🎉 Performance test completed!\n"
+                        },
+                        {
+                          "text": "   Overall performance: 10657ms total\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:14:54.248Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-645762e9d49e8df478f5",
+              "file": "user-flow-test.spec.ts",
+              "line": 178,
+              "column": 7
+            },
+            {
+              "title": "Complete Goal to SMART Transformation Flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15218,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🚀 Starting complete user flow test...\n"
+                        },
+                        {
+                          "text": "✅ Page loaded successfully\n"
+                        },
+                        {
+                          "text": "   Title present: true\n"
+                        },
+                        {
+                          "text": "   Input elements: true\n"
+                        },
+                        {
+                          "text": "   Buttons: true\n"
+                        },
+                        {
+                          "text": "   Content length: 575 chars\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "✅ API key configured\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "✅ Goal entered: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "✅ Goal submitted for transformation\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ SMART goal generated successfully\n"
+                        },
+                        {
+                          "text": "   Title: \"I've analyzed your goal \"I want to improve my skills in Python programming by completing three online courses and building a web application from scratch\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Confidence: 60%\n"
+                        },
+                        {
+                          "text": "   Criteria present: {\n  specific: \u001b[33mtrue\u001b[39m,\n  measurable: \u001b[33mtrue\u001b[39m,\n  achievable: \u001b[33mtrue\u001b[39m,\n  relevant: \u001b[33mtrue\u001b[39m,\n  time: \u001b[33mtrue\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "💬 Starting chat refinement: \"Can you make this goal more specific with concrete milestones?\"\n"
+                        },
+                        {
+                          "text": "⚠️ Chat refinement not available (UI not present)\n"
+                        },
+                        {
+                          "text": "🎉 Complete user flow test passed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:15:09.652Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-12c13661305f54328dc3",
+              "file": "user-flow-test.spec.ts",
+              "line": 10,
+              "column": 7
+            },
+            {
+              "title": "Multiple Goal Types Testing",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30245,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/workspaces/personalEA/tests/playwright/user-flow-test.spec.ts",
+                            "column": 90,
+                            "line": 121
+                          },
+                          "message": "Error: Health goal should generate visible result\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  119 |       \n  120 |       // Validate result\n> 121 |       expect(result.visible, `${testCase.category} goal should generate visible result`).toBeTruthy();\n      |                                                                                          ^\n  122 |       expect(result.confidence, `${testCase.category} goal should have reasonable confidence`).toBeGreaterThan(20);\n  123 |       \n  124 |       console.log(`   ✅ Generated: \"${result.title}\"`);\n    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:121:90"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Learning goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development through online courses and complete a project by the end of the year\" and it currently has a 40% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 40%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Business goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development through online courses and complete at least 3 projects\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 60%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Health goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "No SMART goal content detected\n"
+                        },
+                        {
+                          "text": "Error extracting SMART goal result: page.textContent: Target page, context or browser has been closed\n    at GoalStrategyPage.getSmartGoalResult \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:188:43\u001b[90m)\u001b[39m\n    at GoalStrategyPage.waitForSmartGoalGeneration \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:175:23\u001b[90m)\u001b[39m\n    at \u001b[90m/workspaces/personalEA/\u001b[39mtests/playwright/user-flow-test.spec.ts:118:22 {\n  [\u001b[32mSymbol(step)\u001b[39m]: {\n    stepId: \u001b[32m'pw:api@50'\u001b[39m,\n    location: {\n      file: \u001b[32m'/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts'\u001b[39m,\n      line: \u001b[33m188\u001b[39m,\n      column: \u001b[33m43\u001b[39m,\n      function: \u001b[32m'GoalStrategyPage.getSmartGoalResult'\u001b[39m\n    },\n    category: \u001b[32m'pw:api'\u001b[39m,\n    title: \u001b[32m\"Get text content locator('body')\"\u001b[39m,\n    apiName: \u001b[32m'page.textContent'\u001b[39m,\n    params: { selector: \u001b[32m'body'\u001b[39m, timeout: \u001b[33m10000\u001b[39m },\n    boxedStack: \u001b[90mundefined\u001b[39m,\n    steps: [],\n    attachmentIndices: [],\n    info: TestStepInfoImpl {\n      annotations: [],\n      _testInfo: \u001b[36m[TestInfoImpl]\u001b[39m,\n      _stepId: \u001b[32m'pw:api@50'\u001b[39m\n    },\n    complete: \u001b[36m[Function: complete]\u001b[39m,\n    endWallTime: \u001b[33m1750774556928\u001b[39m,\n    error: {\n      message: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed'\u001b[39m,\n      stack: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.getSmartGoalResult (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:188:43)\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.waitForSmartGoalGeneration (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:175:23)\\n'\u001b[39m +\n        \u001b[32m'    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:118:22'\u001b[39m,\n      cause: \u001b[90mundefined\u001b[39m\n    }\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:15:26.701Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-firefox/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-7c4689720dfaf2cbe333",
+              "file": "user-flow-test.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "Error Handling and Edge Cases",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2754,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📝 Entering goal: \"\"\n"
+                        },
+                        {
+                          "text": "⚠️ Empty goal submission behavior: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"win\"\n"
+                        },
+                        {
+                          "text": "⚠️ Short goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a highly skilled software developer who specializes in artificial intelligence and machine learning while also building a successful startup company that helps people achieve their personal and professional goals through technology-enabled coaching and mentoring services that leverage the latest advances in natural language processing and conversational AI to provide personalized guidance and support to users around the world\"\n"
+                        },
+                        {
+                          "text": "⚠️ Long goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "🎉 Error handling test completed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:15:58.427Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-e4388d7c6b8686899618",
+              "file": "user-flow-test.spec.ts",
+              "line": 137,
+              "column": 7
+            },
+            {
+              "title": "Performance and Responsiveness",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14112,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "⚡ Testing performance and responsiveness...\n"
+                        },
+                        {
+                          "text": "✅ Page load time: 567ms\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn data science and analytics\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ Goal processing time: 10134ms\n"
+                        },
+                        {
+                          "text": "✅ Processing result: \"I've analyzed your goal \"Complete an online data science and analytics course to gain proficiency in Python, R, and statistical analysis\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Testing: clicking multiple buttons quickly\n"
+                        },
+                        {
+                          "text": "   Testing: rapid text input\n"
+                        },
+                        {
+                          "text": "   Testing: UI state changes\n"
+                        },
+                        {
+                          "text": "🎉 Performance test completed!\n"
+                        },
+                        {
+                          "text": "   Overall performance: 10701ms total\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:16:01.770Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-0a1c46f48f7984ce2f54",
+              "file": "user-flow-test.spec.ts",
+              "line": 178,
+              "column": 7
+            },
+            {
+              "title": "Complete Goal to SMART Transformation Flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14494,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🚀 Starting complete user flow test...\n"
+                        },
+                        {
+                          "text": "✅ Page loaded successfully\n"
+                        },
+                        {
+                          "text": "   Title present: true\n"
+                        },
+                        {
+                          "text": "   Input elements: true\n"
+                        },
+                        {
+                          "text": "   Buttons: true\n"
+                        },
+                        {
+                          "text": "   Content length: 575 chars\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "✅ API key configured\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "✅ Goal entered: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "✅ Goal submitted for transformation\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ SMART goal generated successfully\n"
+                        },
+                        {
+                          "text": "   Title: \"I've analyzed your goal \"I want to improve my proficiency in Python programming by completing three online courses and building a web application from scratch\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Confidence: 60%\n"
+                        },
+                        {
+                          "text": "   Criteria present: {\n  specific: \u001b[33mtrue\u001b[39m,\n  measurable: \u001b[33mtrue\u001b[39m,\n  achievable: \u001b[33mtrue\u001b[39m,\n  relevant: \u001b[33mtrue\u001b[39m,\n  time: \u001b[33mtrue\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "💬 Starting chat refinement: \"Can you make this goal more specific with concrete milestones?\"\n"
+                        },
+                        {
+                          "text": "⚠️ Chat refinement not available (UI not present)\n"
+                        },
+                        {
+                          "text": "🎉 Complete user flow test passed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:16:17.212Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-52596dea00c07e2502fc",
+              "file": "user-flow-test.spec.ts",
+              "line": 10,
+              "column": 7
+            },
+            {
+              "title": "Multiple Goal Types Testing",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30492,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/workspaces/personalEA/tests/playwright/user-flow-test.spec.ts",
+                            "column": 90,
+                            "line": 121
+                          },
+                          "message": "Error: Health goal should generate visible result\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  119 |       \n  120 |       // Validate result\n> 121 |       expect(result.visible, `${testCase.category} goal should generate visible result`).toBeTruthy();\n      |                                                                                          ^\n  122 |       expect(result.confidence, `${testCase.category} goal should have reasonable confidence`).toBeGreaterThan(20);\n  123 |       \n  124 |       console.log(`   ✅ Generated: \"${result.title}\"`);\n    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:121:90"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Learning goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development through online courses and projects\" and it currently has a 40% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 40%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Business goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development through online courses and complete at least 3 projects\" and it currently has a 40% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 40%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Health goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "No SMART goal content detected\n"
+                        },
+                        {
+                          "text": "Error extracting SMART goal result: page.textContent: Target page, context or browser has been closed\n    at GoalStrategyPage.getSmartGoalResult \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:188:43\u001b[90m)\u001b[39m\n    at GoalStrategyPage.waitForSmartGoalGeneration \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:175:23\u001b[90m)\u001b[39m\n    at \u001b[90m/workspaces/personalEA/\u001b[39mtests/playwright/user-flow-test.spec.ts:118:22 {\n  [\u001b[32mSymbol(step)\u001b[39m]: {\n    stepId: \u001b[32m'pw:api@50'\u001b[39m,\n    location: {\n      file: \u001b[32m'/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts'\u001b[39m,\n      line: \u001b[33m188\u001b[39m,\n      column: \u001b[33m43\u001b[39m,\n      function: \u001b[32m'GoalStrategyPage.getSmartGoalResult'\u001b[39m\n    },\n    category: \u001b[32m'pw:api'\u001b[39m,\n    title: \u001b[32m\"Get text content locator('body')\"\u001b[39m,\n    apiName: \u001b[32m'page.textContent'\u001b[39m,\n    params: { selector: \u001b[32m'body'\u001b[39m, timeout: \u001b[33m10000\u001b[39m },\n    boxedStack: \u001b[90mundefined\u001b[39m,\n    steps: [],\n    attachmentIndices: [],\n    info: TestStepInfoImpl {\n      annotations: [],\n      _testInfo: \u001b[36m[TestInfoImpl]\u001b[39m,\n      _stepId: \u001b[32m'pw:api@50'\u001b[39m\n    },\n    complete: \u001b[36m[Function: complete]\u001b[39m,\n    endWallTime: \u001b[33m1750774622954\u001b[39m,\n    error: {\n      message: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed'\u001b[39m,\n      stack: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.getSmartGoalResult (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:188:43)\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.waitForSmartGoalGeneration (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:175:23)\\n'\u001b[39m +\n        \u001b[32m'    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:118:22'\u001b[39m,\n      cause: \u001b[90mundefined\u001b[39m\n    }\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:16:32.689Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-webkit/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-webkit/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-webkit/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-db386fd5521712bc74a2",
+              "file": "user-flow-test.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "Error Handling and Edge Cases",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1328,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📝 Entering goal: \"\"\n"
+                        },
+                        {
+                          "text": "⚠️ Empty goal submission behavior: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"win\"\n"
+                        },
+                        {
+                          "text": "⚠️ Short goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a highly skilled software developer who specializes in artificial intelligence and machine learning while also building a successful startup company that helps people achieve their personal and professional goals through technology-enabled coaching and mentoring services that leverage the latest advances in natural language processing and conversational AI to provide personalized guidance and support to users around the world\"\n"
+                        },
+                        {
+                          "text": "⚠️ Long goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "🎉 Error handling test completed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:17:03.912Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-bccae4102c476ed366d0",
+              "file": "user-flow-test.spec.ts",
+              "line": 137,
+              "column": 7
+            },
+            {
+              "title": "Performance and Responsiveness",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14624,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "⚡ Testing performance and responsiveness...\n"
+                        },
+                        {
+                          "text": "✅ Page load time: 434ms\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn data science and analytics\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ Goal processing time: 10166ms\n"
+                        },
+                        {
+                          "text": "✅ Processing result: \"I've analyzed your goal \"Learn data science and analytics by completing an online course within the next 6 months\" and it currently has a 40% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Testing: clicking multiple buttons quickly\n"
+                        },
+                        {
+                          "text": "   Testing: rapid text input\n"
+                        },
+                        {
+                          "text": "   Testing: UI state changes\n"
+                        },
+                        {
+                          "text": "🎉 Performance test completed!\n"
+                        },
+                        {
+                          "text": "   Overall performance: 10600ms total\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:17:05.368Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-75d6ed8f9f5cc876ce64",
+              "file": "user-flow-test.spec.ts",
+              "line": 178,
+              "column": 7
+            },
+            {
+              "title": "Complete Goal to SMART Transformation Flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13505,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🚀 Starting complete user flow test...\n"
+                        },
+                        {
+                          "text": "✅ Page loaded successfully\n"
+                        },
+                        {
+                          "text": "   Title present: true\n"
+                        },
+                        {
+                          "text": "   Input elements: true\n"
+                        },
+                        {
+                          "text": "   Buttons: true\n"
+                        },
+                        {
+                          "text": "   Content length: 575 chars\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "✅ API key configured\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "✅ Goal entered: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "✅ Goal submitted for transformation\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ SMART goal generated successfully\n"
+                        },
+                        {
+                          "text": "   Title: \"I've analyzed your goal \"I want to improve my proficiency in Python programming by completing three online courses and building a web application from scratch\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Confidence: 60%\n"
+                        },
+                        {
+                          "text": "   Criteria present: {\n  specific: \u001b[33mtrue\u001b[39m,\n  measurable: \u001b[33mtrue\u001b[39m,\n  achievable: \u001b[33mtrue\u001b[39m,\n  relevant: \u001b[33mtrue\u001b[39m,\n  time: \u001b[33mtrue\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "💬 Starting chat refinement: \"Can you make this goal more specific with concrete milestones?\"\n"
+                        },
+                        {
+                          "text": "⚠️ Chat refinement not available (UI not present)\n"
+                        },
+                        {
+                          "text": "🎉 Complete user flow test passed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:17:20.628Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-24bb87edcaa6ecc41018",
+              "file": "user-flow-test.spec.ts",
+              "line": 10,
+              "column": 7
+            },
+            {
+              "title": "Multiple Goal Types Testing",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30385,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts",
+                            "column": 26,
+                            "line": 146
+                          },
+                          "message": "Error: locator.press: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea, input[placeholder*=\"goal\"], input[placeholder*=\"Goal\"]').first()\u001b[22m\n\n\n   at page-objects/GoalStrategyPage.ts:146\n\n  144 |\n  145 |     // Method 3: Press Enter in the input field\n> 146 |     await this.goalInput.press('Enter');\n      |                          ^\n  147 |   }\n  148 |\n  149 |   async waitForSmartGoalGeneration(timeout = 30000) {\n    at GoalStrategyPage.submitGoal (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:146:26)\n    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:115:7"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Learning goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development through online courses and complete a project within 6 months\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 60%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Business goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "Transform button not found, trying alternatives\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:17:34.268Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-mobile-chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-mobile-chrome/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-mobile-chrome/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-0fb356582882c2139344",
+              "file": "user-flow-test.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "Error Handling and Edge Cases",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1113,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📝 Entering goal: \"\"\n"
+                        },
+                        {
+                          "text": "⚠️ Empty goal submission behavior: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"win\"\n"
+                        },
+                        {
+                          "text": "⚠️ Short goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a highly skilled software developer who specializes in artificial intelligence and machine learning while also building a successful startup company that helps people achieve their personal and professional goals through technology-enabled coaching and mentoring services that leverage the latest advances in natural language processing and conversational AI to provide personalized guidance and support to users around the world\"\n"
+                        },
+                        {
+                          "text": "⚠️ Long goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "🎉 Error handling test completed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:18:05.475Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-fa03bafbf6b1b24345a3",
+              "file": "user-flow-test.spec.ts",
+              "line": 137,
+              "column": 7
+            },
+            {
+              "title": "Performance and Responsiveness",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14078,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "⚡ Testing performance and responsiveness...\n"
+                        },
+                        {
+                          "text": "✅ Page load time: 482ms\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn data science and analytics\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ Goal processing time: 10112ms\n"
+                        },
+                        {
+                          "text": "✅ Processing result: \"I've analyzed your goal \"Learn data science and analytics by completing an online certification course within the next 6 months\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Testing: clicking multiple buttons quickly\n"
+                        },
+                        {
+                          "text": "   Testing: rapid text input\n"
+                        },
+                        {
+                          "text": "   Testing: UI state changes\n"
+                        },
+                        {
+                          "text": "🎉 Performance test completed!\n"
+                        },
+                        {
+                          "text": "   Overall performance: 10594ms total\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:18:06.727Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-71b3b2b33f0c824eea33",
+              "file": "user-flow-test.spec.ts",
+              "line": 178,
+              "column": 7
+            },
+            {
+              "title": "Complete Goal to SMART Transformation Flow",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13621,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🚀 Starting complete user flow test...\n"
+                        },
+                        {
+                          "text": "✅ Page loaded successfully\n"
+                        },
+                        {
+                          "text": "   Title present: true\n"
+                        },
+                        {
+                          "text": "   Input elements: true\n"
+                        },
+                        {
+                          "text": "   Buttons: true\n"
+                        },
+                        {
+                          "text": "   Content length: 575 chars\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "✅ API key configured\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "✅ Goal entered: \"I want to become a better software developer\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "✅ Goal submitted for transformation\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ SMART goal generated successfully\n"
+                        },
+                        {
+                          "text": "   Title: \"I've analyzed your goal \"I want to improve my coding skills in Python by completing three online courses within the next six months\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Confidence: 60%\n"
+                        },
+                        {
+                          "text": "   Criteria present: {\n  specific: \u001b[33mtrue\u001b[39m,\n  measurable: \u001b[33mtrue\u001b[39m,\n  achievable: \u001b[33mtrue\u001b[39m,\n  relevant: \u001b[33mtrue\u001b[39m,\n  time: \u001b[33mtrue\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "💬 Starting chat refinement: \"Can you make this goal more specific with concrete milestones?\"\n"
+                        },
+                        {
+                          "text": "⚠️ Chat refinement not available (UI not present)\n"
+                        },
+                        {
+                          "text": "🎉 Complete user flow test passed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:18:21.468Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-00a75f660082ae7bfeae",
+              "file": "user-flow-test.spec.ts",
+              "line": 10,
+              "column": 7
+            },
+            {
+              "title": "Multiple Goal Types Testing",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30378,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/workspaces/personalEA/tests/playwright/user-flow-test.spec.ts",
+                            "column": 90,
+                            "line": 121
+                          },
+                          "message": "Error: Health goal should generate visible result\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  119 |       \n  120 |       // Validate result\n> 121 |       expect(result.visible, `${testCase.category} goal should generate visible result`).toBeTruthy();\n      |                                                                                          ^\n  122 |       expect(result.confidence, `${testCase.category} goal should have reasonable confidence`).toBeGreaterThan(20);\n  123 |       \n  124 |       console.log(`   ✅ Generated: \"${result.title}\"`);\n    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:121:90"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Learning goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn machine learning and AI development\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development by completing a beginner online course within the next 3 months\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 60%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Business goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Increase revenue for my consulting business\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "   ✅ Generated: \"I've analyzed your goal \"Learn machine learning and AI development through online courses and complete at least 3 projects demonstrating proficiency\" and it currently has a 40% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   ✅ Confidence: 40%\n"
+                        },
+                        {
+                          "text": "\n🧪 Testing Health goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Get in better physical shape\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "No SMART goal content detected\n"
+                        },
+                        {
+                          "text": "Error extracting SMART goal result: page.textContent: Target page, context or browser has been closed\n    at GoalStrategyPage.getSmartGoalResult \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:188:43\u001b[90m)\u001b[39m\n    at GoalStrategyPage.waitForSmartGoalGeneration \u001b[90m(/workspaces/personalEA/\u001b[39mtests/playwright/page-objects/GoalStrategyPage.ts:175:23\u001b[90m)\u001b[39m\n    at \u001b[90m/workspaces/personalEA/\u001b[39mtests/playwright/user-flow-test.spec.ts:118:22 {\n  [\u001b[32mSymbol(step)\u001b[39m]: {\n    stepId: \u001b[32m'pw:api@50'\u001b[39m,\n    location: {\n      file: \u001b[32m'/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts'\u001b[39m,\n      line: \u001b[33m188\u001b[39m,\n      column: \u001b[33m43\u001b[39m,\n      function: \u001b[32m'GoalStrategyPage.getSmartGoalResult'\u001b[39m\n    },\n    category: \u001b[32m'pw:api'\u001b[39m,\n    title: \u001b[32m\"Get text content locator('body')\"\u001b[39m,\n    apiName: \u001b[32m'page.textContent'\u001b[39m,\n    params: { selector: \u001b[32m'body'\u001b[39m, timeout: \u001b[33m10000\u001b[39m },\n    boxedStack: \u001b[90mundefined\u001b[39m,\n    steps: [],\n    attachmentIndices: [],\n    info: TestStepInfoImpl {\n      annotations: [],\n      _testInfo: \u001b[36m[TestInfoImpl]\u001b[39m,\n      _stepId: \u001b[32m'pw:api@50'\u001b[39m\n    },\n    complete: \u001b[36m[Function: complete]\u001b[39m,\n    endWallTime: \u001b[33m1750774745470\u001b[39m,\n    error: {\n      message: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed'\u001b[39m,\n      stack: \u001b[32m'Error: page.textContent: Target page, context or browser has been closed\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.getSmartGoalResult (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:188:43)\\n'\u001b[39m +\n        \u001b[32m'    at GoalStrategyPage.waitForSmartGoalGeneration (/workspaces/personalEA/tests/playwright/page-objects/GoalStrategyPage.ts:175:23)\\n'\u001b[39m +\n        \u001b[32m'    at /workspaces/personalEA/tests/playwright/user-flow-test.spec.ts:118:22'\u001b[39m,\n      cause: \u001b[90mundefined\u001b[39m\n    }\n  }\n}\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:18:35.209Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-mobile-safari/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-mobile-safari/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspaces/personalEA/test-results/user-flow-test-PersonalEA--d0385-Multiple-Goal-Types-Testing-mobile-safari/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-f253c8960bfdc2e2980d",
+              "file": "user-flow-test.spec.ts",
+              "line": 83,
+              "column": 7
+            },
+            {
+              "title": "Error Handling and Edge Cases",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1234,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📝 Entering goal: \"\"\n"
+                        },
+                        {
+                          "text": "⚠️ Empty goal submission behavior: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"win\"\n"
+                        },
+                        {
+                          "text": "⚠️ Short goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"I want to become a highly skilled software developer who specializes in artificial intelligence and machine learning while also building a successful startup company that helps people achieve their personal and professional goals through technology-enabled coaching and mentoring services that leverage the latest advances in natural language processing and conversational AI to provide personalized guidance and support to users around the world\"\n"
+                        },
+                        {
+                          "text": "⚠️ Long goal handling: Could not find goal input field\n"
+                        },
+                        {
+                          "text": "🎉 Error handling test completed!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:19:06.280Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-1ed26bf6577a781b9680",
+              "file": "user-flow-test.spec.ts",
+              "line": 137,
+              "column": 7
+            },
+            {
+              "title": "Performance and Responsiveness",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-safari",
+                  "projectName": "mobile-safari",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 14478,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "⚡ Testing performance and responsiveness...\n"
+                        },
+                        {
+                          "text": "✅ Page load time: 471ms\n"
+                        },
+                        {
+                          "text": "🔑 Configuring API key...\n"
+                        },
+                        {
+                          "text": "📝 Entering goal: \"Learn data science and analytics\"\n"
+                        },
+                        {
+                          "text": "🚀 Submitting goal for transformation...\n"
+                        },
+                        {
+                          "text": "⏳ Waiting for SMART goal generation...\n"
+                        },
+                        {
+                          "text": "Smart goal display not found, checking for any results\n"
+                        },
+                        {
+                          "text": "✅ Goal processing time: 10143ms\n"
+                        },
+                        {
+                          "text": "✅ Processing result: \"I've analyzed your goal \"Learn data science and analytics by completing an online course and applying the skills to analyze a real-world dataset\" and it currently has a 40% confidence score. There are several areas where we can make it more specific, measurable, and actionable.\"\n"
+                        },
+                        {
+                          "text": "   Testing: clicking multiple buttons quickly\n"
+                        },
+                        {
+                          "text": "   Testing: rapid text input\n"
+                        },
+                        {
+                          "text": "   Testing: UI state changes\n"
+                        },
+                        {
+                          "text": "🎉 Performance test completed!\n"
+                        },
+                        {
+                          "text": "   Overall performance: 10614ms total\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-24T14:19:07.635Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8370b9427fe0c0967dec-0735170c4051822ff02d",
+              "file": "user-flow-test.spec.ts",
+              "line": 178,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-06-24T14:13:57.466Z",
+    "duration": 324728.16400000005,
+    "expected": 15,
+    "skipped": 0,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}

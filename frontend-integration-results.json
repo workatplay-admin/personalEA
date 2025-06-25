@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-06-24T18:26:09.947Z",
+  "frontendResults": {
+    "loading": {
+      "loaded": true,
+      "title": "Goal & Strategy Service Testing Interface",
+      "hasApiConfig": false,
+      "hasGoalInput": false,
+      "hasButton": true
+    },
+    "autoConfig": {
+      "autoConfigDetected": false,
+      "messages": []
+    },
+    "transform": {
+      "inputWorking": false,
+      "buttonWorking": false,
+      "error": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"text\"], textarea').first() to be visible\u001b[22m\n"
+    },
+    "network": {
+      "networkActive": false,
+      "responses": []
+    }
+  },
+  "summary": {
+    "totalTests": 6,
+    "passedTests": 1,
+    "successRate": 17,
+    "frontendStatus": "NOT_WORKING"
+  }
+}

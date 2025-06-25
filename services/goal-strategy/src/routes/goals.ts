@@ -134,12 +134,21 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
     const result = await smartGoalProcessor.translateGoal(input, userApiKey);
 
     res.json({
-      smart_goal: result.smartGoal,
-      smart_criteria: result.smartCriteria,
-      missing_criteria: result.missingCriteria,
-      clarification_questions: result.clarificationQuestions,
-      confidence: result.confidence,
-      correlation_id: correlationId
+      success: true,
+      data: {
+        id: correlationId,
+        title: result.smartGoal,
+        description: result.smartGoal,
+        smart_criteria: result.smartCriteria,
+        missing_criteria: result.missingCriteria,
+        clarification_questions: result.clarificationQuestions,
+        confidence: result.confidence,
+        correlation_id: correlationId,
+        status: 'DRAFT',
+        priority: 'MEDIUM',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
     });
 
   } catch (error) {
@@ -217,12 +226,21 @@ router.post('/clarify', requireScopes(['goals:write']), async (req, res, next): 
     ));
 
     res.json({
-      goal: updatedGoal,
-      smart_criteria: result.smartCriteria,
-      remaining_missing_criteria: result.missingCriteria,
-      additional_questions: result.clarificationQuestions,
-      confidence: result.confidence,
-      correlation_id: correlationId
+      success: true,
+      data: {
+        id: updatedGoal.id,
+        title: updatedGoal.title,
+        description: updatedGoal.description,
+        smart_criteria: result.smartCriteria,
+        remaining_missing_criteria: result.missingCriteria,
+        additional_questions: result.clarificationQuestions,
+        confidence: result.confidence,
+        correlation_id: correlationId,
+        status: updatedGoal.status,
+        priority: updatedGoal.priority,
+        created_at: updatedGoal.createdAt.toISOString(),
+        updated_at: updatedGoal.updatedAt.toISOString()
+      }
     });
 
   } catch (error) {
@@ -264,7 +282,8 @@ router.post('/', requireScopes(['goals:write']), async (req, res, next) => {
     });
 
     res.status(201).json({
-      goal,
+      success: true,
+      data: goal,
       correlation_id: correlationId
     });
 
@@ -314,12 +333,15 @@ router.get('/', requireScopes(['goals:read']), async (req, res, next) => {
     ]);
 
     res.json({
-      goals,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
+      success: true,
+      data: {
+        goals,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit)
+        }
       },
       correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
@@ -380,13 +402,16 @@ router.get('/:id', requireScopes(['goals:read']), async (req, res, next): Promis
     const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
     res.json({
-      goal,
-      progress: {
-        percentage: progressPercentage,
-        completed_tasks: completedTasks,
-        total_tasks: totalTasks,
-        completed_milestones: milestones.filter((m: any) => m.status === 'COMPLETED').length,
-        total_milestones: milestones.length
+      success: true,
+      data: {
+        goal,
+        progress: {
+          percentage: progressPercentage,
+          completed_tasks: completedTasks,
+          total_tasks: totalTasks,
+          completed_milestones: milestones.filter((m: any) => m.status === 'COMPLETED').length,
+          total_milestones: milestones.length
+        }
       },
       correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
@@ -455,7 +480,8 @@ router.put('/:id', requireScopes(['goals:write']), async (req, res, next): Promi
     });
 
     res.json({
-      goal,
+      success: true,
+      data: goal,
       correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
@@ -501,6 +527,7 @@ router.delete('/:id', requireScopes(['goals:write']), async (req, res, next): Pr
 
     res.json({
       success: true,
+      data: { deleted: true },
       correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
@@ -541,9 +568,12 @@ router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res
     );
 
     res.json({
-      goal_id: goalId,
-      smart_criteria: goal.smartCriteria,
-      analysis,
+      success: true,
+      data: {
+        goal_id: goalId,
+        smart_criteria: goal.smartCriteria,
+        analysis
+      },
       correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
@@ -600,7 +630,8 @@ router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, nex
     });
 
     res.status(201).json({
-      metric,
+      success: true,
+      data: metric,
       correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 
@@ -654,8 +685,11 @@ router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, r
     }));
 
     res.json({
-      goal_id: goalId,
-      metrics: tracking,
+      success: true,
+      data: {
+        goal_id: goalId,
+        metrics: tracking
+      },
       correlation_id: req.correlationId || Math.random().toString(36).substring(7)
     });
 

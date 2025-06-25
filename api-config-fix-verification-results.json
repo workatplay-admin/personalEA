@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-06-24T21:47:53.351Z",
+  "tests": [
+    {
+      "name": "Backend Health Check",
+      "status": "PASS",
+      "response": {
+        "status": "healthy",
+        "service": "goal-strategy-service",
+        "version": "v1",
+        "timestamp": "2025-06-24T21:47:53.383Z",
+        "correlationId": "gs-1750801673382-44xyn4vf7"
+      }
+    },
+    {
+      "name": "Environment Configuration Check",
+      "status": "PASS",
+      "response": {
+        "success": true,
+        "data": {
+          "environmentConfigured": true,
+          "message": "OpenAI API key configured in environment"
+        }
+      }
+    },
+    {
+      "name": "Goal Translation API Test",
+      "status": "FAIL",
+      "error": "Request failed with status code 401",
+      "isTimeout": false
+    },
+    {
+      "name": "Port Configuration Verification",
+      "status": "PASS",
+      "details": "Port 8085 (old) not responding, Port 8086 (correct) working"
+    }
+  ],
+  "overallStatus": "FAIL",
+  "errors": [
+    "Goal translation: Request failed with status code 401"
+  ]
+}

@@ -1,0 +1,88 @@
+# Page snapshot
+
+```yaml
+- heading "Goal & Strategy Service Testing" [level=1]
+- paragraph: AI-powered goal breakdown with conversational SMART goal refinement
+- navigation "Progress":
+  - list:
+    - listitem:
+      - img
+    - listitem:
+      - img
+    - listitem:
+      - img
+    - listitem:
+      - img
+    - listitem:
+      - img
+    - listitem:
+      - img
+- img
+- heading "SMART Goal Generated" [level=2]
+- paragraph: Working with AI to refine your SMART goal. The goal will update in real-time as we chat.
+- img
+- heading "Your SMART Goal" [level=3]
+- img
+- text: Updating in real-time
+- img
+- heading "Learn machine learning and AI development through completing an online course within the next 6 months" [level=2]
+- img
+- text: 60% Confidence
+- heading "Specific" [level=4]
+- text: 30%
+- paragraph: Learn machine learning and AI development
+- heading "Measurable" [level=4]
+- text: 20%
+- paragraph: To be determined
+- heading "Achievable" [level=4]
+- text: 50%
+- paragraph: To be assessed
+- heading "Relevant" [level=4]
+- text: 40%
+- paragraph: To be clarified
+- heading "Time-bound" [level=4]
+- text: 10%
+- paragraph: To be specified
+- heading "Status" [level=4]
+- paragraph: "Missing:"
+- paragraph: Measurable, Achievable, Time-bound
+- heading "Clarification Needed" [level=4]:
+  - img
+  - text: Clarification Needed
+- list:
+  - listitem: • Measurable
+  - listitem: • Achievable
+  - listitem: • Time-bound
+- heading "📊 Improvement Progress" [level=4]
+- text: specific 30% measurable 20% achievable 50% relevant 40% Time-bound 10%
+- img
+- heading "AI Clarification Assistant" [level=3]
+- img
+- heading "SMART Goal Assistant" [level=3]
+- paragraph: "Working on: Specific"
+- img
+- text: "Hello! I'm your SMART Goal Refinement Assistant. 🎯 I've analyzed your goal \"Learn machine learning and AI development through completing an online course within the next 6 months\" and it currently has a 60% confidence score. There are several areas where we can make it more specific, measurable, and actionable. I'll guide you through each SMART component systematically: •"
+- strong: Specific
+- text: "- Making it clear and focused •"
+- strong: Measurable
+- text: "- Adding concrete metrics •"
+- strong: Achievable
+- text: "- Ensuring it's realistic •"
+- strong: Relevant
+- text: "- Confirming it aligns with your priorities •"
+- strong: Time-bound
+- text: "- Setting clear deadlines As we chat, your goal will update in real-time on the left. Ready to begin? Let's start with the first component!"
+- img
+- text: What specific online course will you be completing to learn machine learning and AI development within the next 6 months?
+- textbox "Tell me about specific... (or say \"I don't know\" for suggestions)"
+- button [disabled]:
+  - img
+- button "Regenerate Goal":
+  - img
+  - text: Regenerate Goal
+- button "🧹 Clear Cache"
+- button "Continue to Milestones":
+  - text: Continue to Milestones
+  - img
+- button "Start Over"
+```
