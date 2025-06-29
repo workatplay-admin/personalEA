@@ -84,7 +84,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           <p className="text-blue-800 dark:text-blue-200 text-sm">
             {safeCriteria.specific.value}
           </p>
-          {safeCriteria.specific.missing && safeCriteria.specific.missing.length > 0 && (
+          {safeCriteria.specific.missing && safeCriteria.specific.missing.length > 0 && safeCriteria.specific.confidence < 0.9 && (
             <div className="mt-2">
               <p className="text-xs text-blue-600 dark:text-blue-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-blue-600 dark:text-blue-300 list-disc list-inside">
@@ -108,7 +108,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           <p className="text-green-800 dark:text-green-200 text-sm">
             {safeCriteria.measurable.value}
           </p>
-          {safeCriteria.measurable.missing && safeCriteria.measurable.missing.length > 0 && (
+          {safeCriteria.measurable.missing && safeCriteria.measurable.missing.length > 0 && safeCriteria.measurable.confidence < 0.9 && (
             <div className="mt-2">
               <p className="text-xs text-green-600 dark:text-green-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-green-600 dark:text-green-300 list-disc list-inside">
@@ -132,7 +132,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           <p className="text-yellow-800 dark:text-yellow-200 text-sm">
             {safeCriteria.achievable.value}
           </p>
-          {safeCriteria.achievable.missing && safeCriteria.achievable.missing.length > 0 && (
+          {safeCriteria.achievable.missing && safeCriteria.achievable.missing.length > 0 && safeCriteria.achievable.confidence < 0.9 && (
             <div className="mt-2">
               <p className="text-xs text-yellow-600 dark:text-yellow-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-yellow-600 dark:text-yellow-300 list-disc list-inside">
@@ -156,7 +156,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           <p className="text-purple-800 dark:text-purple-200 text-sm">
             {safeCriteria.relevant.value}
           </p>
-          {safeCriteria.relevant.missing && safeCriteria.relevant.missing.length > 0 && (
+          {safeCriteria.relevant.missing && safeCriteria.relevant.missing.length > 0 && safeCriteria.relevant.confidence < 0.9 && (
             <div className="mt-2">
               <p className="text-xs text-purple-600 dark:text-purple-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-purple-600 dark:text-purple-300 list-disc list-inside">
@@ -180,7 +180,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           <p className="text-red-800 dark:text-red-200 text-sm">
             {safeCriteria.timeBound.value}
           </p>
-          {safeCriteria.timeBound.missing && safeCriteria.timeBound.missing.length > 0 && (
+          {safeCriteria.timeBound.missing && safeCriteria.timeBound.missing.length > 0 && safeCriteria.timeBound.confidence < 0.9 && (
             <div className="mt-2">
               <p className="text-xs text-red-600 dark:text-red-300 font-medium">Needs clarification:</p>
               <ul className="text-xs text-red-600 dark:text-red-300 list-disc list-inside">
@@ -226,8 +226,8 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
         </div>
       </div>
 
-      {/* Clarification Questions */}
-      {safeGoal.clarificationQuestions.length > 0 && (
+      {/* Clarification Questions - only show if not all criteria are at 90%+ */}
+      {safeGoal.clarificationQuestions.length > 0 && !Object.values(safeCriteria).every(criterion => criterion.confidence >= 0.9) && (
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
           <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2 flex items-center">
             <AlertTriangle className="w-4 h-4 mr-2" />

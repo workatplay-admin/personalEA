@@ -98,6 +98,7 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
   const [showTips, setShowTips] = useState(false)
   const [isLearningMode, setIsLearningMode] = useState(true)
   const [completedComponents, setCompletedComponents] = useState<Set<string>>(new Set())
+  const [currentGoal, setCurrentGoal] = useState<Goal>(goal)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -108,17 +109,22 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
     scrollToBottom()
   }, [messages])
 
+  // Sync goal prop changes with currentGoal state
+  useEffect(() => {
+    setCurrentGoal(goal)
+  }, [goal])
+
   // Find the next component to work on based on lowest confidence score
   const findNextComponent = (): typeof SMART_COMPONENTS[number] | null => {
     let lowestScore = 100
     let lowestComponent: typeof SMART_COMPONENTS[number] | null = null
 
     for (const component of SMART_COMPONENTS) {
-      const criterion = goal.criteria[component.key as keyof typeof goal.criteria]
+      const criterion = currentGoal.criteria[component.key as keyof typeof currentGoal.criteria]
       const confidence = criterion.confidence
 
       // Skip components that are already above 90% or completed
-      if (confidence >= 90 || completedComponents.has(component.key)) {
+      if (confidence >= 0.9 || completedComponents.has(component.key)) {
         continue
       }
 
@@ -134,8 +140,8 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
 
   // Check if the current component has reached 90%+ confidence
   const isComponentComplete = (componentKey: string): boolean => {
-    const criterion = goal.criteria[componentKey as keyof typeof goal.criteria]
-    return criterion.confidence >= 90
+    const criterion = currentGoal.criteria[componentKey as keyof typeof currentGoal.criteria]
+    return criterion.confidence >= 0.9
   }
 
   useEffect(() => {
@@ -147,7 +153,7 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
   const initializeChat = () => {
     // Check if all components are already above 90%
     const allComponentsComplete = SMART_COMPONENTS.every(component => 
-      goal.criteria[component.key as keyof typeof goal.criteria].confidence >= 90
+      currentGoal.criteria[component.key as keyof typeof currentGoal.criteria].confidence >= 0.9
     )
 
     if (allComponentsComplete) {
@@ -161,16 +167,16 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
       type: 'bot',
       content: `👋 Welcome to the SMART Goal Builder! 
 
-I'm here to help you transform "${goal.title}" into a powerful SMART goal that will set you up for success.
+I'm here to help you transform "${currentGoal.title}" into a powerful SMART goal that will set you up for success.
 
 I've analyzed your goal and identified areas where we can make it stronger. Let's focus on the aspects that need the most improvement to get your goal to 90%+ confidence.
 
 SMART goals are:
-• **S**pecific - Clear and well-defined (${goal.criteria.specific.confidence}% confident)
-• **M**easurable - With concrete criteria for tracking progress (${goal.criteria.measurable.confidence}% confident)  
-• **A**chievable - Realistic and attainable (${goal.criteria.achievable.confidence}% confident)
-• **R**elevant - Meaningful and aligned with your values (${goal.criteria.relevant.confidence}% confident)
-• **T**ime-bound - With a clear deadline (${goal.criteria.timeBound.confidence}% confident)
+• **S**pecific - Clear and well-defined (${Math.round(currentGoal.criteria.specific.confidence * 100)}% confident)
+• **M**easurable - With concrete criteria for tracking progress (${Math.round(currentGoal.criteria.measurable.confidence * 100)}% confident)  
+• **A**chievable - Realistic and attainable (${Math.round(currentGoal.criteria.achievable.confidence * 100)}% confident)
+• **R**elevant - Meaningful and aligned with your values (${Math.round(currentGoal.criteria.relevant.confidence * 100)}% confident)
+• **T**ime-bound - With a clear deadline (${Math.round(currentGoal.criteria.timeBound.confidence * 100)}% confident)
 
 Let's work together to strengthen the areas that need improvement. Ready to start?`,
       timestamp: new Date(),
@@ -202,7 +208,7 @@ Let's work together to strengthen the areas that need improvement. Ready to star
     setShowTips(false)
 
     // Introduction to the component
-    const currentConfidence = goal.criteria[component.key as keyof typeof goal.criteria].confidence
+    const currentConfidence = currentGoal.criteria[component.key as keyof typeof currentGoal.criteria].confidence
     const introMessage: ChatMessage = {
       id: `intro-${component.key}`,
       type: 'bot',
@@ -210,9 +216,9 @@ Let's work together to strengthen the areas that need improvement. Ready to star
 
 ${component.description}
 
-Your current ${component.label.toLowerCase()} score is ${currentConfidence}%. Let's work on improving it to 90% or higher.
+Your current ${component.label.toLowerCase()} score is ${Math.round(currentConfidence * 100)}%. Let's work on improving it to 90% or higher.
 
-${isLearningMode && currentConfidence < 50 ? `Let me show you an example first, then we'll work on yours.` : `Let's refine the ${component.label.toLowerCase()} aspect of your goal.`}`,
+${isLearningMode && currentConfidence < 0.5 ? `Let me show you an example first, then we'll work on yours.` : `Let's refine the ${component.label.toLowerCase()} aspect of your goal.`}`,
       timestamp: new Date(),
       smartComponent: component.key as any,
       messageType: 'intro'
@@ -221,7 +227,7 @@ ${isLearningMode && currentConfidence < 50 ? `Let me show you an example first, 
     setMessages(prev => [...prev, introMessage])
 
     // Show example if in learning mode and confidence is low
-    if (isLearningMode && currentConfidence < 50) {
+    if (isLearningMode && currentConfidence < 0.5) {
       setTimeout(() => {
         showComponentExample(component)
       }, 2000)
@@ -285,15 +291,15 @@ See the difference? Now let's make your goal ${component.label.toLowerCase()}!`,
       console.log('ChatClarification: Asking question for component:', component.key)
       
       // Generate a personalized question based on the current goal state
-      const criterion = goal.criteria[component.key as keyof typeof goal.criteria]
+      const criterion = currentGoal.criteria[component.key as keyof typeof currentGoal.criteria]
       
       const questionResponse = await goalAPI.generateComponentQuestion(
-        goal.title,
+        currentGoal.title,
         component.key,
         criterion.value,
         criterion.confidence,
         false, // Not high confidence since we're building from scratch
-        goal
+        currentGoal
       )
 
       const message: ChatMessage = {
@@ -311,7 +317,7 @@ See the difference? Now let's make your goal ${component.label.toLowerCase()}!`,
       
       // Fallback to a generic question
       const fallbackQuestions = {
-        specific: `Let's make your goal more specific. Currently you have: "${goal.title}"\n\nWhat exactly do you want to accomplish? Be as detailed as possible.`,
+        specific: `Let's make your goal more specific. Currently you have: "${currentGoal.title}"\n\nWhat exactly do you want to accomplish? Be as detailed as possible.`,
         measurable: `How will you measure success? What specific numbers, metrics, or milestones will tell you that you've achieved your goal?`,
         achievable: `Is this goal realistic given your current resources, skills, and constraints? What makes you confident you can achieve it?`,
         relevant: `Why is this goal important to you? How does it align with your larger objectives or values?`,
@@ -372,7 +378,7 @@ See the difference? Now let's make your goal ${component.label.toLowerCase()}!`,
       return
     }
 
-    // Store the clarification
+    // Store the clarification for this session
     const newClarifications = {
       ...collectedClarifications,
       [currentComponent.key]: userInput
@@ -395,14 +401,15 @@ See the difference? Now let's make your goal ${component.label.toLowerCase()}!`,
 
       // Call the API to process the clarification
       const goalContext = {
-        title: goal.title,
-        description: goal.title,
-        originalGoal: goal.title
+        title: currentGoal.title,
+        description: currentGoal.title,
+        originalGoal: currentGoal.title
       }
       
+      // Send only the current clarification, not all accumulated ones
       const response = await goalAPI.clarifyGoal(
-        goal.id, 
-        newClarifications, 
+        currentGoal.id, 
+        { [currentComponent.key]: userInput },  // Only send current component's answer
         goalContext,
         conversationHistory
       )
@@ -429,18 +436,19 @@ See the difference? Now let's make your goal ${component.label.toLowerCase()}!`,
       }
 
       // Update the goal
-      onGoalUpdate(response as Goal)
+      const updatedGoal = response as Goal
+      onGoalUpdate(updatedGoal)
+      setCurrentGoal(updatedGoal)
 
       // Check if the component has reached 90%+ confidence
-      const updatedGoal = response as Goal
       const updatedConfidence = updatedGoal.criteria[currentComponent.key as keyof typeof updatedGoal.criteria].confidence
 
-      if (updatedConfidence >= 90) {
+      if (updatedConfidence >= 0.9) {
         // Component is complete!
         const feedbackMessage: ChatMessage = {
           id: `feedback-${Date.now()}`,
           type: 'bot',
-          content: `Excellent! You've successfully improved the ${currentComponent.label.toLowerCase()} aspect of your goal to ${updatedConfidence}% confidence! 🎉\n\n${(response as any).aiFeedback || ''}`,
+          content: `Excellent! You've successfully improved the ${currentComponent.label.toLowerCase()} aspect of your goal to ${Math.round(updatedConfidence * 100)}% confidence! 🎉\n\n${(response as any).aiFeedback || ''}`,
           timestamp: new Date(),
           messageType: 'feedback'
         }
@@ -458,7 +466,7 @@ See the difference? Now let's make your goal ${component.label.toLowerCase()}!`,
         const feedbackMessage: ChatMessage = {
           id: `feedback-${Date.now()}`,
           type: 'bot',
-          content: `Good progress! Your ${currentComponent.label.toLowerCase()} score improved to ${updatedConfidence}%. Let's keep refining it to reach 90% or higher.\n\n${(response as any).aiFeedback || ''}`,
+          content: `Good progress! Your ${currentComponent.label.toLowerCase()} score improved to ${Math.round(updatedConfidence * 100)}%. Let's keep refining it to reach 90% or higher.\n\n${(response as any).aiFeedback || ''}`,
           timestamp: new Date(),
           messageType: 'feedback'
         }
@@ -501,7 +509,7 @@ ${currentComponent.tips.map(tip => `• ${tip}`).join('\n')}
 
 Need an example? Here's how to make a goal ${currentComponent.label.toLowerCase()}:
 
-**Original:** "${goal.title}"
+**Original:** "${currentGoal.title}"
 **${currentComponent.label}:** [Your improved version here]
 
 Type your answer when ready, or say 'skip' to move to the next component.`,
@@ -518,10 +526,10 @@ Type your answer when ready, or say 'skip' to move to the next component.`,
     const componentScores = SMART_COMPONENTS.map(component => ({
       key: component.key,
       label: component.label,
-      confidence: goal.criteria[component.key as keyof typeof goal.criteria].confidence
+      confidence: currentGoal.criteria[component.key as keyof typeof currentGoal.criteria].confidence
     }))
 
-    const highConfidenceComponents = componentScores.filter(c => c.confidence >= 90)
+    const highConfidenceComponents = componentScores.filter(c => c.confidence >= 0.9)
     const improvedComponents = componentScores.filter(c => completedComponents.has(c.key))
 
     const finalMessage: ChatMessage = {
@@ -531,7 +539,7 @@ Type your answer when ready, or say 'skip' to move to the next component.`,
 
 **Final Confidence Scores:**
 ${componentScores.map(c => 
-  `${c.confidence >= 90 ? '✅' : '⚡'} **${c.label}** - ${c.confidence}% confidence`
+  `${c.confidence >= 0.9 ? '✅' : '⚡'} **${c.label}** - ${Math.round(c.confidence * 100)}% confidence`
 ).join('\n')}
 
 ${highConfidenceComponents.length === 5 
@@ -581,8 +589,8 @@ Click "Complete" below to finalize your SMART goal!`,
           {/* Progress Indicator */}
           <div className="flex space-x-1">
             {SMART_COMPONENTS.map((comp) => {
-              const confidence = goal.criteria[comp.key as keyof typeof goal.criteria].confidence
-              const isComplete = confidence >= 90
+              const confidence = currentGoal.criteria[comp.key as keyof typeof currentGoal.criteria].confidence
+              const isComplete = confidence >= 0.9
               const isCurrent = currentComponent?.key === comp.key
               
               return (
@@ -593,7 +601,7 @@ Click "Complete" below to finalize your SMART goal!`,
                     isCurrent ? 'bg-white animate-pulse' :
                     'bg-white/30'
                   }`}
-                  title={`${comp.label} - ${confidence}%`}
+                  title={`${comp.label} - ${Math.round(confidence * 100)}%`}
                 />
               )
             })}

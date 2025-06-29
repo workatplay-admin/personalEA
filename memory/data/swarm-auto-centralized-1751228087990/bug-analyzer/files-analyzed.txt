@@ -1,0 +1,30 @@
+Files Analyzed for Confidence Score Display Bug:
+
+Frontend Components:
+- /workspaces/personalEA/testing/goal-strategy-test/src/components/ChatClarification.tsx
+- /workspaces/personalEA/testing/goal-strategy-test/src/components/SmartGoalDisplay.tsx
+- /workspaces/personalEA/testing/goal-strategy-test/src/components/SmartGoalViewer.tsx
+- /workspaces/personalEA/testing/goal-strategy-test/src/components/InteractiveGoalDisplay.tsx
+- /workspaces/personalEA/testing/goal-strategy-test/src/components/EstimationDisplay.tsx
+- /workspaces/personalEA/testing/goal-strategy-test/src/App.tsx
+
+Backend Services:
+- /workspaces/personalEA/services/goal-strategy/src/services/smart-goal-processor.ts
+- /workspaces/personalEA/services/goal-strategy/src/routes/goals.ts
+
+API Layer:
+- /workspaces/personalEA/testing/goal-strategy-test/src/services/api.ts
+
+Test/Mock Files:
+- /workspaces/personalEA/test-confidence-bug-fix.js
+- /workspaces/personalEA/test-comprehensive-confidence-fix.js
+- /workspaces/personalEA/testing/goal-strategy-test/mock-api-server.js
+
+Search Patterns Used:
+- confidence.*[0-9]|confidence.*percent|confidence.*\*|confidence.*\/
+- toFixed|\.confidence|confidenceScore|confidence.*100|confidence.*\%
+- Smart Translation|SmartTranslation
+- confidence.*200|confidence.*0\.2|confidence.*0\.9
+
+Total Files Searched: 100+
+Files with Relevant Code: 13

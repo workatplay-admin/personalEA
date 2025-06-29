@@ -215,10 +215,30 @@ router.post('/:id/clarify', requireScopes(['goals:read']), async (req, res, next
     }
 
     // If clarifications are provided, process them
-    if (clarifications && Array.isArray(clarifications)) {
-      const clarificationAnswers: ClarificationAnswer[] = clarifications.map((c: any) => ({
+    if (clarifications && Array.isArray(clarifications) && clarifications.length > 0) {
+      // Filter out any empty or already-processed clarifications
+      const newClarifications = clarifications.filter((c: any) => 
+        c.answer && c.answer.trim().length > 0
+      );
+
+      if (newClarifications.length === 0) {
+        // No new clarifications to process
+        res.json({
+          success: true,
+          data: {
+            ...goal,
+            confidence: 0.75,
+            updatedAt: goal.updatedAt.toISOString()
+          },
+          message: "No new clarifications to process",
+          correlation_id: correlationId
+        });
+        return;
+      }
+
+      const clarificationAnswers: ClarificationAnswer[] = newClarifications.map((c: any) => ({
         question: c.question,
-        answer: c.answer,
+        answer: c.answer.trim(),
         smartCriterion: c.smartCriterion
       }));
 
@@ -241,13 +261,13 @@ router.post('/:id/clarify', requireScopes(['goals:read']), async (req, res, next
         }
       });
 
-      // Save clarification answers
-      await Promise.all(clarifications.map((clarification: any) => 
+      // Save clarification answers (only new ones)
+      await Promise.all(newClarifications.map((clarification: any) => 
         prisma.goalClarification.create({
           data: {
             goalId,
             question: clarification.question,
-            answer: clarification.answer,
+            answer: clarification.answer.trim(),
             smartCriterion: clarification.smartCriterion,
             status: 'ANSWERED'
           }
@@ -831,8 +851,7 @@ router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, r
   }
 });
 
-// Import chat endpoint handlers
-import { contextualHelpHandler, componentQuestionHandler } from './goals-chat-endpoints';
+// Chat endpoint handlers already imported at the top
 
 /**
  * POST /api/v1/goals/interactive-refine
@@ -890,12 +909,13 @@ Respond in JSON format:
   "confidenceIncrease": number (0-0.3)
 }`;
 
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...(conversation_history || [])
-    ];
+    // Messages array prepared but not used in current implementation
+    // const messages = [
+    //   { role: 'system', content: systemPrompt },
+    //   ...(conversation_history || [])
+    // ];
 
-    const apiKey = userApiKey || env.OPENAI_API_KEY;
+    const apiKey = userApiKey || process.env.OPENAI_API_KEY;
     const aiResponse = await smartGoalProcessor['callOpenAI'](systemPrompt, correlationId, apiKey);
     const refinementResult = JSON.parse(smartGoalProcessor['stripMarkdownCodeBlocks'](aiResponse));
 
@@ -910,7 +930,7 @@ Respond in JSON format:
     }
 
     // Update goal in database
-    const updatedGoal = await prisma.goal.update({
+    await prisma.goal.update({
       where: { id: goal_id },
       data: {
         smartCriteria: updatedCriteria,

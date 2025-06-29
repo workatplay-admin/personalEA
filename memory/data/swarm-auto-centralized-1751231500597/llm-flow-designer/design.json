@@ -1,0 +1,195 @@
+{
+  "timestamp": "2025-06-29T21:14:38.111Z",
+  "designer": "llm-flow-designer",
+  "swarmId": "swarm-auto-centralized-1751231500597",
+  "newFlow": {
+    "name": "LLM-First Goal Processing Architecture",
+    "principles": [
+      "LLM manages all conversation state and flow logic",
+      "App is a thin presentation layer only",
+      "All decision-making happens in the LLM",
+      "Minimal parsing/extraction in the application",
+      "Single source of truth: LLM conversation history"
+    ],
+    "architecture": {
+      "conversationManagement": {
+        "owner": "LLM",
+        "description": "LLM maintains full conversation context and decides next actions",
+        "implementation": "Use structured outputs with conversation_state object"
+      },
+      "stateTracking": {
+        "owner": "LLM",
+        "description": "LLM tracks SMART criteria progress, confidence scores, and missing elements",
+        "implementation": "Return state updates in each response"
+      },
+      "flowControl": {
+        "owner": "LLM",
+        "description": "LLM decides when to ask questions, provide examples, or complete the process",
+        "implementation": "Use action_type field: ask_question, show_example, update_goal, complete"
+      },
+      "dataStructure": {
+        "owner": "LLM",
+        "description": "LLM returns structured JSON with UI rendering instructions",
+        "implementation": "Standardized response format with display_elements array"
+      }
+    },
+    "interactionPattern": {
+      "userInput": "User provides goal or answers question",
+      "appRole": "Send raw input to LLM with conversation history",
+      "llmProcessing": "Analyze input, update internal state, decide next action",
+      "llmResponse": "Return structured response with UI instructions",
+      "appRendering": "Render UI elements based on LLM instructions only"
+    }
+  },
+  "llmResponsibilities": [
+    "Maintain complete conversation state and history",
+    "Analyze goals and identify SMART criteria gaps",
+    "Generate contextual questions based on missing information",
+    "Calculate and track confidence scores for each criterion",
+    "Decide when goal is sufficiently refined",
+    "Provide examples and educational content when needed",
+    "Handle all conversation flow logic and branching",
+    "Generate the final SMART goal with all components",
+    "Manage user learning preferences and adapt accordingly",
+    "Track progress through SMART components",
+    "Validate user inputs and provide feedback",
+    "Orchestrate the entire goal refinement process"
+  ],
+  "appResponsibilities": [
+    "Display UI elements as instructed by LLM",
+    "Send user inputs to LLM without modification",
+    "Render chat messages in chronological order",
+    "Handle basic UI interactions (button clicks, form submission)",
+    "Maintain WebSocket or streaming connection for real-time updates",
+    "Store final results when LLM indicates completion",
+    "Provide visual feedback for loading states",
+    "Handle errors and connection issues gracefully"
+  ],
+  "extractionStrategy": {
+    "principle": "No extraction - pass everything to LLM",
+    "implementation": {
+      "userInput": "Send raw text directly to LLM",
+      "llmResponse": "Parse only the top-level structure (action_type, display_elements)",
+      "avoidance": [
+        "Do not parse goal components",
+        "Do not calculate confidence scores",
+        "Do not determine question types",
+        "Do not manage conversation flow"
+      ]
+    }
+  },
+  "parsingStrategy": {
+    "principle": "Minimal parsing - only for UI rendering",
+    "requiredParsing": {
+      "action_type": "To determine UI layout (chat, form, completion screen)",
+      "display_elements": "Array of UI elements to render",
+      "ui_state": "Basic state for UI (loading, error, success)"
+    },
+    "llmHandledParsing": [
+      "SMART criteria extraction from user input",
+      "Confidence score calculations",
+      "Goal component identification",
+      "Context understanding",
+      "Progress tracking"
+    ]
+  },
+  "structuredOutputFormat": {
+    "response": {
+      "action_type": "ask_question  < /dev/null |  show_example | update_progress | complete | show_tips",
+      "conversation_state": {
+        "current_goal": "string",
+        "smart_criteria": {
+          "specific": {
+            "value": "string",
+            "confidence": "number",
+            "missing": "array"
+          },
+          "measurable": {
+            "value": "string",
+            "confidence": "number",
+            "missing": "array"
+          },
+          "achievable": {
+            "value": "string",
+            "confidence": "number",
+            "missing": "array"
+          },
+          "relevant": {
+            "value": "string",
+            "confidence": "number",
+            "missing": "array"
+          },
+          "timeBound": {
+            "value": "string",
+            "confidence": "number",
+            "missing": "array"
+          }
+        },
+        "overall_confidence": "number",
+        "current_focus": "specific | measurable | achievable | relevant | timeBound",
+        "completed_components": "array",
+        "conversation_phase": "initial | clarifying | refining | complete"
+      },
+      "display_elements": [
+        {
+          "type": "message | question | example | tip | progress",
+          "content": "string",
+          "metadata": {
+            "sender": "bot | user",
+            "smart_component": "string",
+            "visual_style": "primary | info | success | warning"
+          }
+        }
+      ],
+      "ui_instructions": {
+        "show_tips": "boolean",
+        "show_progress": "boolean",
+        "enable_input": "boolean",
+        "show_examples": "boolean",
+        "completion_ready": "boolean"
+      }
+    }
+  },
+  "implementationSteps": [
+    {
+      "step": 1,
+      "task": "Create new LLM prompt template",
+      "description": "Design comprehensive prompt that handles all SMART goal logic",
+      "priority": "HIGH"
+    },
+    {
+      "step": 2,
+      "task": "Simplify API endpoint",
+      "description": "Single endpoint that passes user input and returns structured response",
+      "priority": "HIGH"
+    },
+    {
+      "step": 3,
+      "task": "Refactor frontend to stateless renderer",
+      "description": "Remove all state management logic, only render LLM instructions",
+      "priority": "HIGH"
+    },
+    {
+      "step": 4,
+      "task": "Implement streaming support",
+      "description": "Add real-time streaming for better UX",
+      "priority": "MEDIUM"
+    },
+    {
+      "step": 5,
+      "task": "Add conversation persistence",
+      "description": "Store conversation history for context",
+      "priority": "MEDIUM"
+    }
+  ],
+  "benefits": [
+    "Dramatically simplified frontend code",
+    "All logic in one place (LLM prompt)",
+    "Easy to modify behavior without code changes",
+    "Better conversation flow and context awareness",
+    "Reduced testing complexity",
+    "More natural and adaptive interactions",
+    "Eliminates state synchronization issues",
+    "Enables more sophisticated goal analysis"
+  ]
+}

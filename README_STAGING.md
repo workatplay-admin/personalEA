@@ -8,8 +8,9 @@ The PersonalEA staging environment has been set up and is **ready for immediate 
 
 ### **Simple Goal Testing (Recommended)**
 ```bash
-# 1. Set your OpenAI API key
-export OPENAI_API_KEY='sk-your-api-key-here'
+# 1. Set your REAL OpenAI API key (required - no mock keys)
+export OPENAI_API_KEY='sk-your-actual-api-key-here'
+# Get your key from: https://platform.openai.com/api-keys
 
 # 2. Start Goal Strategy testing (no Docker required)
 ./start-goal-testing.sh
@@ -17,15 +18,24 @@ export OPENAI_API_KEY='sk-your-api-key-here'
 # 3. Open http://localhost:5173 and start testing!
 ```
 
+**⚠️ API Key Requirements:**
+- Must be a valid, real OpenAI API key
+- Test/mock keys will be rejected on startup
+- Ensure your key has available credits
+
 ### **Full Docker Staging (Advanced)**
 ```bash
-# 1. Set your OpenAI API key
-export OPENAI_API_KEY='sk-your-api-key-here'
+# 1. Set your REAL OpenAI API key (no mock/test keys)
+export OPENAI_API_KEY='sk-your-actual-api-key-here'
 
-# 2. Start complete staging environment
+# 2. Copy and configure staging environment
+cp .env.staging.example .env.staging
+# Edit .env.staging with your real API keys
+
+# 3. Start complete staging environment
 ./start-staging.sh
 
-# 3. Access services:
+# 4. Access services:
 #    - Testing Interface: http://localhost:5173
 #    - Health Dashboard: http://localhost:8080
 ```
@@ -125,9 +135,10 @@ PersonalEA Complete Vision:
 
 ### **Option 1: Simple Goal Testing (Recommended)**
 - **What**: Just Goal Strategy Service + React UI
-- **Requirements**: Node.js, OpenAI API key
+- **Requirements**: Node.js, **REAL** OpenAI API key (no mocks)
 - **Command**: `./start-goal-testing.sh`
 - **Best For**: Quick testing, focus on core features
+- **API Validation**: System validates keys on startup
 
 ### **Option 2: Full Staging Environment**
 - **What**: All available services in Docker
@@ -220,7 +231,11 @@ docker-compose -f docker-compose.staging.yml logs -f goal-strategy-service
 ## 📞 **Getting Help**
 
 ### **Common Issues**
-- **OpenAI API Key**: Make sure it's set and valid
+- **OpenAI API Key**: 
+  - Must be a REAL key (not test/mock)
+  - Check it's valid: `curl https://api.openai.com/v1/models -H "Authorization: Bearer $OPENAI_API_KEY"`
+  - Ensure it has available credits
+  - Service won't start with invalid keys
 - **Port Conflicts**: Ensure ports 3000, 5173 are available
 - **Node.js**: Requires version 18 or higher
 - **Docker**: Must be running for full staging environment
@@ -243,10 +258,16 @@ pkill -f "node.*3000" && ./start-goal-testing.sh
 **The PersonalEA staging environment is configured and ready for user testing.**
 
 ### **Immediate Actions**
-1. **Set OpenAI API Key**: `export OPENAI_API_KEY='sk-your-key'`
+1. **Set REAL OpenAI API Key**: 
+   ```bash
+   export OPENAI_API_KEY='sk-your-actual-api-key-here'
+   # Get from: https://platform.openai.com/api-keys
+   ```
 2. **Start Testing**: `./start-goal-testing.sh`
 3. **Open Interface**: http://localhost:5173
 4. **Begin Goal Testing**: Enter your first goal and explore!
+
+**Remember**: No mock/test API keys - the system requires real API connections
 
 ### **What to Focus On**
 - **Goal Translation Quality**: How well does AI convert your goals?

@@ -50,6 +50,8 @@ Choose the installation method that works best for you:
 
 **Prerequisites:**
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed
+- **Valid OpenAI API key** (get from https://platform.openai.com/api-keys)
+- No mock/test keys allowed - real API keys are mandatory
 
 **Installation Steps:**
 1. **Download PersonalEA**
@@ -75,6 +77,8 @@ Choose the installation method that works best for you:
 **Prerequisites:**
 - Node.js 18+ ([Download here](https://nodejs.org/))
 - Git ([Download here](https://git-scm.com/))
+- **Valid OpenAI API key** (required - no test/mock keys)
+- Valid Claude API key (if using Claude features)
 
 **Installation Steps:**
 1. **Download and Setup**
@@ -181,15 +185,26 @@ After installation and security hardening, you'll be guided through a setup wiza
 
 PersonalEA uses a centralized configuration system for managing API keys:
 
+**⚠️ CRITICAL: No Mock Data Policy**
+- PersonalEA does NOT support mock or test API keys
+- You MUST use valid, real API keys to run the system
+- The application validates API keys on startup
+- Invalid keys will prevent the system from starting
+
 1. **Copy the environment template**
    ```bash
    cp .env.example .env
+   # For staging:
+   cp .env.staging.example .env.staging
    ```
 
-2. **Add your OpenAI API key**
+2. **Add your REAL OpenAI API key**
    ```bash
    # Edit the .env file and replace the placeholder:
+   # Get your key from: https://platform.openai.com/api-keys
    OPENAI_API_KEY=sk-your-actual-openai-api-key-here
+   
+   # DO NOT use test keys like 'sk-test-*' or 'mock-key'
    ```
 
 3. **How the centralized config works**
@@ -294,6 +309,11 @@ PersonalEA uses a centralized configuration system for managing API keys:
 - **FAQ**: Check docs/faq.md for common questions
 - **Video Tutorials**: Step-by-step setup videos
 - **Configuration Examples**: Sample setups for different use cases
+- **API Key Troubleshooting**:
+  - Ensure you're using a real OpenAI API key
+  - Check your API key has available credits
+  - Verify the key starts with 'sk-' and is valid
+  - Test your key: `curl https://api.openai.com/v1/models -H "Authorization: Bearer $OPENAI_API_KEY"`
 
 **Community Support**
 - **GitHub Discussions**: Ask questions and share tips

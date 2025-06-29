@@ -1,0 +1,232 @@
+{
+  "testScenarios": [
+    {
+      "id": "basic-fitness",
+      "name": "Basic Fitness Goal",
+      "initialGoal": "Get fit",
+      "expectedFlow": {
+        "clarifications": [
+          {
+            "component": "specific",
+            "suggestedAnswer": "Run 5K races and do strength training",
+            "expectedScore": 80
+          },
+          {
+            "component": "measurable",
+            "suggestedAnswer": "Run 3 times per week, gym 2 times per week",
+            "expectedScore": 85
+          },
+          {
+            "component": "timeBound",
+            "suggestedAnswer": "Complete first 5K race in 3 months",
+            "expectedScore": 90
+          }
+        ],
+        "expectedIterations": 3,
+        "finalConfidence": 85
+      }
+    },
+    {
+      "id": "career-development",
+      "name": "Career Development Goal",
+      "initialGoal": "Advance my career",
+      "expectedFlow": {
+        "clarifications": [
+          {
+            "component": "specific",
+            "suggestedAnswer": "Become a senior software engineer at a tech company",
+            "expectedScore": 85
+          },
+          {
+            "component": "measurable",
+            "suggestedAnswer": "Get promoted or new job with 30% salary increase",
+            "expectedScore": 90
+          },
+          {
+            "component": "achievable",
+            "suggestedAnswer": "I have 5 years experience and strong technical skills",
+            "expectedScore": 85
+          },
+          {
+            "component": "timeBound",
+            "suggestedAnswer": "Within the next 12 months",
+            "expectedScore": 90
+          }
+        ],
+        "expectedIterations": 4,
+        "finalConfidence": 87
+      }
+    },
+    {
+      "id": "learning-skill",
+      "name": "Learning New Skill",
+      "initialGoal": "Learn Spanish",
+      "expectedFlow": {
+        "clarifications": [
+          {
+            "component": "specific",
+            "suggestedAnswer": "Reach conversational Spanish B2 level for travel and work",
+            "expectedScore": 85
+          },
+          {
+            "component": "measurable",
+            "suggestedAnswer": "Pass DELE B2 exam, have 30-minute conversations",
+            "expectedScore": 90
+          },
+          {
+            "component": "timeBound",
+            "suggestedAnswer": "By next summer vacation in July",
+            "expectedScore": 95
+          }
+        ],
+        "expectedIterations": 3,
+        "finalConfidence": 88
+      }
+    },
+    {
+      "id": "financial-goal",
+      "name": "Financial Savings Goal",
+      "initialGoal": "Save money",
+      "expectedFlow": {
+        "clarifications": [
+          {
+            "component": "specific",
+            "suggestedAnswer": "Build emergency fund for 6 months of expenses",
+            "expectedScore": 85
+          },
+          {
+            "component": "measurable",
+            "suggestedAnswer": "Save $15,000 total, $1,250 per month",
+            "expectedScore": 95
+          },
+          {
+            "component": "achievable",
+            "suggestedAnswer": "Can cut discretionary spending and use bonus",
+            "expectedScore": 80
+          },
+          {
+            "component": "relevant",
+            "suggestedAnswer": "Need financial security before starting family",
+            "expectedScore": 90
+          },
+          {
+            "component": "timeBound",
+            "suggestedAnswer": "Complete in 12 months",
+            "expectedScore": 95
+          }
+        ],
+        "expectedIterations": 5,
+        "finalConfidence": 89
+      }
+    },
+    {
+      "id": "comprehensive-initial",
+      "name": "Comprehensive Initial Goal",
+      "initialGoal": "Lose 20 pounds in 6 months through daily 30-minute cardio workouts and 1500 calorie diet tracked in MyFitnessPal",
+      "expectedFlow": {
+        "clarifications": [
+          {
+            "component": "achievable",
+            "suggestedAnswer": "Yes, I've lost weight before and have gym membership",
+            "expectedScore": 85
+          },
+          {
+            "component": "relevant",
+            "suggestedAnswer": "Doctor recommended for health, want more energy",
+            "expectedScore": 90
+          }
+        ],
+        "expectedIterations": 2,
+        "finalConfidence": 92,
+        "note": "Should require minimal clarifications due to detailed initial goal"
+      }
+    },
+    {
+      "id": "vague-goal",
+      "name": "Very Vague Goal",
+      "initialGoal": "Be better",
+      "expectedFlow": {
+        "clarifications": [
+          {
+            "component": "specific",
+            "suggestedAnswer": "Improve my public speaking skills",
+            "expectedScore": 75
+          },
+          {
+            "component": "measurable",
+            "suggestedAnswer": "Give 5 presentations without anxiety",
+            "expectedScore": 80
+          },
+          {
+            "component": "achievable",
+            "suggestedAnswer": "Join Toastmasters, practice weekly",
+            "expectedScore": 85
+          },
+          {
+            "component": "relevant",
+            "suggestedAnswer": "Required for my promotion to team lead",
+            "expectedScore": 90
+          },
+          {
+            "component": "timeBound",
+            "suggestedAnswer": "Over the next 6 months",
+            "expectedScore": 90
+          }
+        ],
+        "expectedIterations": 5,
+        "finalConfidence": 84,
+        "note": "Tests system's ability to handle very vague initial input"
+      }
+    }
+  ],
+  "edgeCases": [
+    {
+      "id": "empty-answers",
+      "name": "User Provides Empty Answers",
+      "initialGoal": "Start a business",
+      "testBehavior": "Submit empty or very short answers like 'yes', 'no', 'maybe'",
+      "expectedResult": "System should ask for more detail and maintain low scores"
+    },
+    {
+      "id": "all-in-one",
+      "name": "All Components in One Answer",
+      "initialGoal": "Get certified",
+      "firstAnswer": "Get AWS Solutions Architect certification by passing the exam with 85% score within 3 months through daily 2-hour study sessions using official materials because it's required for my promotion",
+      "expectedResult": "Should update all 5 components to 80%+ in one interaction"
+    },
+    {
+      "id": "context-reference",
+      "name": "Answers Reference Previous Context",
+      "initialGoal": "Improve health",
+      "answers": [
+        "Focus on cardiovascular fitness",
+        "Do it 4 times per week",
+        "For at least 45 minutes each time"
+      ],
+      "expectedResult": "System should understand 'it' refers to cardiovascular exercise"
+    },
+    {
+      "id": "skip-components",
+      "name": "User Skips Components",
+      "initialGoal": "Learn cooking",
+      "behavior": "Use 'skip' command for achievable and relevant",
+      "expectedResult": "System should move to next component and still complete flow"
+    }
+  ],
+  "performanceMetrics": {
+    "targetMetrics": {
+      "avgIterationsToComplete": 3.5,
+      "avgFinalConfidence": 85,
+      "percentCompletedUnder5Iterations": 95,
+      "percentReaching90Confidence": 80,
+      "avgTimeToComplete": "5 minutes"
+    },
+    "scoreProgressionTargets": {
+      "afterFirstAnswer": 40,
+      "afterSecondAnswer": 60,
+      "afterThirdAnswer": 75,
+      "afterFourthAnswer": 85,
+      "afterFifthAnswer": 90
+    }
+  }
+}

@@ -18,9 +18,9 @@ import {
   incompleteGoalInputs
 } from '../fixtures/goal-inputs';
 
-// Mock fetch globally
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
+// Mock fetch globally with proper typing
+const mockFetch = jest.fn<Promise<Response>, [input: RequestInfo | URL, init?: RequestInit]>();
+global.fetch = mockFetch as any;
 
 describe('SMARTGoalProcessor', () => {
   let processor: SMARTGoalProcessor;

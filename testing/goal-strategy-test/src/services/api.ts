@@ -29,7 +29,7 @@ console.log('🔧 API Configuration:', {
 // API Configuration interface
 interface ApiConfig {
   jwtToken: string
-  openaiApiKey: string
+  // SECURITY: OpenAI API key removed - server-side management only
 }
 
 // Global API configuration
@@ -69,14 +69,8 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   // Add authentication headers if config is available
   if (apiConfig && config.headers) {
     config.headers['Authorization'] = `Bearer ${apiConfig.jwtToken}`
-    
-    // Only add API key header if not using environment configuration
-    if (apiConfig.openaiApiKey && apiConfig.openaiApiKey !== 'ENVIRONMENT_CONFIGURED') {
-      config.headers['X-OpenAI-API-Key'] = apiConfig.openaiApiKey
-      console.log('🔧 Using user-provided OpenAI API key')
-    } else {
-      console.log('🔧 Using backend environment API key configuration (no header sent)')
-    }
+    // SECURITY: API key handling removed - server manages all API keys
+    console.log('🔧 Using secure server-side API key configuration')
   }
   
   return config
@@ -252,12 +246,15 @@ export const goalAPI = {
       })
 
       // Call the backend endpoint with proper format
+      // Filter out empty clarifications before sending
       const response = await api.post<APIResponse<Goal>>(`/goals/${goalId}/clarify`, {
-        clarifications: Object.entries(clarifications).map(([key, value]) => ({
-          question: `What is the ${key} aspect of your goal?`,
-          answer: value,
-          smartCriterion: key
-        })),
+        clarifications: Object.entries(clarifications)
+          .filter(([_, value]) => value && value.trim().length > 0)  // Only send non-empty answers
+          .map(([key, value]) => ({
+            question: `What is the ${key} aspect of your goal?`,
+            answer: value.trim(),
+            smartCriterion: key
+          })),
         goalContext,
         conversationHistory
       })

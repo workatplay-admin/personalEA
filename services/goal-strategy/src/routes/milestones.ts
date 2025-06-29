@@ -50,7 +50,7 @@ router.use(authenticateJWT);
  * POST /api/v1/goals/:goalId/milestones/generate
  * Generate milestone breakdown for a goal using AI
  */
-router.post('/:goalId/milestones/generate', requireScopes(['goals:write']), async (req, res, next) => {
+router.post('/:goalId/milestones/generate', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
     const goalId = req.params['goalId']!;
     const { preferences } = generateMilestonesSchema.parse(req.body);
@@ -85,7 +85,7 @@ router.post('/:goalId/milestones/generate', requireScopes(['goals:write']), asyn
       goalId,
       goalTitle: goal.title,
       smartCriteria: goal.smartCriteria as any,
-      targetDate: goal.targetDate || undefined,
+      targetDate: goal.targetDate || new Date(), // Provide default date instead of undefined
       preferences: preferences ? {
         ...(preferences.milestone_count !== undefined && { milestoneCount: preferences.milestone_count }),
         ...(preferences.distribution_strategy !== undefined && { distributionStrategy: preferences.distribution_strategy }),
@@ -131,7 +131,7 @@ router.post('/:goalId/milestones/generate', requireScopes(['goals:write']), asyn
  * POST /api/v1/goals/:goalId/milestones
  * Create a new milestone for a goal
  */
-router.post('/:goalId/milestones', requireScopes(['goals:write']), async (req, res, next) => {
+router.post('/:goalId/milestones', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
     const goalId = req.params['goalId']!;
     const milestoneData = createMilestoneSchema.parse(req.body);
@@ -175,7 +175,7 @@ router.post('/:goalId/milestones', requireScopes(['goals:write']), async (req, r
       data: {
         goalId,
         title: milestoneData.title,
-        description: milestoneData.description,
+        description: milestoneData.description || null, // Convert undefined to null
         targetDate: new Date(milestoneData.target_date),
         completionCriteria: milestoneData.completion_criteria,
         orderIndex,
@@ -197,7 +197,7 @@ router.post('/:goalId/milestones', requireScopes(['goals:write']), async (req, r
  * GET /api/v1/goals/:goalId/milestones
  * Get all milestones for a goal
  */
-router.get('/:goalId/milestones', requireScopes(['goals:read']), async (req, res, next) => {
+router.get('/:goalId/milestones', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
   try {
     const goalId = req.params['goalId']!;
 
@@ -267,7 +267,7 @@ router.get('/:goalId/milestones', requireScopes(['goals:read']), async (req, res
  * GET /api/v1/milestones/:id
  * Get specific milestone with full details
  */
-router.get('/:id', requireScopes(['goals:read']), async (req, res, next) => {
+router.get('/:id', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
   try {
     const milestoneId = req.params['id']!;
 

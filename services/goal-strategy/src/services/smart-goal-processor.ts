@@ -79,12 +79,10 @@ export interface ClarificationAnswer {
 export class SMARTGoalProcessor {
   private readonly aiApiKey: string;
   private readonly aiModel: string;
-  private readonly mockMode: boolean;
 
   constructor() {
     this.aiApiKey = env.OPENAI_API_KEY;
     this.aiModel = env.OPENAI_MODEL || 'gpt-4';
-    this.mockMode = env.NODE_ENV === 'development' && (!this.aiApiKey || this.aiApiKey.startsWith('sk-test-'));
   }
 
   /**
@@ -339,8 +337,16 @@ CRITICAL INSTRUCTIONS:
 2. UPDATE ALL components that the user provided information about (not just the one asked about)
 3. EXTRACT specific details, timeframes, metrics, feasibility info from their answer
 4. DO NOT add assumptions - only use what the user explicitly provided
-5. INCREASE confidence significantly (0.7-0.9) when user provides comprehensive details
+5. INCREASE confidence significantly (0.8-0.95) when user provides comprehensive details
 6. Ask follow-up questions only for components that still lack information
+
+CONFIDENCE SCORING RULES:
+- If user provides specific numbers, names, locations, or methods → confidence ≥ 0.8
+- If user provides timeframes with dates or durations → confidence ≥ 0.85
+- If user provides multiple specific details → confidence ≥ 0.9
+- If user says they already specified something, CHECK if it's in their answer → if yes, confidence ≥ 0.85
+- Default confidence for vague answers → 0.3-0.5
+- Never keep asking for details the user already provided
 
 ANALYSIS CHECKLIST for the user's answer:
 - SPECIFIC: Does it contain specific details, locations, methods, or clarifications?
@@ -480,6 +486,14 @@ Provide analysis in JSON format:
           throw new Error(`Invalid SMART criteria format - missing or invalid ${field}`);
         }
         
+        // Normalize confidence values to 0-1 range
+        let confidence = criteria[field].confidence;
+        if (confidence > 1) {
+          // If confidence is provided as percentage (e.g., 80 instead of 0.8), convert it
+          confidence = Math.min(confidence / 100, 1);
+        }
+        criteria[field].confidence = Math.max(0, Math.min(1, confidence));
+        
         // Ensure arrays are properly initialized
         if (field === 'measurable' && !Array.isArray(criteria[field].metrics)) {
           criteria[field].metrics = [];
@@ -489,12 +503,19 @@ Provide analysis in JSON format:
         }
       }
 
+      // Normalize overall confidence value
+      let overallConfidence = Number(parsed.confidence) || 0.5;
+      if (overallConfidence > 1) {
+        overallConfidence = Math.min(overallConfidence / 100, 1);
+      }
+      overallConfidence = Math.max(0, Math.min(1, overallConfidence));
+
       return {
         smartGoal: parsed.smartGoal,
         smartCriteria: criteria,
         missingCriteria: Array.isArray(parsed.missingCriteria) ? parsed.missingCriteria : [],
         clarificationQuestions: Array.isArray(parsed.clarificationQuestions) ? parsed.clarificationQuestions : [],
-        confidence: Number(parsed.confidence) || 0.5
+        confidence: overallConfidence
       };
     } catch (error) {
       logger.error('Failed to parse AI response', {
@@ -677,7 +698,7 @@ Respond in JSON format:
       if (criterion === 'timeBound') {
         const hasTimeframe = this.detectTimeframeInAnswer(answerLower);
         if (hasTimeframe) {
-          updatedCriteria.timeBound.confidence = Math.max(0.8, updatedCriteria.timeBound.confidence);
+          updatedCriteria.timeBound.confidence = Math.max(0.85, updatedCriteria.timeBound.confidence);
           updatedCriteria.timeBound.missing = [];
         }
       }
@@ -686,7 +707,7 @@ Respond in JSON format:
       if (criterion === 'measurable') {
         const hasMetrics = this.detectMetricsInAnswer(answerLower);
         if (hasMetrics) {
-          updatedCriteria.measurable.confidence = Math.max(0.8, updatedCriteria.measurable.confidence);
+          updatedCriteria.measurable.confidence = Math.max(0.85, updatedCriteria.measurable.confidence);
           updatedCriteria.measurable.missing = [];
         }
       }
@@ -695,14 +716,36 @@ Respond in JSON format:
       if (criterion === 'specific') {
         const hasSpecifics = this.detectSpecificsInAnswer(answer.answer);
         if (hasSpecifics) {
-          updatedCriteria.specific.confidence = Math.max(0.8, updatedCriteria.specific.confidence);
+          updatedCriteria.specific.confidence = Math.max(0.85, updatedCriteria.specific.confidence);
           updatedCriteria.specific.missing = [];
         }
       }
 
+      // Check for achievable indicators
+      if (criterion === 'achievable') {
+        const hasAchievableIndicators = this.detectAchievableInAnswer(answer.answer);
+        if (hasAchievableIndicators) {
+          updatedCriteria.achievable.confidence = Math.max(0.85, updatedCriteria.achievable.confidence);
+          updatedCriteria.achievable.missing = [];
+        }
+      }
+
+      // Check for relevance indicators
+      if (criterion === 'relevant') {
+        const hasRelevanceIndicators = this.detectRelevanceInAnswer(answer.answer);
+        if (hasRelevanceIndicators) {
+          updatedCriteria.relevant.confidence = Math.max(0.85, updatedCriteria.relevant.confidence);
+          updatedCriteria.relevant.missing = [];
+        }
+      }
+
       // Check if the answer provides substantial content
-      if (answer.answer.length > 20) {
-        // Update the addressed criterion with at least moderate confidence
+      if (answer.answer.length > 50) {
+        // Update the addressed criterion with higher confidence for detailed answers
+        const currentConfidence = updatedCriteria[criterion].confidence;
+        updatedCriteria[criterion].confidence = Math.max(0.75, currentConfidence);
+      } else if (answer.answer.length > 20) {
+        // Update with moderate confidence for shorter answers
         const currentConfidence = updatedCriteria[criterion].confidence;
         updatedCriteria[criterion].confidence = Math.max(0.6, currentConfidence);
       }
@@ -772,7 +815,18 @@ Respond in JSON format:
       /improve.*by\s*\d+/i,
       /\d+\s*out\s*of\s*\d+/i,
       /score\s*of\s*\d+/i,
-      /rating\s*of\s*\d+/i
+      /rating\s*of\s*\d+/i,
+      // Fitness and health metrics
+      /\d+\s*(pounds?|lbs?|kg|kilos?|kilograms?)/i,
+      /\d+\s*(miles?|km|kilometers?|meters?)/i,
+      /\d+\s*(hours?|minutes?|seconds?)/i,
+      /\d+\s*(times?|reps?|repetitions?|sets?)/i,
+      /\d+\s*(per\s+week|per\s+day|per\s+month|weekly|daily|monthly)/i,
+      /\d+\s*(calories?|steps?|workouts?)/i,
+      // General quantifiable metrics
+      /\d+\s*(sessions?|classes?|lessons?|courses?)/i,
+      /\d+\s*(projects?|tasks?|goals?|objectives?)/i,
+      /\d+\s*(years?|months?|weeks?|days?)/i
     ];
     
     return metricPatterns.some(pattern => pattern.test(answer));
@@ -784,23 +838,102 @@ Respond in JSON format:
   private detectSpecificsInAnswer(answer: string): boolean {
     // Check for specific indicators:
     // - Answer contains multiple words (not just yes/no)
-    // - Contains location, product, or service names
-    // - Contains action verbs
-    // - Has adequate detail (more than 30 characters)
+    // - Contains specific actions, methods, locations, or measurable details
+    // - Has adequate detail (more than 20 characters for specific answers)
     
-    if (answer.length < 30) return false;
+    if (answer.length < 20) return false;
     
     const words = answer.split(/\s+/);
-    if (words.length < 5) return false;
+    if (words.length < 4) return false;
     
-    // Check for action verbs or specific nouns
+    // Check for specific action verbs and concrete nouns across multiple domains
     const specificIndicators = [
-      /\b(create|build|develop|implement|launch|design|improve|optimize|analyze|establish)\b/i,
-      /\b(system|platform|product|service|feature|component|module|application)\b/i,
-      /\b(customer|client|user|employee|team|department|company)\b/i
+      // Technology/Business
+      /\b(create|build|develop|implement|launch|design|improve|optimize|analyze|establish|deploy|integrate)\b/i,
+      /\b(system|platform|product|service|feature|component|module|application|website|app|software)\b/i,
+      /\b(customer|client|user|employee|team|department|company|organization|startup|business)\b/i,
+      
+      // Fitness/Health
+      /\b(lose|gain|run|walk|swim|exercise|workout|train|diet|eat|weight|fitness|gym|yoga|cardio)\b/i,
+      /\b(pounds|lbs|kg|kilos|miles|km|kilometers|marathon|race|muscle|strength|endurance|nutrition)\b/i,
+      /\b(per\s+week|per\s+day|per\s+month|weekly|daily|monthly|times?\s+per|sessions?)\b/i,
+      
+      // Education/Learning
+      /\b(learn|study|practice|master|complete|finish|pass|graduate|certify|skill|course|class|degree)\b/i,
+      /\b(language|programming|certification|diploma|university|college|school|training|tutorial)\b/i,
+      
+      // General specific activities
+      /\b(read|write|publish|travel|visit|move|relocate|save|invest|buy|sell|organize|plan)\b/i,
+      /\b(book|article|chapter|page|project|task|goal|objective|target|milestone|deadline)\b/i,
+      
+      // Specific quantifiers and measurements (numbers with units)
+      /\d+\s*(pounds?|lbs?|kg|miles?|km|hours?|minutes?|weeks?|months?|years?|times?|sessions?|dollars?|\$)/i,
+      
+      // Location and context specifics
+      /\b(at\s+\w+|in\s+\w+|with\s+\w+|using\s+\w+|through\s+\w+|by\s+\w+|via\s+\w+)\b/i
     ];
     
     return specificIndicators.some(pattern => pattern.test(answer));
+  }
+
+  /**
+   * Detect achievable indicators in user answer
+   */
+  private detectAchievableInAnswer(answer: string): boolean {
+    const achievablePatterns = [
+      // Resource and capability mentions
+      /\b(have|possess|own|access|available|can|able|capable|skill|experience|knowledge)\b/i,
+      /\b(resource|budget|funding|time|equipment|tool|support|team|help)\b/i,
+      
+      // Feasibility assessments
+      /\b(realistic|achievable|feasible|possible|doable|manageable|attainable)\b/i,
+      /\b(challenge|difficult|easy|hard|simple|complex|straightforward)\b/i,
+      
+      // Past experience or success
+      /\b(done|completed|achieved|succeeded|accomplished|managed|handled)\b/i,
+      /\b(before|previously|already|experience|background|history)\b/i,
+      
+      // Constraints and limitations
+      /\b(constraint|limitation|restriction|challenge|obstacle|barrier)\b/i,
+      /\b(despite|although|even though|considering|given)\b/i,
+      
+      // Confidence expressions
+      /\b(confident|sure|certain|believe|think|feel|know)\b/i,
+      /\b(will|can|should|could|would|might)\b/i
+    ];
+    
+    return achievablePatterns.some(pattern => pattern.test(answer));
+  }
+
+  /**
+   * Detect relevance indicators in user answer
+   */
+  private detectRelevanceInAnswer(answer: string): boolean {
+    const relevancePatterns = [
+      // Purpose and motivation
+      /\b(because|since|as|for|to|in order to|so that|reason|purpose|why)\b/i,
+      /\b(important|crucial|critical|essential|vital|key|significant|meaningful)\b/i,
+      /\b(want|need|require|must|should|goal|objective|aim|aspiration)\b/i,
+      
+      // Alignment with broader goals
+      /\b(align|support|contribute|help|enable|facilitate|advance|further)\b/i,
+      /\b(career|personal|professional|life|future|long-term|short-term)\b/i,
+      /\b(value|priority|focus|strategy|plan|vision|mission)\b/i,
+      
+      // Benefits and outcomes
+      /\b(benefit|advantage|improve|enhance|better|growth|development|progress)\b/i,
+      /\b(result|outcome|impact|effect|consequence|lead to|achieve)\b/i,
+      
+      // Personal connection
+      /\b(my|me|I|mine|myself|our|us|we)\b/i,
+      /\b(passion|interest|love|enjoy|excited|motivated|inspired)\b/i,
+      
+      // Problem solving
+      /\b(solve|address|fix|resolve|overcome|tackle|handle|deal with)\b/i,
+      /\b(problem|issue|challenge|gap|need|opportunity)\b/i
+    ];
+    
+    return relevancePatterns.some(pattern => pattern.test(answer));
   }
 }
 
@@ -823,7 +956,7 @@ export class GoalParsingUtilities {
 
     for (const pattern of conditionalPatterns) {
       const match = goalText.match(pattern);
-      if (match) {
+      if (match && match[1] && match[2]) {
         const conditions = match[1].split(/\s*and\s*/i).map(c => c.trim());
         return {
           conditions,
@@ -898,8 +1031,8 @@ export class GoalParsingUtilities {
       for (const match of matches) {
         if (match[1]) {
           milestones.push({
-            action: match[1].trim(),
-            timeframe: undefined // Could be enhanced to extract specific timeframes
+            action: match[1].trim()
+            // timeframe property omitted when undefined
           });
         }
       }

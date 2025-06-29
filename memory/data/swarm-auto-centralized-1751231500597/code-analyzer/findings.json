@@ -1,0 +1,116 @@
+{
+  "swarmId": "swarm-auto-centralized-1751231500597",
+  "agent": "code-analyzer",
+  "timestamp": "2025-06-29T20:31:00Z",
+  "overprocessingAreas": [
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "location": "lines 257-319",
+      "issue": "Complex prompt building with extensive instructions",
+      "recommendation": "Trust LLM to understand simpler, more natural prompts without over-specifying the response format"
+    },
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "location": "lines 469-530",
+      "issue": "Heavy response parsing and validation",
+      "recommendation": "Let LLM provide responses in a more flexible format and trust its output quality"
+    },
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "location": "lines 683-777",
+      "issue": "Confidence score recalculation after clarifications",
+      "recommendation": "Ask LLM to provide updated confidence scores directly instead of recalculating"
+    },
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "location": "lines 782-937",
+      "issue": "Pattern detection methods using regex",
+      "recommendation": "Let LLM detect timeframes, metrics, specifics, achievability, and relevance in user responses"
+    }
+  ],
+  "complexLogic": [
+    {
+      "file": "services/goal-strategy/src/services/planner-service.ts",
+      "location": "lines 157-185",
+      "issue": "Slot scoring algorithm with multiple factors",
+      "recommendation": "Let LLM handle scheduling suggestions based on task requirements and constraints"
+    },
+    {
+      "file": "services/goal-strategy/src/services/planner-service.ts",
+      "location": "lines 238-287",
+      "issue": "Dependency resolution with graph creation and critical path calculation",
+      "recommendation": "Ask LLM to determine task order and dependencies in natural language"
+    },
+    {
+      "file": "services/goal-strategy/src/services/task-estimation-engine.ts",
+      "location": "lines 118-126",
+      "issue": "Multiple estimation methods (PERT, parametric, bottom-up, etc.)",
+      "recommendation": "Let LLM provide time estimates directly based on task description"
+    },
+    {
+      "file": "services/goal-strategy/src/services/milestone-generator.ts",
+      "location": "lines 122-150",
+      "issue": "Timeline optimization with complex constraints",
+      "recommendation": "Ask LLM to suggest optimal timeline considering constraints in a single prompt"
+    }
+  ],
+  "llmInterference": [
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "location": "lines 941-1043",
+      "issue": "GoalParsingUtilities class extracts conditionals, domain context, and timelines",
+      "recommendation": "These parsing utilities should be removed - LLM can extract all this information"
+    },
+    {
+      "file": "services/goal-strategy/src/routes/goals.ts",
+      "location": "lines 1002-1008",
+      "issue": "calculateOverallProgress manually averages confidence scores",
+      "recommendation": "Ask LLM for overall progress/confidence directly"
+    },
+    {
+      "file": "services/goal-strategy/src/routes/goals.ts",
+      "location": "lines 13-91",
+      "issue": "Extensive Zod validation schemas",
+      "recommendation": "Use simpler schemas and let LLM handle data structure flexibility"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "recommendation": "Replace pattern detection methods with LLM analysis",
+      "impact": "Remove 150+ lines of regex patterns and detection logic",
+      "implementation": "Ask LLM to identify timeframes, metrics, etc. in user input directly"
+    },
+    {
+      "priority": "HIGH", 
+      "recommendation": "Simplify prompt engineering",
+      "impact": "Reduce prompt complexity by 70%, trust LLM capabilities more",
+      "implementation": "Use natural language prompts instead of detailed JSON schemas"
+    },
+    {
+      "priority": "HIGH",
+      "recommendation": "Remove complex algorithms",
+      "impact": "Eliminate scheduling, estimation, and optimization algorithms",
+      "implementation": "Replace with single LLM calls that handle the entire logic"
+    },
+    {
+      "priority": "MEDIUM",
+      "recommendation": "Simplify response parsing",
+      "impact": "Remove validation and normalization code",
+      "implementation": "Trust LLM to provide well-structured responses"
+    },
+    {
+      "priority": "MEDIUM",
+      "recommendation": "Consolidate services",
+      "impact": "Merge multiple service classes into simpler LLM interface",
+      "implementation": "Create a single LLM service that handles all complex logic"
+    }
+  ],
+  "summary": {
+    "totalFilesAnalyzed": 6,
+    "majorOverprocessingInstances": 12,
+    "estimatedLinesOfCodeToRemove": 800,
+    "mainProblem": "The app is trying to implement deterministic algorithms for tasks that LLMs excel at naturally",
+    "keyInsight": "The codebase shows a lack of trust in LLM capabilities, resulting in unnecessary complexity"
+  }
+}

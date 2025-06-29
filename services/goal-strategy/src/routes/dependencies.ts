@@ -6,32 +6,32 @@ import { logger } from '../utils/logger';
 
 const router = Router();
 
-// Validation schemas
-const AnalyzeDependenciesSchema = z.object({
-  body: z.object({
-    milestoneId: z.string().uuid(),
-    analysisType: z.enum(['CRITICAL_PATH', 'PARALLEL_OPTIMIZATION', 'RESOURCE_LEVELING']).optional(),
-    includeBuffers: z.boolean().optional(),
-    bufferPercentage: z.number().min(0).max(50).optional(),
-  }),
-});
+// Validation schemas - commented out as they're not currently used
+// const AnalyzeDependenciesSchema = z.object({
+//   body: z.object({
+//     milestoneId: z.string().uuid(),
+//     analysisType: z.enum(['CRITICAL_PATH', 'PARALLEL_OPTIMIZATION', 'RESOURCE_LEVELING']).optional(),
+//     includeBuffers: z.boolean().optional(),
+//     bufferPercentage: z.number().min(0).max(50).optional(),
+//   }),
+// });
 
-const AddDependencySchema = z.object({
-  body: z.object({
-    predecessorId: z.string().uuid(),
-    successorId: z.string().uuid(),
-    dependencyType: z.enum(['FINISH_TO_START', 'START_TO_START', 'FINISH_TO_FINISH', 'START_TO_FINISH']).optional(),
-    lag: z.number().optional(),
-    isHard: z.boolean().optional(),
-  }),
-});
+// const AddDependencySchema = z.object({
+//   body: z.object({
+//     predecessorId: z.string().uuid(),
+//     successorId: z.string().uuid(),
+//     dependencyType: z.enum(['FINISH_TO_START', 'START_TO_START', 'FINISH_TO_FINISH', 'START_TO_FINISH']).optional(),
+//     lag: z.number().optional(),
+//     isHard: z.boolean().optional(),
+//   }),
+// });
 
-const RemoveDependencySchema = z.object({
-  body: z.object({
-    predecessorId: z.string().uuid(),
-    successorId: z.string().uuid(),
-  }),
-});
+// const RemoveDependencySchema = z.object({
+//   body: z.object({
+//     predecessorId: z.string().uuid(),
+//     successorId: z.string().uuid(),
+//   }),
+// });
 
 /**
  * @route POST /api/v1/dependencies/analyze
@@ -161,7 +161,7 @@ router.delete(
 router.get(
   '/:milestoneId/critical-path',
   authenticateJWT,
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const correlationId = `critical-path-${Date.now()}`;
     const { milestoneId } = req.params;
     
@@ -222,7 +222,7 @@ router.get(
 router.get(
   '/:milestoneId/parallel-tracks',
   authenticateJWT,
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const correlationId = `parallel-tracks-${Date.now()}`;
     const { milestoneId } = req.params;
     
@@ -282,7 +282,7 @@ router.get(
 router.get(
   '/:milestoneId/resource-conflicts',
   authenticateJWT,
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const correlationId = `resource-conflicts-${Date.now()}`;
     const { milestoneId } = req.params;
     
@@ -343,7 +343,7 @@ router.get(
 router.get(
   '/:milestoneId/optimization',
   authenticateJWT,
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const correlationId = `optimization-${Date.now()}`;
     const { milestoneId } = req.params;
     

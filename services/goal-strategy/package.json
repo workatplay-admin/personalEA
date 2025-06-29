@@ -2,11 +2,11 @@
   "name": "@personalea/goal-strategy-service",
   "version": "1.0.0",
   "description": "Goal & Strategy Service - Sophisticated 8-step goal-setting and strategic planning workflow",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
+    "start": "node -r module-alias/register dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -45,12 +45,14 @@
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "openai": "^4.20.1",
     "uuid": "^9.0.1",
     "winston": "^3.11.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
@@ -66,7 +68,6 @@
     "jest": "^29.7.0",
     "jest-playwright-preset": "^4.0.0",
     "playwright": "^1.40.1",
-    "@playwright/test": "^1.40.1",
     "prisma": "^5.7.1",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
@@ -75,5 +76,14 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "_moduleAliases": {
+    "@": "dist",
+    "@/config": "dist/config",
+    "@/middleware": "dist/middleware",
+    "@/routes": "dist/routes",
+    "@/services": "dist/services",
+    "@/types": "dist/types",
+    "@/utils": "dist/utils"
   }
 }

@@ -1,0 +1,186 @@
+# Canary Deployment Monitoring Configuration
+
+metrics:
+  # Success rate thresholds
+  success_rate:
+    warning_threshold: 95  # Alert if success rate drops below 95%
+    critical_threshold: 90 # Rollback if success rate drops below 90%
+    evaluation_window: 5m  # Evaluate over 5 minute windows
+
+  # Response time thresholds
+  response_time:
+    p50_warning: 500ms     # Median response time warning
+    p50_critical: 1000ms   # Median response time critical
+    p95_warning: 2000ms    # 95th percentile warning
+    p95_critical: 5000ms   # 95th percentile critical
+    p99_warning: 5000ms    # 99th percentile warning
+    p99_critical: 10000ms  # 99th percentile critical
+
+  # Error rate thresholds
+  error_rate:
+    warning_threshold: 2%   # Alert if error rate exceeds 2%
+    critical_threshold: 5%  # Rollback if error rate exceeds 5%
+    
+  # LLM specific metrics
+  llm_metrics:
+    api_timeout_rate:
+      warning: 1%          # Warning if 1% of LLM calls timeout
+      critical: 5%         # Critical if 5% timeout
+    token_usage:
+      cost_increase_warning: 20%  # Alert if token costs increase >20%
+      cost_increase_critical: 50% # Critical if costs increase >50%
+    
+# Canary deployment stages
+deployment_stages:
+  - name: "Initial Canary"
+    traffic_percentage: 1
+    duration: 10m
+    validation:
+      - metric: success_rate
+        threshold: 99
+      - metric: response_time.p95
+        threshold: 2000ms
+  
+  - name: "Extended Canary"
+    traffic_percentage: 10
+    duration: 30m
+    validation:
+      - metric: success_rate
+        threshold: 98
+      - metric: error_rate
+        threshold: 2
+      - metric: llm_metrics.api_timeout_rate
+        threshold: 1
+  
+  - name: "Half Traffic"
+    traffic_percentage: 50
+    duration: 1h
+    validation:
+      - metric: success_rate
+        threshold: 97
+      - metric: error_rate
+        threshold: 3
+      - metric: llm_metrics.token_usage.cost_increase
+        threshold: 30
+  
+  - name: "Full Deployment"
+    traffic_percentage: 100
+    duration: continuous
+    validation:
+      - metric: success_rate
+        threshold: 95
+      - metric: error_rate
+        threshold: 5
+
+# Monitoring queries
+prometheus_queries:
+  success_rate: |
+    sum(rate(http_requests_total{service="goal-strategy",status=~"2.."}[5m])) / 
+    sum(rate(http_requests_total{service="goal-strategy"}[5m])) * 100
+  
+  error_rate: |
+    sum(rate(http_requests_total{service="goal-strategy",status=~"5.."}[5m])) / 
+    sum(rate(http_requests_total{service="goal-strategy"}[5m])) * 100
+  
+  response_time_p50: |
+    histogram_quantile(0.50, 
+      sum(rate(http_request_duration_seconds_bucket{service="goal-strategy"}[5m])) 
+      by (le)
+    )
+  
+  response_time_p95: |
+    histogram_quantile(0.95, 
+      sum(rate(http_request_duration_seconds_bucket{service="goal-strategy"}[5m])) 
+      by (le)
+    )
+  
+  llm_timeout_rate: |
+    sum(rate(openai_api_timeouts_total{service="goal-strategy"}[5m])) / 
+    sum(rate(openai_api_requests_total{service="goal-strategy"}[5m])) * 100
+  
+  token_usage_cost: |
+    sum(rate(openai_tokens_used_total{service="goal-strategy"}[5m])) * 0.002
+
+# Automated rollback conditions
+rollback_conditions:
+  - condition: "success_rate < 90"
+    action: immediate_rollback
+    notify: ["oncall", "engineering-leads"]
+  
+  - condition: "error_rate > 10"
+    action: immediate_rollback
+    notify: ["oncall", "engineering-leads", "cto"]
+  
+  - condition: "llm_timeout_rate > 10"
+    action: pause_deployment
+    notify: ["oncall", "platform-team"]
+  
+  - condition: "response_time_p95 > 10000ms"
+    action: reduce_traffic
+    notify: ["oncall"]
+
+# Notification channels
+notifications:
+  slack:
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channels:
+      oncall: "#oncall-alerts"
+      engineering-leads: "#eng-leads"
+      platform-team: "#platform"
+      cto: "@cto-direct"
+  
+  pagerduty:
+    integration_key: "${PAGERDUTY_KEY}"
+    severity_mapping:
+      warning: "warning"
+      critical: "critical"
+      
+# Health check endpoints
+health_checks:
+  - name: "Basic Health"
+    endpoint: "/health"
+    interval: 10s
+    timeout: 5s
+    
+  - name: "LLM Connectivity"
+    endpoint: "/health/llm"
+    interval: 30s
+    timeout: 15s
+    
+  - name: "Database Health"
+    endpoint: "/health/db"
+    interval: 20s
+    timeout: 10s
+
+# Smoke tests for canary validation
+smoke_tests:
+  - name: "Create SMART Goal"
+    endpoint: "/api/v1/goals/translate"
+    method: POST
+    body:
+      goal: "Improve my programming skills"
+    expected_status: 200
+    expected_response:
+      - field: "smartGoal"
+        type: "string"
+        min_length: 20
+      - field: "confidence"
+        type: "number"
+        min_value: 0
+        max_value: 1
+    
+  - name: "Goal Clarification"
+    endpoint: "/api/v1/goals/{goal_id}/clarify"
+    method: POST
+    body:
+      clarifications:
+        specific: "Focus on Python and machine learning"
+    expected_status: 200
+    
+  - name: "Health Check"
+    endpoint: "/health"
+    method: GET
+    expected_status: 200
+    expected_response:
+      - field: "status"
+        value: "healthy"

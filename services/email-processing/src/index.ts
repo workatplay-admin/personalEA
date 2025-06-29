@@ -10,6 +10,10 @@ import { requestLogger } from '@/middleware/request-logger';
 import { authMiddleware } from '@/middleware/auth';
 import { emailRoutes } from '@/routes/email';
 import { healthRoutes } from '@/routes/health';
+import { validateAPIKeys } from '../../shared/utils/validate-api-keys';
+
+// Validate API keys before starting the service
+validateAPIKeys();
 
 const app = express();
 

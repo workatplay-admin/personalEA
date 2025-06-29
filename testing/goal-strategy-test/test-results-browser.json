@@ -1,0 +1,4 @@
+
+> goal-strategy-test@0.0.0 test:e2e:chromium
+> playwright test --project=chromium --reporter=json
+

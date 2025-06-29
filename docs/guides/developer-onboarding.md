@@ -11,6 +11,13 @@ Before you begin, ensure you have the following installed:
 - **Git**
 - **PostgreSQL** (for local database development)
 - **Redis** (for caching and job queues)
+- **Valid OpenAI API key** (REQUIRED - get from https://platform.openai.com/api-keys)
+- **Valid Claude API key** (optional - if using Claude features)
+
+**⚠️ IMPORTANT: No Mock Data Policy**
+- PersonalEA does NOT support mock or test API keys
+- You MUST use valid, real API keys for ALL environments
+- The system validates API keys on startup and will fail if invalid
 
 ## Environment Setup
 
@@ -44,10 +51,20 @@ cp services/email-processing/.env.example services/email-processing/.env
 
 Key environment variables to configure:
 
-- `OPENAI_API_KEY`: Your OpenAI API key
+- `OPENAI_API_KEY`: Your **REAL** OpenAI API key (required - no test/mock keys)
 - `DATABASE_URL`: PostgreSQL connection string
 - `REDIS_URL`: Redis connection string
 - `JWT_SECRET`: Secret for JWT token generation
+
+**API Key Validation:**
+```bash
+# Verify your OpenAI API key is valid
+curl https://api.openai.com/v1/models \
+  -H "Authorization: Bearer $OPENAI_API_KEY"
+
+# If you see a list of models, your key is valid
+# If you get an error, check your key
+```
 
 ### 4. Database Setup
 
@@ -226,7 +243,12 @@ const keys = await memory.list();
 ### Common Issues
 - **Port conflicts**: Check if ports 3000, 3001, 3002 are free
 - **Database connection**: Ensure PostgreSQL is running
-- **API keys**: Verify environment variables are set
+- **API keys**: Verify environment variables are set with REAL keys
+- **API Key Errors**: 
+  - `Invalid API key`: You're using a test/mock key - use a real one
+  - `Rate limit exceeded`: Your API key has hit its limit
+  - `Insufficient quota`: Add credits to your OpenAI account
+  - Service won't start: Check logs for API validation errors
 
 ## Resources
 

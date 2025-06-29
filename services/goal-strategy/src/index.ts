@@ -7,6 +7,8 @@ import { env, getCorsOrigins } from '@/config/environment';
 import { logger } from '@/utils/logger';
 import { requestLogger, performanceLogger } from '@/middleware/request-logger';
 import { errorHandler, notFoundHandler } from '@/middleware/error-handler';
+import { validateAPIKeys } from './shared-utils/validate-api-keys';
+import { validateLLMConnections } from './shared-utils/validate-llm-connections';
 
 // Import routes
 import healthRoutes from '@/routes/health';
@@ -20,6 +22,28 @@ import feedbackRoutes from '@/routes/feedback';
 import plannerRoutes from '@/routes/planner';
 // import taskRoutes from '@/routes/tasks';
 // import capacityRoutes from '@/routes/capacity';
+
+// Validate API keys before starting the service (non-blocking)
+try {
+  const isTestingMode = process.env.NODE_ENV === 'test' || process.env.FORCE_LLM_VALIDATION === 'true';
+  validateAPIKeys(isTestingMode);
+} catch (error) {
+  logger.warn('API key validation skipped during startup:', error);
+}
+
+// Validate LLM connections asynchronously (non-blocking for user-provided keys)
+if (process.env.NODE_ENV === 'test' || process.env.FORCE_LLM_VALIDATION === 'true') {
+  (async () => {
+    try {
+      await validateLLMConnections();
+    } catch (error) {
+      logger.error('Failed to validate LLM connections:', error);
+      process.exit(1);
+    }
+  })();
+} else {
+  logger.info('LLM validation skipped - API keys will be validated per-request');
+}
 
 const app = express();
 

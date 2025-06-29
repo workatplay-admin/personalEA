@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { ApiConfigPage } from '../page-objects/ApiConfigPage';
-import { GoalInputPage } from '../page-objects/GoalInputPage';
-import { SmartGoalPage } from '../page-objects/SmartGoalPage';
-import { TestUtils } from '../fixtures/test-utils';
+import { ApiConfigPage } from './page-objects/ApiConfigPage';
+import { GoalInputPage } from './page-objects/GoalInputPage';
+import { SmartGoalPage } from './page-objects/SmartGoalPage';
+import { TestUtils } from './fixtures/test-utils';
 
 test.describe('Transform to SMART Goal Button - Complete User Flow', () => {
   let apiConfigPage: ApiConfigPage;

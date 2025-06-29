@@ -1,0 +1,13 @@
+{
+  "objective": "here is the bug report: I chose the goal *I want to lose weight and get fit*  1. The Smart Transaltion screen says it's 200% confidence but the AI Clarification Assistant says its 0.2%. The AI Clarification Assistant should say 20% because that is what it means. To make the goal more specific i wrote, I would like to lose 30 pounds and be able to run 30 KM per week. This was enough to bring the score to 90% but the chat is saying 0.9%. The reply was still on specific - Can you tell me how many pounds you're hoping to lose, and what does 'get fit' look like for you? For example, are you thinking about running a 5k, feeling more energetic, or something else?",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-06-29T20:14:47.990Z",
+  "id": "swarm-auto-centralized-1751228087990"
+}

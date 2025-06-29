@@ -65,8 +65,8 @@ export default function EstimationDisplay({
   }
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 80) return 'text-green-600 dark:text-green-400'
-    if (confidence >= 60) return 'text-yellow-600 dark:text-yellow-400'
+    if (confidence >= 0.8) return 'text-green-600 dark:text-green-400'
+    if (confidence >= 0.6) return 'text-yellow-600 dark:text-yellow-400'
     return 'text-red-600 dark:text-red-400'
   }
 
@@ -131,7 +131,7 @@ export default function EstimationDisplay({
         </div>
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-center">
           <div className={`text-2xl font-bold ${getConfidenceColor(averageConfidence)}`}>
-            {averageConfidence.toFixed(0)}%
+            {Math.round(averageConfidence * 100)}%
           </div>
           <div className="text-sm text-blue-800 dark:text-blue-200">Avg Confidence</div>
         </div>
@@ -170,7 +170,7 @@ export default function EstimationDisplay({
                     {estimation.finalEstimate.hours.toFixed(1)}h
                   </div>
                   <div className={`text-sm ${getConfidenceColor(estimation.finalEstimate.confidence)}`}>
-                    {estimation.finalEstimate.confidence.toFixed(0)}% confidence
+                    {Math.round(estimation.finalEstimate.confidence * 100)}% confidence
                   </div>
                 </div>
               </button>
@@ -185,7 +185,7 @@ export default function EstimationDisplay({
                       </h4>
                       <div className="text-blue-800 dark:text-blue-200">
                         <div className="text-lg font-bold">{estimation.expertJudgment.estimate}h</div>
-                        <div className="text-sm">{estimation.expertJudgment.confidence}% confidence</div>
+                        <div className="text-sm">{Math.round(estimation.expertJudgment.confidence * 100)}% confidence</div>
                         <div className="text-xs mt-1">{estimation.expertJudgment.reasoning}</div>
                       </div>
                     </div>
@@ -212,7 +212,7 @@ export default function EstimationDisplay({
                       </h4>
                       <div className="text-yellow-800 dark:text-yellow-200">
                         <div className="text-lg font-bold">{estimation.analogyBased.estimate}h</div>
-                        <div className="text-sm">{estimation.analogyBased.confidence}% confidence</div>
+                        <div className="text-sm">{Math.round(estimation.analogyBased.confidence * 100)}% confidence</div>
                         <div className="text-xs mt-1">Similar: {estimation.analogyBased.similarTask}</div>
                       </div>
                     </div>
@@ -230,7 +230,7 @@ export default function EstimationDisplay({
                       <div className="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                         <div 
                           className="bg-indigo-600 h-2 rounded-full"
-                          style={{ width: `${(estimation.finalEstimate.confidence)}%` }}
+                          style={{ width: `${Math.round(estimation.finalEstimate.confidence * 100)}%` }}
                         ></div>
                       </div>
                       <span className="text-sm text-gray-600 dark:text-gray-400">

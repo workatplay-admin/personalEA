@@ -6,28 +6,28 @@ import { logger } from '../utils/logger';
 
 const router = Router();
 
-// Validation schemas
-const EstimateTaskSchema = z.object({
-  body: z.object({
-    taskId: z.string().uuid().optional(),
-    taskDescription: z.string().min(1).max(1000),
-    complexity: z.enum(['SIMPLE', 'MODERATE', 'COMPLEX']),
-    skills: z.array(z.string()).min(1),
-    methods: z.array(z.enum(['EXPERT_JUDGMENT', 'ANALOGY', 'THREE_POINT_PERT', 'PARAMETRIC', 'BOTTOM_UP'])).optional(),
-    includeUncertainty: z.boolean().optional(),
-    confidenceLevel: z.number().min(0.5).max(0.99).optional(),
-  }),
-});
+// Validation schemas - commented out as they're not currently used
+// const EstimateTaskSchema = z.object({
+//   body: z.object({
+//     taskId: z.string().uuid().optional(),
+//     taskDescription: z.string().min(1).max(1000),
+//     complexity: z.enum(['SIMPLE', 'MODERATE', 'COMPLEX']),
+//     skills: z.array(z.string()).min(1),
+//     methods: z.array(z.enum(['EXPERT_JUDGMENT', 'ANALOGY', 'THREE_POINT_PERT', 'PARAMETRIC', 'BOTTOM_UP'])).optional(),
+//     includeUncertainty: z.boolean().optional(),
+//     confidenceLevel: z.number().min(0.5).max(0.99).optional(),
+//   }),
+// });
 
-const UpdateActualSchema = z.object({
-  params: z.object({
-    taskId: z.string().uuid(),
-  }),
-  body: z.object({
-    actualHours: z.number().min(0.1),
-    completionNotes: z.string().optional(),
-  }),
-});
+// const UpdateActualSchema = z.object({
+//   params: z.object({
+//     taskId: z.string().uuid(),
+//   }),
+//   body: z.object({
+//     actualHours: z.number().min(0.1),
+//     completionNotes: z.string().optional(),
+//   }),
+// });
 
 /**
  * @route POST /api/v1/estimations/estimate
@@ -82,7 +82,7 @@ router.post(
 router.put(
   '/:taskId/actual',
   authenticateJWT,
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const correlationId = `update-actual-${Date.now()}`;
     const { taskId } = req.params;
     
@@ -133,7 +133,7 @@ router.put(
 router.post(
   '/batch',
   authenticateJWT,
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const correlationId = `batch-estimation-${Date.now()}`;
     
     try {
@@ -311,7 +311,7 @@ router.get(
 router.get(
   '/:taskId/history',
   authenticateJWT,
-  async (req, res) => {
+  async (req, res): Promise<void> => {
     const correlationId = `estimation-history-${Date.now()}`;
     const { taskId } = req.params;
     

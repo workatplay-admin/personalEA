@@ -46,12 +46,16 @@ personalEA/
 - Use the `.env.example` template for new installations
 - Keep secrets out of version control (`.env` is in `.gitignore`)
 - Use strong, unique secrets for each environment
+- **Use REAL API keys for ALL environments** (no mock/test keys)
+- **Validate API keys before deployment**
 
 **❌ DON'T:**
 - Hardcode secrets in configuration files
 - Duplicate API keys across service-specific `.env` files
 - Commit real secrets to version control
 - Use default or weak secrets in production
+- **Use mock or test API keys** (e.g., 'sk-test-*', 'mock-key')
+- **Deploy without validating API keys first**
 
 ### 2. Secret Rotation
 
@@ -70,17 +74,28 @@ personalEA/
 
 ### 3. Environment Separation
 
+**⚠️ IMPORTANT: All environments require REAL API keys**
+
 **Development:**
 ```bash
 # .env.development
-OPENAI_API_KEY=sk-dev-key-here
+OPENAI_API_KEY=sk-your-real-dev-api-key-here
 JWT_SECRET=dev-jwt-secret-32-chars-minimum
+# No mock keys - use a real OpenAI API key
+```
+
+**Staging (must mirror production):**
+```bash
+# .env.staging
+OPENAI_API_KEY=sk-your-real-staging-api-key-here
+JWT_SECRET=staging-jwt-secret-32-chars-minimum
+# Staging should use real keys to match production behavior
 ```
 
 **Production:**
 ```bash
 # .env.production
-OPENAI_API_KEY=sk-prod-key-here
+OPENAI_API_KEY=sk-your-real-prod-api-key-here
 JWT_SECRET=prod-jwt-secret-32-chars-minimum
 ```
 
@@ -93,10 +108,15 @@ JWT_SECRET=prod-jwt-secret-32-chars-minimum
    cp .env.example .env
    ```
 
-2. **Configure secrets:**
+2. **Configure secrets with REAL API keys:**
    ```bash
    # Edit .env file
+   # Get your key from: https://platform.openai.com/api-keys
    OPENAI_API_KEY=sk-your-actual-openai-api-key-here
+   
+   # DO NOT use test keys like 'sk-test-*' or 'mock-key'
+   # The system will validate and reject invalid keys
+   
    JWT_SECRET=your-secure-jwt-secret-minimum-32-characters
    DATABASE_URL=postgresql://user:password@localhost:5432/personalea
    ```
@@ -153,10 +173,17 @@ FEATURE_AI_GOAL_TRANSLATION=true
 
 ### Configuration Validation
 
-**Check environment loading:**
+**Check environment loading and validate API keys:**
 ```bash
 # Verify environment variables are loaded
 node -e "require('dotenv').config(); console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'SET' : 'NOT SET')"
+
+# Validate OpenAI API key is real and working
+curl https://api.openai.com/v1/models \
+  -H "Authorization: Bearer $OPENAI_API_KEY"
+
+# If you see a list of models, your key is valid
+# If you get an error, you need a real API key
 ```
 
 **Test service configuration:**

@@ -1,0 +1,95 @@
+{
+  "timestamp": "2025-06-29T17:24:00.425Z",
+  "module": "goal-strategy",
+  "criticalIssues": [
+    {
+      "severity": "CRITICAL",
+      "type": "Production Build Failure",
+      "description": "TypeScript path aliases not resolved in production build",
+      "error": "Error: Cannot find module @/config/environment",
+      "impact": "Service fails to start in production",
+      "location": "dist/index.js",
+      "rootCause": "TypeScript compiles path aliases but Node.js cannot resolve them",
+      "solution": "Need to add module-alias or tsconfig-paths/register for runtime resolution"
+    }
+  ],
+  "bugs": [
+    {
+      "severity": "HIGH",
+      "type": "Test Suite Compilation Errors",
+      "description": "All test suites failing due to TypeScript errors",
+      "errors": [
+        "mockFetch type errors - Argument of type is not assignable to parameter of type never",
+        "Undefined variable errors in test files",
+        "Type mismatches with RawGoalInput"
+      ],
+      "location": "tests/unit/*.test.ts",
+      "impact": "Cannot run tests, CI/CD pipeline broken",
+      "solution": "Fix mock typing and test setup configuration"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "Configuration Issues",
+      "description": "Environment variables require many required fields",
+      "location": "src/config/environment.ts",
+      "impact": "Difficult to run in development without full config",
+      "solution": "Add better defaults or make more fields optional"
+    },
+    {
+      "severity": "LOW",
+      "type": "Code Quality",
+      "description": "Multiple TODO and FIXME comments throughout codebase",
+      "locations": [
+        "src/routes/goals-chat-endpoints.ts",
+        "src/routes/planner.ts",
+        "src/services/planner-service.ts",
+        "src/middleware/auth.ts",
+        "src/config/environment.ts",
+        "src/routes/wbs.ts",
+        "src/middleware/request-logger.ts"
+      ],
+      "impact": "Technical debt accumulation",
+      "solution": "Address TODOs or create tracking issues"
+    }
+  ],
+  "errorPatterns": [
+    {
+      "pattern": "Module resolution errors",
+      "count": "All imports using @ alias",
+      "severity": "CRITICAL"
+    },
+    {
+      "pattern": "Type errors in tests",
+      "count": "20+ occurrences",
+      "severity": "HIGH"
+    }
+  ],
+  "failingTests": {
+    "status": "ALL TESTS FAILING",
+    "reason": "TypeScript compilation errors",
+    "testSuites": 13,
+    "details": "Cannot run any tests due to compilation failures"
+  },
+  "recommendations": [
+    {
+      "priority": 1,
+      "action": "Fix production build by adding runtime path resolution",
+      "implementation": "Add module-alias package and configure _moduleAliases in package.json"
+    },
+    {
+      "priority": 2,
+      "action": "Fix test mock typing issues",
+      "implementation": "Properly type global.fetch mock or use proper testing utilities"
+    },
+    {
+      "priority": 3,
+      "action": "Add development environment defaults",
+      "implementation": "Make more environment variables optional with sensible defaults"
+    },
+    {
+      "priority": 4,
+      "action": "Set up proper CI/CD pipeline",
+      "implementation": "Ensure tests pass before deployment"
+    }
+  ]
+}

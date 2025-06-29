@@ -6,16 +6,16 @@ dotenv.config();
 
 const environmentSchema = z.object({
   // Database
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().url().default('postgresql://localhost:5432/goal_strategy_dev'),
 
   // OpenAI Configuration
-  OPENAI_API_KEY: z.string().min(1),
+  OPENAI_API_KEY: z.string().min(1).default('sk-test-placeholder-key'),
   OPENAI_MODEL: z.string().default('gpt-4-turbo-preview'),
   OPENAI_MAX_TOKENS: z.coerce.number().default(4000),
   OPENAI_TEMPERATURE: z.coerce.number().min(0).max(2).default(0.7),
 
   // JWT Configuration
-  JWT_SECRET: z.string().min(32),
+  JWT_SECRET: z.string().min(32).default('development-secret-key-please-change-in-production'),
   JWT_EXPIRES_IN: z.string().default('24h'),
 
   // Server Configuration
@@ -28,7 +28,7 @@ const environmentSchema = z.object({
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
 
   // CORS Configuration
-  CORS_ORIGIN: z.string().default('http://localhost:3000,http://localhost:8080'),
+  CORS_ORIGIN: z.string().default('http://localhost:3000,http://localhost:8080,http://localhost:5173,http://localhost:5174,https://*.app.github.dev'),
   CORS_CREDENTIALS: z.coerce.boolean().default(true),
 
   // Redis Configuration
@@ -101,8 +101,30 @@ export const isFeatureEnabled = (feature: keyof Pick<Environment,
   return env[feature];
 };
 
-export const getCorsOrigins = (): string[] => {
-  return env.CORS_ORIGIN.split(',').map(origin => origin.trim());
+export const getCorsOrigins = (): (string | RegExp)[] | boolean => {
+  const origins = env.CORS_ORIGIN.split(',').map(origin => origin.trim());
+  
+  // If any origin contains a wildcard, convert to regex
+  const processedOrigins = origins.map(origin => {
+    if (origin === '*') {
+      return true; // Allow all origins (for development only)
+    }
+    if (origin.includes('*')) {
+      // Convert wildcard pattern to regex
+      const regexPattern = origin
+        .replace(/\./g, '\\.')
+        .replace(/\*/g, '.*');
+      return new RegExp(`^${regexPattern}$`);
+    }
+    return origin;
+  });
+  
+  // If array contains true, return true (allow all)
+  if (processedOrigins.includes(true)) {
+    return true;
+  }
+  
+  return processedOrigins as (string | RegExp)[];
 };
 
 export const isDevelopment = (): boolean => env.NODE_ENV === 'development';

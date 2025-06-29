@@ -156,12 +156,18 @@ export default function SmartGoalDisplay({
   const shouldShowChatOption = () => {
     if (!smartGoal) return false
     
+    // Don't show chat if all criteria are at 90% or higher
+    const allCriteriaHighConfidence = Object.values(smartGoal.criteria).every(criterion => 
+      criterion.confidence >= 0.9
+    )
+    if (allCriteriaHighConfidence) return false
+    
     // Show chat if overall confidence is low
     if (smartGoal.confidence < 0.7) return true
     
-    // Show chat if any individual criteria has low confidence
+    // Show chat if any individual criteria has low confidence (less than 90%)
     const hasLowConfidence = Object.values(smartGoal.criteria).some(criterion => 
-      criterion.confidence < 0.7
+      criterion.confidence < 0.9
     )
     if (hasLowConfidence) return true
     
@@ -172,6 +178,15 @@ export default function SmartGoalDisplay({
     if (smartGoal.missingCriteria && smartGoal.missingCriteria.length > 0) return true
     
     return false
+  }
+
+  const shouldAutoAdvanceToMilestones = () => {
+    if (!smartGoal) return false
+    
+    // Auto-advance if all criteria are at 90% or higher
+    return Object.values(smartGoal.criteria).every(criterion => 
+      criterion.confidence >= 0.9
+    )
   }
 
   const handleStartChat = () => {
@@ -247,7 +262,9 @@ export default function SmartGoalDisplay({
             </h2>
           </div>
           <p className="text-gray-600 dark:text-gray-300">
-            {showChat && !chatCompleted 
+            {shouldAutoAdvanceToMilestones()
+              ? "🎯 Excellent! All SMART criteria are at 90% or higher. Your goal is ready for milestone planning."
+              : showChat && !chatCompleted 
               ? "Working with AI to refine your SMART goal. The goal will update in real-time as we chat."
               : chatCompleted
               ? "Your SMART goal has been refined through our conversation. You can continue or restart the chat."
@@ -256,16 +273,22 @@ export default function SmartGoalDisplay({
           </p>
         </div>
 
-        {/* Side-by-Side Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Side - SMART Goal Display */}
+        {/* Layout - Full width when auto-advancing, side-by-side otherwise */}
+        <div className={shouldAutoAdvanceToMilestones() ? "space-y-4" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
+          {/* SMART Goal Display */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Target className="w-5 h-5 text-indigo-600" />
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Your SMART Goal
               </h3>
-              {showChat && (
+              {shouldAutoAdvanceToMilestones() && (
+                <div className="flex items-center space-x-1 text-sm text-green-600">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>All criteria at 90%+</span>
+                </div>
+              )}
+              {showChat && !shouldAutoAdvanceToMilestones() && (
                 <div className="flex items-center space-x-1 text-sm text-indigo-600">
                   <Sparkles className="w-4 h-4" />
                   <span>Updating in real-time</span>
@@ -274,8 +297,35 @@ export default function SmartGoalDisplay({
             </div>
             <SmartGoalViewer goal={smartGoal} />
             
-            {/* Progress Summary */}
-            {(showChat || chatCompleted) && originalSmartGoal && (
+            {/* High Confidence Success Message */}
+            {shouldAutoAdvanceToMilestones() && (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+                <div className="text-center">
+                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
+                    🎉 Perfect SMART Goal!
+                  </h4>
+                  <p className="text-green-700 dark:text-green-300 mb-4">
+                    All SMART criteria have achieved 90% or higher confidence. Your goal is well-defined and ready for milestone planning.
+                  </p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {smartGoal.criteria && Object.entries(smartGoal.criteria).map(([key, criterion]) => (
+                      <div key={key} className="text-center">
+                        <div className="text-xs font-medium text-green-700 dark:text-green-300 capitalize mb-1">
+                          {key === 'timeBound' ? 'Time-bound' : key}
+                        </div>
+                        <div className="text-sm font-bold text-green-800 dark:text-green-200">
+                          {Math.round(criterion.confidence * 100)}%
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Progress Summary - only show for chat sessions */}
+            {(showChat || chatCompleted) && originalSmartGoal && !shouldAutoAdvanceToMilestones() && (
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
                   📊 Improvement Progress
@@ -306,45 +356,47 @@ export default function SmartGoalDisplay({
             )}
           </div>
 
-          {/* Right Side - Chat Interface */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <MessageSquare className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                AI Clarification Assistant
-              </h3>
-            </div>
-            
-            {!chatCompleted ? (
-              <ChatClarification
-                goal={smartGoal}
-                onGoalUpdate={handleGoalUpdate}
-                onComplete={handleChatComplete}
-                isVisible={true}
-              />
-            ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-96 flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <MessageSquare className="w-16 h-16 text-gray-400 mx-auto" />
-                  <div>
-                    <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                      Chat Completed!
-                    </h4>
-                    <p className="text-gray-600 dark:text-gray-400 max-w-sm">
-                      Your SMART goal has been refined through our conversation. You can continue to milestones or restart the refinement chat.
-                    </p>
-                  </div>
-                  {originalSmartGoal && (
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4">
-                      <p className="text-sm text-green-800 dark:text-green-200">
-                        🎯 <strong>Goal Improved!</strong> Confidence increased from {Math.round(originalSmartGoal.confidence * 100)}% to {Math.round(smartGoal.confidence * 100)}%
+          {/* Chat Interface - only show if not auto-advancing */}
+          {!shouldAutoAdvanceToMilestones() && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="w-5 h-5 text-indigo-600" />
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  AI Clarification Assistant
+                </h3>
+              </div>
+              
+              {!chatCompleted ? (
+                <ChatClarification
+                  goal={smartGoal}
+                  onGoalUpdate={handleGoalUpdate}
+                  onComplete={handleChatComplete}
+                  isVisible={true}
+                />
+              ) : (
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-96 flex items-center justify-center">
+                  <div className="text-center space-y-4">
+                    <MessageSquare className="w-16 h-16 text-gray-400 mx-auto" />
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                        Chat Completed!
+                      </h4>
+                      <p className="text-gray-600 dark:text-gray-400 max-w-sm">
+                        Your SMART goal has been refined through our conversation. You can continue to milestones or restart the refinement chat.
                       </p>
                     </div>
-                  )}
+                    {originalSmartGoal && (
+                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4">
+                        <p className="text-sm text-green-800 dark:text-green-200">
+                          🎯 <strong>Goal Improved!</strong> Confidence increased from {Math.round(originalSmartGoal.confidence * 100)}% to {Math.round(smartGoal.confidence * 100)}%
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -358,7 +410,7 @@ export default function SmartGoalDisplay({
               Regenerate Goal
             </button>
             
-            {!showChat && shouldShowChatOption() && (
+            {!shouldAutoAdvanceToMilestones() && !showChat && shouldShowChatOption() && (
               <button
                 onClick={handleStartChat}
                 className="flex items-center px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-300 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -368,7 +420,7 @@ export default function SmartGoalDisplay({
               </button>
             )}
             
-            {chatCompleted && (
+            {!shouldAutoAdvanceToMilestones() && chatCompleted && (
               <button
                 onClick={handleStartChat}
                 className="flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -388,7 +440,11 @@ export default function SmartGoalDisplay({
 
           <button
             onClick={handleContinue}
-            className="flex items-center px-6 py-2 text-base font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className={`flex items-center px-6 py-2 text-base font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+              shouldAutoAdvanceToMilestones() 
+                ? 'bg-green-600 hover:bg-green-700 animate-pulse' 
+                : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
           >
             Continue to Milestones
             <CheckCircle className="w-5 h-5 ml-2" />

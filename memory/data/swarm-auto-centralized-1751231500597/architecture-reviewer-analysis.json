@@ -1,0 +1,97 @@
+{
+  "currentFlow": {
+    "steps": [
+      "User input in frontend",
+      "API validation with Zod schemas",
+      "Complex prompt building in smart-goal-processor",
+      "LLM call with forced JSON response",
+      "Response parsing and validation",
+      "Database storage",
+      "Frontend state management",
+      "UI interpretation and re-presentation"
+    ],
+    "dataTransformations": [
+      "Raw user input → Validated schema",
+      "Schema → Structured prompt",
+      "LLM response → Parsed JSON",
+      "JSON → Database records",
+      "Database → Frontend state",
+      "State → UI components"
+    ]
+  },
+  "bottlenecks": [
+    {
+      "location": "smart-goal-processor.ts",
+      "issue": "Overly constrained prompts forcing structured JSON responses",
+      "impact": "Prevents natural LLM conversation flow",
+      "details": "Complex prompts with 300+ lines of instructions, forcing specific JSON schemas"
+    },
+    {
+      "location": "routes/goals.ts",  
+      "issue": "Multiple API endpoints for what should be a single conversation",
+      "impact": "Fragments the conversation across multiple requests",
+      "details": "translate, clarify, interactive-refine endpoints instead of single chat endpoint"
+    },
+    {
+      "location": "ChatClarification.tsx",
+      "issue": "Frontend managing conversation state and flow",
+      "impact": "App logic overrides LLM conversational guidance",
+      "details": "Forces users through specific component flows, tracks confidence scores, manages state"
+    },
+    {
+      "location": "Database layer",
+      "issue": "Saving intermediate states to database",
+      "impact": "Adds latency and complexity to simple conversations",
+      "details": "Every clarification saved as database record"
+    }
+  ],
+  "processingLayers": [
+    {
+      "layer": "Validation",
+      "components": ["Zod schemas", "Input validation", "API parameter checking"],
+      "overhead": "High - prevents flexibility"
+    },
+    {
+      "layer": "Prompt Engineering",
+      "components": ["buildTranslationPrompt", "buildClarificationPrompt", "parseAIResponse"],
+      "overhead": "Very High - constrains LLM capabilities"
+    },
+    {
+      "layer": "State Management",
+      "components": ["Frontend state", "Database persistence", "Session tracking"],
+      "overhead": "High - fragments conversation"
+    },
+    {
+      "layer": "UI Control",
+      "components": ["ChatClarification flow", "Confidence tracking", "Component progression"],
+      "overhead": "High - prevents natural dialog"
+    }
+  ],
+  "simplificationOpportunities": [
+    {
+      "area": "API Design",
+      "current": "Multiple endpoints with complex schemas",
+      "proposed": "Single streaming chat endpoint",
+      "benefit": "Natural conversation flow"
+    },
+    {
+      "area": "LLM Integration",
+      "current": "Structured JSON requests/responses",
+      "proposed": "Natural language in/out with light parsing",
+      "benefit": "Let LLM guide the conversation"
+    },
+    {
+      "area": "Frontend",
+      "current": "Complex state management and flow control",
+      "proposed": "Simple chat interface displaying LLM responses directly",
+      "benefit": "Transparent LLM interaction"
+    },
+    {
+      "area": "Data Flow",
+      "current": "8+ transformation steps",
+      "proposed": "Direct user ↔ LLM communication",
+      "benefit": "Reduced latency and complexity"
+    }
+  ],
+  "keyInsight": "The app is treating the LLM as a structured data service rather than a conversational AI. Every layer adds constraints that prevent the LLM from having natural, helpful conversations with users."
+}

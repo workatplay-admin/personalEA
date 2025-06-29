@@ -77,6 +77,8 @@ All services are designed with OpenAPI 3.1 specifications following contract-fir
 - Node.js 18+ and npm 9+
 - Docker and Docker Compose
 - Git
+- **Valid OpenAI API key** (REQUIRED - no mock data allowed)
+- Valid Claude API key (if using Claude features)
 
 ### 🧪 User Testing Setup (Codespaces)
 
@@ -93,7 +95,8 @@ node verify-setup.js
 **Key Requirements:**
 - Port 3000 set to PUBLIC in Codespaces
 - CORS headers properly configured  
-- OpenAI API key set in environment
+- **REAL OpenAI API key set in environment** (no test/mock keys)
+- **All environments require real API keys** (staging should mirror production)
 
 **User Testing URL:** Codespaces Ports tab → Click 🌐 next to port 5174
 
@@ -101,15 +104,27 @@ node verify-setup.js
 
 PersonalEA uses a centralized configuration approach for managing API keys and secrets:
 
+**⚠️ IMPORTANT: No Mock Data Policy**
+- PersonalEA does NOT support mock or test API keys
+- You MUST use valid, real API keys for all environments
+- The system validates API keys on startup and will fail if invalid
+- This ensures realistic testing and prevents production surprises
+
 1. **Copy the environment template**
    ```bash
    cp .env.example .env
+   # For staging environment:
+   cp .env.staging.example .env.staging
    ```
 
-2. **Configure your OpenAI API key**
+2. **Configure your REAL OpenAI API key**
    ```bash
-   # Edit .env and replace the placeholder with your real API key
+   # Edit .env and replace the placeholder with your REAL API key
+   # Get your key from: https://platform.openai.com/api-keys
    OPENAI_API_KEY=sk-your-actual-openai-api-key-here
+   
+   # NEVER use test keys like 'sk-test-*' or 'mock-key'
+   # The system will validate and reject invalid keys
    ```
 
 3. **How it works**
@@ -164,16 +179,11 @@ cd personalEA
    npm run validate:api
    ```
 
-6. **Start enhanced mock servers for development**
+6. **API Testing Setup**
    ```bash
-   # Quick start with Docker Compose (Recommended)
-   npm run mock:docker
-   
-   # Or use the setup script for full management
-   ./mocks/setup.sh start
-   
-   # Or start individual Prism servers
-   npm run mock:all
+   # PersonalEA requires real API connections
+   # No mock servers are used - ensure your API keys are configured
+   # The system will validate API connectivity on startup
    ```
 
 7. **Access services**
@@ -295,37 +305,31 @@ Access interactive API documentation:
 
 ## 🎯 Client Development
 
-### Enhanced Mock Servers
+### API Integration
 
-PersonalEA provides production-ready mock servers with realistic data and stateful responses:
+PersonalEA requires real API connections for all functionality:
 
-**Features:**
-- **Realistic Data**: Business emails, personal goals, calendar events with relationships
-- **Stateful Responses**: Created resources persist, updates modify existing data
-- **Cross-Service Integration**: Mock data includes realistic relationships between services
-- **Docker Compose Setup**: Easy orchestration with health checks and logging
-- **CORS Support**: Ready for frontend development
+**No Mock Data Policy:**
+- **Real API Keys Required**: All environments need valid API keys
+- **API Validation**: System validates keys on startup
+- **Realistic Testing**: Using real APIs ensures accurate behavior
+- **Production Parity**: Staging environment mirrors production exactly
+- **No Test Keys**: Mock/test keys will be rejected
 
-**Quick Start:**
+**Service Endpoints:**
+- Goal & Strategy Service: http://localhost:3000
+- Email Processing Service: http://localhost:3001
+- Calendar Service: http://localhost:3003 (when implemented)
+
+**API Key Troubleshooting:**
 ```bash
-# Start all enhanced mock servers
-npm run mock:docker
+# Validate your API key
+curl https://api.openai.com/v1/models \
+  -H "Authorization: Bearer $OPENAI_API_KEY"
 
-# Or use the management script
-./mocks/setup.sh start
-
-# Check service health
-npm run mock:status
-
-# View logs
-npm run mock:docker:logs
+# Check service startup logs for API validation errors
+docker-compose logs goal-strategy-service | grep "API"
 ```
-
-**Service URLs:**
-- Email Service: http://localhost:8083
-- Goal & Strategy Service: http://localhost:8085
-- Calendar Service: http://localhost:8086
-- Mock Data Server: http://localhost:8090
 
 ### Client Development Kit
 

@@ -23,8 +23,8 @@ const envSchema = z.object({
   GMAIL_CLIENT_SECRET: z.string().optional(),
   GMAIL_REDIRECT_URI: z.string().url().optional(),
   
-  // AI Services
-  OPENAI_API_KEY: z.string().optional(),
+  // AI Services (REQUIRED)
+  OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required for AI processing'),
   OPENAI_MODEL: z.string().default('gpt-4'),
   
   // CORS
@@ -39,7 +39,17 @@ const envSchema = z.object({
 });
 
 // Validate environment variables
-const env = envSchema.parse(process.env);
+let env: z.infer<typeof envSchema>;
+
+try {
+  env = envSchema.parse(process.env);
+} catch (error) {
+  console.error('❌ Invalid environment configuration:', error);
+  console.error('\n⚠️  Missing required environment variables.');
+  console.error('Please ensure all required API keys are configured in your .env file.');
+  console.error('See .env.example for the complete list of required variables.\n');
+  process.exit(1);
+}
 
 export const config = {
   environment: env.NODE_ENV,
