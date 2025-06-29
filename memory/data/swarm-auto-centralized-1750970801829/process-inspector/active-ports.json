@@ -1,0 +1,240 @@
+{
+  "timestamp": "2025-06-26T20:47:00Z",
+  "active_ports": {
+    "listening_ports": [
+      {
+        "port": 53,
+        "address": "127.0.0.53",
+        "service": "DNS resolver",
+        "protocol": "TCP/UDP",
+        "description": "System DNS resolver service"
+      },
+      {
+        "port": 2000,
+        "address": "0.0.0.0",
+        "service": "Unknown service",
+        "protocol": "TCP",
+        "description": "Unknown service listening on all interfaces"
+      },
+      {
+        "port": 2222,
+        "address": "0.0.0.0",
+        "service": "SSH alternative",
+        "protocol": "TCP",
+        "description": "Alternative SSH port for secure connections"
+      },
+      {
+        "port": 3000,
+        "address": "0.0.0.0",
+        "service": "Mock API Server",
+        "protocol": "TCP",
+        "process": "node mock-api-server.js",
+        "pid": 10922,
+        "description": "Mock API server for testing purposes"
+      },
+      {
+        "port": 5432,
+        "address": "0.0.0.0",
+        "service": "PostgreSQL",
+        "protocol": "TCP",
+        "description": "PostgreSQL database server",
+        "container": "personalea-postgres"
+      },
+      {
+        "port": 6379,
+        "address": "0.0.0.0",
+        "service": "Redis",
+        "protocol": "TCP",
+        "description": "Redis in-memory data store",
+        "container": "personalea-redis"
+      },
+      {
+        "port": 8085,
+        "address": "0.0.0.0",
+        "service": "Goal Strategy Service",
+        "protocol": "TCP",
+        "process": "node/tsx src/index.ts",
+        "pid": 141226,
+        "description": "Goal & Strategy backend service"
+      },
+      {
+        "port": 16634,
+        "address": "127.0.0.1",
+        "service": "VS Code IPC",
+        "protocol": "TCP",
+        "description": "VS Code inter-process communication"
+      },
+      {
+        "port": 16635,
+        "address": "127.0.0.1",
+        "service": "VS Code IPC",
+        "protocol": "TCP",
+        "description": "VS Code inter-process communication"
+      },
+      {
+        "port": 24647,
+        "address": "127.0.0.1",
+        "service": "VS Code Extension Host",
+        "protocol": "TCP",
+        "pid": 401,
+        "description": "VS Code extension host process"
+      },
+      {
+        "port": 36907,
+        "address": "127.0.0.1",
+        "service": "VS Code Server",
+        "protocol": "TCP",
+        "pid": 378,
+        "description": "VS Code remote server"
+      },
+      {
+        "port": 43833,
+        "address": "127.0.0.1",
+        "service": "Unknown service",
+        "protocol": "TCP",
+        "description": "Unknown local service"
+      }
+    ],
+    "documented_ports": {
+      "development": [
+        {
+          "port": 3000,
+          "service": "Dialog Gateway / Frontend",
+          "description": "Main web interface entry point"
+        },
+        {
+          "port": 3001,
+          "service": "Email Processing Service",
+          "description": "Email synchronization and processing API"
+        },
+        {
+          "port": 3002,
+          "service": "Goal Service",
+          "description": "Goal management service (placeholder)"
+        },
+        {
+          "port": 3003,
+          "service": "Calendar Service",
+          "description": "Calendar integration service (placeholder)"
+        },
+        {
+          "port": 5174,
+          "service": "Vite Dev Server",
+          "description": "Frontend development server for testing UI"
+        },
+        {
+          "port": 5432,
+          "service": "PostgreSQL Database",
+          "description": "Main database for all services"
+        },
+        {
+          "port": 6379,
+          "service": "Redis Cache",
+          "description": "Caching and session storage"
+        },
+        {
+          "port": 8080,
+          "service": "API Documentation",
+          "description": "Interactive API documentation server"
+        },
+        {
+          "port": 8083,
+          "service": "Email Service Mock",
+          "description": "Mock server for Email Service API"
+        },
+        {
+          "port": 8085,
+          "service": "Goal & Strategy Service",
+          "description": "Goal & Strategy Service API (real or mock)"
+        },
+        {
+          "port": 8086,
+          "service": "Calendar Service Mock",
+          "description": "Mock server for Calendar Service API"
+        },
+        {
+          "port": 8090,
+          "service": "Mock Data Server",
+          "description": "Central mock data management server"
+        }
+      ],
+      "production": [
+        {
+          "port": 3000,
+          "service": "PersonalEA Web Interface",
+          "description": "Main production web application"
+        },
+        {
+          "port": 5432,
+          "service": "PostgreSQL Database",
+          "description": "Production database (localhost only)",
+          "binding": "127.0.0.1"
+        },
+        {
+          "port": 6379,
+          "service": "Redis Cache",
+          "description": "Production cache (localhost only)",
+          "binding": "127.0.0.1"
+        },
+        {
+          "port": 8085,
+          "service": "Goal Strategy Service",
+          "description": "Production Goal & Strategy API"
+        }
+      ],
+      "monitoring": [
+        {
+          "port": 9090,
+          "service": "Prometheus",
+          "description": "Metrics collection and monitoring"
+        },
+        {
+          "port": 3000,
+          "service": "Grafana",
+          "description": "Monitoring dashboards (port conflict with main app)"
+        },
+        {
+          "port": 9100,
+          "service": "Node Exporter",
+          "description": "System metrics exporter"
+        },
+        {
+          "port": 9256,
+          "service": "Process Exporter",
+          "description": "Process-level metrics"
+        },
+        {
+          "port": 9115,
+          "service": "Blackbox Exporter",
+          "description": "Endpoint monitoring"
+        }
+      ]
+    },
+    "docker_services": {
+      "postgres": {
+        "internal_port": 5432,
+        "external_port": 5432,
+        "container": "personalea-postgres",
+        "status": "running"
+      },
+      "redis": {
+        "internal_port": 6379,
+        "external_port": 6379,
+        "container": "personalea-redis",
+        "status": "running"
+      }
+    },
+    "conflicts_and_notes": [
+      {
+        "issue": "Port 3000 conflict",
+        "description": "Multiple services try to use port 3000 (Dialog Gateway, Frontend, Grafana)",
+        "resolution": "Use different ports for each service in production"
+      },
+      {
+        "issue": "Public vs Private binding",
+        "description": "Development uses 0.0.0.0 (all interfaces), production uses 127.0.0.1 (localhost only) for databases",
+        "security": "Production configuration is more secure"
+      }
+    ]
+  }
+}

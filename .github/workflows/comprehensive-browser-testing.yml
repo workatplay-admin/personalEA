@@ -1,0 +1,219 @@
+name: Comprehensive Browser Testing Matrix
+
+on:
+  pull_request:
+    branches: [ main, staging ]
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+
+env:
+  NODE_VERSION: '20.x'
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+jobs:
+  browser-matrix:
+    name: Browser Testing (${{ matrix.browser }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        browser: [chromium, firefox, webkit]
+        include:
+          - os: ubuntu-latest
+            browser: chrome
+          - os: ubuntu-latest
+            browser: msedge
+        exclude:
+          - os: windows-latest
+            browser: webkit  # Safari not available on Windows
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx playwright install ${{ matrix.browser }}
+          
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm ci
+          npm run build
+          npm run dev &
+          npm run openai-api &
+          sleep 10
+          
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:5173 --timeout 60000
+          npx wait-on http://localhost:3001/health --timeout 60000
+          
+      - name: Run browser tests
+        run: |
+          npx playwright test --project=${{ matrix.browser }} \
+            --reporter=html,json,junit \
+            --output-dir=test-results/${{ matrix.os }}-${{ matrix.browser }}
+        env:
+          BROWSER: ${{ matrix.browser }}
+          OS: ${{ matrix.os }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.browser }}
+          path: |
+            test-results/
+            playwright-report/
+            testing/goal-strategy-test/test-results/
+          retention-days: 7
+          
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.os }}-${{ matrix.browser }}
+          path: test-results/screenshots/
+          retention-days: 14
+
+  mobile-testing:
+    name: Mobile Device Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        device: 
+          - 'iPhone 12'
+          - 'iPhone 13 Pro'
+          - 'Pixel 5'
+          - 'Galaxy S21'
+          - 'iPad'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx playwright install chromium webkit
+          
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm ci
+          npm run build
+          npm run dev &
+          npm run openai-api &
+          sleep 10
+          
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:5173 --timeout 60000
+          npx wait-on http://localhost:3001/health --timeout 60000
+          
+      - name: Run mobile tests
+        run: |
+          npx playwright test \
+            --project="Mobile Chrome" \
+            --project="Mobile Safari" \
+            --reporter=html,json \
+            --grep="mobile|responsive" \
+            --output-dir=test-results/mobile-${{ matrix.device }}
+        env:
+          DEVICE: ${{ matrix.device }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          
+      - name: Upload mobile test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-results-${{ matrix.device }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  test-summary:
+    name: Test Results Summary
+    needs: [browser-matrix, mobile-testing]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          path: all-results/
+          
+      - name: Generate test summary
+        run: |
+          echo "# Browser Testing Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Matrix Results" >> $GITHUB_STEP_SUMMARY
+          echo "| OS | Browser | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+          
+          # Process results and add to summary
+          for result_dir in all-results/test-results-*; do
+            if [ -d "$result_dir" ]; then
+              basename="$(basename "$result_dir")"
+              os="$(echo "$basename" | cut -d'-' -f3)"
+              browser="$(echo "$basename" | cut -d'-' -f4)"
+              if [ -f "$result_dir/junit.xml" ]; then
+                status="✅ Passed"
+              else
+                status="❌ Failed"
+              fi
+              echo "| $os | $browser | $status |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Mobile Testing Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Device | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          
+          for result_dir in all-results/mobile-results-*; do
+            if [ -d "$result_dir" ]; then
+              device="$(basename "$result_dir" | sed 's/mobile-results-//')"
+              if [ -f "$result_dir/junit.xml" ]; then
+                status="✅ Passed"
+              else
+                status="❌ Failed"
+              fi
+              echo "| $device | $status |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          
+      - name: Check overall status
+        run: |
+          if [ "${{ needs.browser-matrix.result }}" = "success" ] && [ "${{ needs.mobile-testing.result }}" = "success" ]; then
+            echo "✅ All browser tests passed!"
+            exit 0
+          else
+            echo "❌ Some browser tests failed. Check individual job results."
+            exit 1
+          fi

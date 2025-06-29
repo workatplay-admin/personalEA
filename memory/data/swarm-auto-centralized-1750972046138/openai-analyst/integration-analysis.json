@@ -1,0 +1,76 @@
+{
+  "step": "OpenAI Integration Analysis",
+  "timestamp": "2025-06-26T21:01:35.000Z",
+  "configFiles": [
+    "/workspaces/personalEA/.env.production.example",
+    "/workspaces/personalEA/services/goal-strategy/src/config/environment.ts"
+  ],
+  "integrationPoints": [
+    {
+      "file": "/workspaces/personalEA/testing/goal-strategy-test/src/services/api.ts",
+      "description": "Frontend API client that sends requests with JWT and OpenAI API key headers"
+    },
+    {
+      "file": "/workspaces/personalEA/services/goal-strategy/src/routes/goals.ts",
+      "description": "Backend endpoints for goal translation and clarification"
+    },
+    {
+      "file": "/workspaces/personalEA/services/goal-strategy/src/routes/goals-chat-endpoints.ts",
+      "description": "Backend endpoints for contextual help and component questions"
+    },
+    {
+      "file": "/workspaces/personalEA/services/goal-strategy/src/services/smart-goal-processor.ts",
+      "description": "Core OpenAI integration service that makes actual API calls"
+    }
+  ],
+  "authFlow": {
+    "frontend": {
+      "headers": [
+        "Authorization: Bearer {JWT_TOKEN}",
+        "X-OpenAI-API-Key: {USER_API_KEY}"
+      ],
+      "storage": "apiConfig in memory and axios interceptors"
+    },
+    "backend": {
+      "jwtAuth": "authenticateJWT middleware validates JWT tokens",
+      "apiKeyHandling": "Reads from X-OpenAI-API-Key header or falls back to env.OPENAI_API_KEY",
+      "mockMode": "Uses mock responses when API key starts with 'sk-test-'"
+    }
+  },
+  "sessionHandling": {
+    "problem": "CONVERSATION HISTORY NOT PASSED TO CLARIFICATION PROCESSOR",
+    "details": {
+      "frontend": "ChatClarification.tsx sends conversationHistory in request body",
+      "backend": "/goals/:id/clarify endpoint receives conversationHistory but DOES NOT extract or use it",
+      "processor": "smartGoalProcessor.processClarifications() does NOT receive conversation history"
+    },
+    "codeEvidence": {
+      "frontendSends": {
+        "file": "ChatClarification.tsx",
+        "lines": "267-285",
+        "payload": {
+          "clarifications": "Object with user answers",
+          "goalContext": "Goal metadata",
+          "conversationHistory": "Array of messages"
+        }
+      },
+      "backendReceives": {
+        "file": "goals.ts",
+        "line": "178",
+        "code": "const { clarifications, goalContext } = req.body;",
+        "issue": "conversationHistory is in req.body but NOT extracted"
+      },
+      "processorCalled": {
+        "file": "goals.ts",
+        "lines": "221-226",
+        "code": "smartGoalProcessor.processClarifications(goal.rawGoal, goal.smartCriteria, clarificationAnswers, userApiKey)",
+        "issue": "conversationHistory is NOT passed to processor"
+      }
+    }
+  },
+  "rootCause": {
+    "summary": "The clarify endpoint ignores conversation history, causing AI to lose context",
+    "impact": "Follow-up replies fail because AI doesn't know what was discussed before",
+    "solution": "Extract conversationHistory from req.body and pass it to processClarifications"
+  }
+}

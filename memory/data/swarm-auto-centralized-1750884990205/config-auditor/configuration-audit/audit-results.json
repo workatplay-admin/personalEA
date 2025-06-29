@@ -1,0 +1,170 @@
+{
+  "timestamp": "2025-06-25T20:59:52.455Z",
+  "auditor": "config-auditor",
+  "summary": {
+    "critical_issues": 3,
+    "warnings": 5,
+    "properly_configured": 8,
+    "overall_status": "CRITICAL"
+  },
+  "critical_findings": [
+    {
+      "severity": "CRITICAL",
+      "component": "OpenAI API Key",
+      "issue": "HARDCODED API KEY EXPOSED",
+      "locations": [
+        ".env (line 66)",
+        ".env.production (line 106)",
+        ".env.staging (line 13)"
+      ],
+      "details": "Real OpenAI API key (sk-proj-...) is hardcoded in multiple environment files",
+      "recommendation": "Immediately rotate this API key and use environment-specific secure key management"
+    },
+    {
+      "severity": "CRITICAL",
+      "component": "Mock Mode Detection",
+      "issue": "NO ACTUAL FALLBACK IMPLEMENTATION",
+      "location": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "details": "mockMode variable is defined but never used - no fallback mechanism exists",
+      "recommendation": "Application will fail if API key is invalid - no graceful degradation"
+    },
+    {
+      "severity": "CRITICAL",
+      "component": "Security Keys",
+      "issue": "HARDCODED SECRETS",
+      "locations": [
+        "JWT_SECRET in multiple files",
+        "SESSION_SECRET in multiple files",
+        "EMAIL_ENCRYPTION_KEY in multiple files"
+      ],
+      "details": "Production secrets are hardcoded and exposed in repository",
+      "recommendation": "Use secure secret management (e.g., AWS Secrets Manager, HashiCorp Vault)"
+    }
+  ],
+  "warnings": [
+    {
+      "severity": "WARNING",
+      "component": "Database Passwords",
+      "issue": "Weak/Default Passwords",
+      "details": "Using simple passwords like \"personalea\" in some configurations",
+      "recommendation": "Generate strong random passwords for production"
+    },
+    {
+      "severity": "WARNING",
+      "component": "Test Keys",
+      "issue": "Placeholder Test Keys",
+      "locations": [
+        "services/goal-strategy/.env (line 5)",
+        "services/email-processing/.env (line 20)"
+      ],
+      "details": "Using \"sk-test-key-for-development-only\" placeholders",
+      "recommendation": "Ensure proper key injection in production deployments"
+    },
+    {
+      "severity": "WARNING",
+      "component": "API Configuration",
+      "issue": "No Environment Variable Validation",
+      "details": "api.production.ts uses fallback to \"https://api.personalea.com\" which may not exist",
+      "recommendation": "Implement proper environment validation at startup"
+    },
+    {
+      "severity": "WARNING",
+      "component": "CORS Configuration",
+      "issue": "Hardcoded CORS Origins",
+      "details": "CORS origins are hardcoded in multiple places",
+      "recommendation": "Use environment-specific CORS configuration"
+    },
+    {
+      "severity": "WARNING",
+      "component": "Rate Limiting",
+      "issue": "Default Rate Limits",
+      "details": "Using default rate limits that may not be suitable for production",
+      "recommendation": "Configure production-appropriate rate limits"
+    }
+  ],
+  "properly_configured": [
+    {
+      "component": "Environment Schema Validation",
+      "status": "GOOD",
+      "details": "Using Zod for environment variable validation in goal-strategy service"
+    },
+    {
+      "component": "Feature Flags",
+      "status": "GOOD",
+      "details": "Proper feature flag implementation for enabling/disabling features"
+    },
+    {
+      "component": "API Error Handling",
+      "status": "GOOD",
+      "details": "Comprehensive error handling with retry logic in api.production.ts"
+    },
+    {
+      "component": "Session Storage",
+      "status": "GOOD",
+      "details": "Using secure session storage with encryption in production API"
+    },
+    {
+      "component": "Request Interceptors",
+      "status": "GOOD",
+      "details": "Proper authentication headers and request tracking"
+    },
+    {
+      "component": "Health Checks",
+      "status": "GOOD",
+      "details": "Health check endpoints configured for monitoring"
+    },
+    {
+      "component": "Logging Configuration",
+      "status": "GOOD",
+      "details": "Structured logging with appropriate levels for different environments"
+    },
+    {
+      "component": "TypeScript Usage",
+      "status": "GOOD",
+      "details": "Strong typing for configuration and API interfaces"
+    }
+  ],
+  "environment_analysis": {
+    "development": {
+      "uses_live_keys": false,
+      "has_placeholders": true,
+      "status": "ACCEPTABLE"
+    },
+    "staging": {
+      "uses_live_keys": true,
+      "has_warnings": true,
+      "status": "RISKY"
+    },
+    "production": {
+      "uses_live_keys": true,
+      "has_hardcoded_secrets": true,
+      "status": "CRITICAL"
+    }
+  },
+  "recommendations": {
+    "immediate_actions": [
+      "ROTATE the exposed OpenAI API key immediately",
+      "Remove all hardcoded secrets from repository",
+      "Implement secure secret management system",
+      "Add .env files to .gitignore if not already done"
+    ],
+    "short_term": [
+      "Implement proper fallback mechanisms for external API failures",
+      "Add runtime validation for all required environment variables",
+      "Create environment-specific configuration templates",
+      "Implement secret rotation policies"
+    ],
+    "long_term": [
+      "Migrate to cloud-native secret management",
+      "Implement zero-trust security model",
+      "Add automated security scanning to CI/CD pipeline",
+      "Implement comprehensive audit logging"
+    ]
+  },
+  "compliance_status": {
+    "live_keys_only": "PARTIAL",
+    "no_hardcoded_data": "FAILED",
+    "proper_env_usage": "PARTIAL",
+    "fallback_mechanisms": "FAILED"
+  }
+}

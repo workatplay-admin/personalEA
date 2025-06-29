@@ -1,0 +1,296 @@
+# PersonalEA Alerting Rules
+# Comprehensive monitoring alerts for all services
+
+groups:
+  - name: service_health
+    interval: 30s
+    rules:
+      # Service Down Alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "Service {{ $labels.service }} is down"
+          description: "{{ $labels.service }} on {{ $labels.instance }} has been down for more than 2 minutes."
+          runbook_url: "https://docs.personalea.com/runbooks/service-down"
+
+      # API Service Health
+      - alert: GoalStrategyServiceUnhealthy
+        expr: probe_success{instance="http://goal-strategy-service:3000/api/v1/health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: goal-strategy
+        annotations:
+          summary: "Goal Strategy Service health check failing"
+          description: "Goal Strategy Service health endpoint has been failing for more than 2 minutes."
+
+      - alert: EmailProcessingServiceUnhealthy
+        expr: probe_success{instance="http://email-processing-service:3001/health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: email-processing
+        annotations:
+          summary: "Email Processing Service health check failing"
+          description: "Email Processing Service health endpoint has been failing for more than 2 minutes."
+
+  - name: performance
+    interval: 30s
+    rules:
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: |
+          (100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% (current value: {{ $value }}%) on {{ $labels.instance }}."
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% (current value: {{ $value }}%) on {{ $labels.instance }}."
+
+      # Container Memory Usage
+      - alert: ContainerHighMemoryUsage
+        expr: |
+          (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container {{ $labels.container_label_com_docker_compose_service }} high memory usage"
+          description: "Container memory usage is above 90% of limit (current: {{ $value }}%)."
+
+  - name: database
+    interval: 30s
+    rules:
+      # PostgreSQL Connection Issues
+      - alert: PostgreSQLDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL instance {{ $labels.instance }} is down."
+
+      - alert: PostgreSQLTooManyConnections
+        expr: |
+          sum(pg_stat_activity_count) by (instance) > 0.8 * sum(pg_settings_max_connections) by (instance)
+        for: 5m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL too many connections"
+          description: "PostgreSQL instance {{ $labels.instance }} has too many connections (current: {{ $value }})."
+
+      - alert: PostgreSQLSlowQueries
+        expr: |
+          avg(rate(pg_stat_statements_mean_time_seconds[5m])) by (instance) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL slow queries detected"
+          description: "PostgreSQL instance {{ $labels.instance }} has queries with average execution time > 1s."
+
+  - name: redis
+    interval: 30s
+    rules:
+      # Redis Issues
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: redis
+        annotations:
+          summary: "Redis is down"
+          description: "Redis instance {{ $labels.instance }} is down."
+
+      - alert: RedisHighMemoryUsage
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis high memory usage"
+          description: "Redis memory usage is above 90% (current: {{ $value }}%)."
+
+      - alert: RedisRejectedConnections
+        expr: |
+          increase(redis_rejected_connections_total[5m]) > 0
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis rejecting connections"
+          description: "Redis instance {{ $labels.instance }} has rejected {{ $value }} connections in the last 5 minutes."
+
+  - name: api_performance
+    interval: 30s
+    rules:
+      # API Response Time
+      - alert: APIHighResponseTime
+        expr: |
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API high response time"
+          description: "95th percentile response time is above 2s (current: {{ $value }}s) for {{ $labels.service }}."
+
+      # API Error Rate
+      - alert: APIHighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (service)
+          /
+          sum(rate(http_requests_total[5m])) by (service) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API high error rate"
+          description: "{{ $labels.service }} has error rate above 5% (current: {{ $value }}%)."
+
+      # Rate Limiting
+      - alert: APIRateLimitExceeded
+        expr: |
+          increase(rate_limit_exceeded_total[5m]) > 100
+        labels:
+          severity: warning
+        annotations:
+          summary: "API rate limits being exceeded"
+          description: "{{ $labels.service }} has had {{ $value }} rate limit violations in the last 5 minutes."
+
+  - name: openai_integration
+    interval: 30s
+    rules:
+      # OpenAI API Issues
+      - alert: OpenAIAPIErrors
+        expr: |
+          increase(openai_api_errors_total[5m]) > 10
+        labels:
+          severity: warning
+          service: goal-strategy
+        annotations:
+          summary: "OpenAI API errors detected"
+          description: "{{ $value }} OpenAI API errors in the last 5 minutes."
+
+      - alert: OpenAIAPIHighLatency
+        expr: |
+          histogram_quantile(0.95, rate(openai_request_duration_seconds_bucket[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: goal-strategy
+        annotations:
+          summary: "OpenAI API high latency"
+          description: "95th percentile OpenAI API latency is above 10s (current: {{ $value }}s)."
+
+      - alert: OpenAIRateLimitApproaching
+        expr: |
+          increase(openai_rate_limit_remaining[5m]) < 10
+        labels:
+          severity: warning
+          service: goal-strategy
+        annotations:
+          summary: "OpenAI rate limit approaching"
+          description: "Less than 10 OpenAI API calls remaining in rate limit window."
+
+  - name: disk_space
+    interval: 30s
+    rules:
+      # Disk Space
+      - alert: DiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 10% (current: {{ $value }}%) on {{ $labels.instance }}."
+
+      # Database disk usage
+      - alert: DatabaseDiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql"} / node_filesystem_size_bytes{mountpoint="/var/lib/postgresql"}) * 100 < 20
+        for: 5m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "Database disk space low"
+          description: "PostgreSQL disk space is below 20% (current: {{ $value }}%)."
+
+  - name: security
+    interval: 30s
+    rules:
+      # Failed Authentication Attempts
+      - alert: HighFailedAuthAttempts
+        expr: |
+          increase(auth_failed_attempts_total[5m]) > 50
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "High number of failed authentication attempts"
+          description: "{{ $value }} failed authentication attempts in the last 5 minutes on {{ $labels.service }}."
+
+      # JWT Token Issues
+      - alert: JWTTokenValidationErrors
+        expr: |
+          increase(jwt_validation_errors_total[5m]) > 20
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "JWT token validation errors"
+          description: "{{ $value }} JWT validation errors in the last 5 minutes on {{ $labels.service }}."
+
+  - name: business_metrics
+    interval: 30s
+    rules:
+      # Goal Processing
+      - alert: GoalProcessingStalled
+        expr: |
+          increase(goals_processed_total[10m]) == 0 and goals_pending_total > 0
+        for: 10m
+        labels:
+          severity: warning
+          service: goal-strategy
+        annotations:
+          summary: "Goal processing appears stalled"
+          description: "No goals processed in the last 10 minutes despite {{ $value }} pending goals."
+
+      # Email Processing
+      - alert: EmailProcessingBacklog
+        expr: |
+          emails_queue_size > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: email-processing
+        annotations:
+          summary: "Email processing backlog growing"
+          description: "Email queue has {{ $value }} messages waiting to be processed."

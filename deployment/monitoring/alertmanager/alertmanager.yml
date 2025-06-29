@@ -1,0 +1,87 @@
+global:
+  resolve_timeout: 5m
+  # SMTP configuration
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'personalea-alerts@example.com'
+  smtp_auth_username: '{{ ALERTMANAGER_EMAIL_USERNAME }}'
+  smtp_auth_password: '{{ ALERTMANAGER_EMAIL_PASSWORD }}'
+  smtp_require_tls: true
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# The root route on which each incoming alert enters.
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+  
+  routes:
+    # Critical alerts
+    - match:
+        severity: critical
+      receiver: 'critical-receiver'
+      continue: true
+      
+    # Database alerts
+    - match:
+        team: database
+      receiver: 'database-team'
+      
+    # Platform alerts
+    - match:
+        team: platform
+      receiver: 'platform-team'
+
+# Inhibition rules
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: 'team@example.com'
+        headers:
+          Subject: 'PersonalEA Alert: {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>PersonalEA Alert</h2>
+          <p><b>Alert:</b> {{ .GroupLabels.alertname }}</p>
+          <p><b>Severity:</b> {{ .CommonLabels.severity }}</p>
+          <p><b>Summary:</b> {{ .CommonAnnotations.summary }}</p>
+          <p><b>Description:</b> {{ .CommonAnnotations.description }}</p>
+          
+  - name: 'critical-receiver'
+    email_configs:
+      - to: 'oncall@example.com'
+        send_resolved: true
+    webhook_configs:
+      - url: '{{ ALERTMANAGER_WEBHOOK_URL }}'
+        send_resolved: true
+    pagerduty_configs:
+      - service_key: '{{ PAGERDUTY_SERVICE_KEY }}'
+        severity: 'critical'
+        
+  - name: 'database-team'
+    email_configs:
+      - to: 'database-team@example.com'
+    slack_configs:
+      - api_url: '{{ SLACK_DATABASE_WEBHOOK }}'
+        channel: '#database-alerts'
+        title: 'Database Alert'
+        text: '{{ .CommonAnnotations.summary }}'
+        
+  - name: 'platform-team'
+    email_configs:
+      - to: 'platform-team@example.com'
+    slack_configs:
+      - api_url: '{{ SLACK_PLATFORM_WEBHOOK }}'
+        channel: '#platform-alerts'
+        title: 'Platform Alert'
+        text: '{{ .CommonAnnotations.summary }}'

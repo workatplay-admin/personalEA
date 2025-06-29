@@ -3,7 +3,6 @@ import { BasePage } from './BasePage';
 
 export class ApiConfigPage extends BasePage {
   readonly apiKeyInput: Locator;
-  readonly apiUrlInput: Locator;
   readonly saveButton: Locator;
   readonly testConnectionButton: Locator;
   readonly connectionStatus: Locator;
@@ -11,20 +10,15 @@ export class ApiConfigPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.apiKeyInput = page.locator('[data-testid="api-key-input"]');
-    this.apiUrlInput = page.locator('[data-testid="api-url-input"]');
-    this.saveButton = page.locator('[data-testid="save-config-button"]');
+    this.apiKeyInput = page.locator('input[placeholder*="API key"], input[placeholder*="OpenAI API Key"]');
+    this.saveButton = page.locator('button:has-text("Configure API"), button:has-text("Save Configuration")');
     this.testConnectionButton = page.locator('[data-testid="test-connection-button"]');
     this.connectionStatus = page.locator('[data-testid="connection-status"]');
-    this.configForm = page.locator('[data-testid="api-config-form"]');
+    this.configForm = page.locator('[data-testid="api-config-form"], form');
   }
 
   async fillApiKey(apiKey: string) {
     await this.apiKeyInput.fill(apiKey);
-  }
-
-  async fillApiUrl(apiUrl: string) {
-    await this.apiUrlInput.fill(apiUrl);
   }
 
   async clickSave() {
@@ -35,9 +29,8 @@ export class ApiConfigPage extends BasePage {
     await this.testConnectionButton.click();
   }
 
-  async configureApi(apiKey: string, apiUrl: string = 'http://localhost:3001') {
+  async configureApi(apiKey: string, apiUrl?: string) {
     await this.fillApiKey(apiKey);
-    await this.fillApiUrl(apiUrl);
     await this.clickSave();
     
     // Wait for configuration to be saved and step to advance

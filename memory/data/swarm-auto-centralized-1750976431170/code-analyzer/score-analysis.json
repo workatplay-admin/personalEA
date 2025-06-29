@@ -1,0 +1,82 @@
+{
+  "analysisType": "SMART Goal Score Update Mechanism",
+  "timestamp": "2025-06-26T22:23:30.655Z",
+  "currentImplementationFlaws": {
+    "mainIssue": "Scores are not calculated by functions but are returned by AI based on prompts",
+    "rootCause": "The buildClarificationPrompt in smart-goal-processor.ts (lines 299-336) contains restrictive instructions",
+    "specificProblems": [
+      "Line 312: 'Keep confidence LOW (0.3-0.5) unless the user provided comprehensive details' - This instruction prevents score increases",
+      "No separate calculateSpecificityScore(), calculateMeasurabilityScore(), or calculateTimeBoundScore() functions exist",
+      "Scores are entirely dependent on AI interpretation of the prompt, not on objective analysis of user input",
+      "The AI is explicitly told to be conservative with confidence updates"
+    ]
+  },
+  
+  "dataFlow": {
+    "step1": "ChatClarification.tsx calls goalAPI.clarifyGoal() with user responses (line 403)",
+    "step2": "API sends clarifications to backend /goals/:id/clarify endpoint",
+    "step3": "Backend calls smartGoalProcessor.processClarifications() (goals.ts line 227)",
+    "step4": "processClarifications builds a prompt with restrictive confidence rules",
+    "step5": "AI returns conservative confidence scores based on the restrictive prompt",
+    "step6": "Updated goal with low confidence scores is returned to frontend"
+  },
+  
+  "exactLocationsNeedingFixes": [
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "lines": "312-313",
+      "currentCode": "Keep confidence LOW (0.3-0.5) unless the user provided comprehensive details",
+      "issue": "This instruction forces AI to keep scores low even when users provide good details"
+    },
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "lines": "326-334",
+      "currentCode": "confidence: 0.3-0.5 in JSON response format",
+      "issue": "Hard-coded low confidence range in expected response"
+    },
+    {
+      "file": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "lines": "309-315",
+      "currentCode": "CRITICAL RULES section",
+      "issue": "Overly restrictive rules preventing proper score updates"
+    }
+  ],
+  
+  "recommendedCodeChanges": [
+    {
+      "location": "buildClarificationPrompt method",
+      "change": "Replace restrictive confidence rules with progressive scoring based on information completeness",
+      "example": "If user provides specific metrics, increase measurable confidence to 0.7-0.9"
+    },
+    {
+      "location": "Add new scoring functions",
+      "change": "Create objective scoring functions that analyze user input for specific keywords and patterns",
+      "functions": [
+        "calculateSpecificityScore(userInput, currentValue) - Check for who, what, where, when details",
+        "calculateMeasurabilityScore(userInput, currentValue) - Check for numbers, metrics, percentages",
+        "calculateTimeBoundScore(userInput, currentValue) - Check for dates, deadlines, timeframes"
+      ]
+    },
+    {
+      "location": "processClarifications method",
+      "change": "After AI response, apply objective scoring functions to adjust confidence scores",
+      "implementation": "Merge AI suggestions with objective score calculations"
+    }
+  ],
+  
+  "stateManagementIssues": [
+    "No local score recalculation after user input",
+    "Complete dependency on AI response for scoring",
+    "No validation of AI-returned scores against user input quality"
+  ],
+  
+  "asyncAwaitIssues": [
+    "No async issues found - the problem is in the scoring logic, not the async flow"
+  ],
+  
+  "summaryOfFindings": {
+    "primaryIssue": "The SMART goal processor uses AI-generated confidence scores based on a prompt that explicitly instructs the AI to keep scores low (0.3-0.5), preventing proper score increases when users provide detailed information",
+    "missingFunctions": "There are no calculateSpecificityScore(), calculateMeasurabilityScore(), or calculateTimeBoundScore() functions - all scoring is delegated to the AI based on the restrictive prompt",
+    "criticalFix": "The buildClarificationPrompt method needs to be rewritten to allow progressive confidence scoring based on the quality and completeness of user input"
+  }
+}

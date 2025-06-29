@@ -1,0 +1,150 @@
+{
+  "project_name": "PersonalEA",
+  "architecture_type": "microservices",
+  "main_components": {
+    "services": {
+      "goal_strategy": {
+        "status": "implemented",
+        "description": "Goal & Strategy Service with 8-step workflow",
+        "technology": "Node.js/Express/TypeScript",
+        "database": "PostgreSQL via Prisma",
+        "port": 3000,
+        "phases_completed": ["phase1", "phase2", "phase3"],
+        "features": [
+          "SMART goal processing",
+          "Milestone generation",
+          "WBS creation",
+          "Task estimation",
+          "Dependency mapping",
+          "Chat clarification with OpenAI"
+        ]
+      },
+      "email_processing": {
+        "status": "implemented",
+        "description": "Email Processing Service",
+        "technology": "Node.js/Express/TypeScript",
+        "database": "PostgreSQL via Prisma",
+        "port": 3001,
+        "features": [
+          "Gmail provider integration",
+          "AI-powered email processing",
+          "Email sync with Redis queue",
+          "JWT authentication"
+        ]
+      },
+      "calendar": {
+        "status": "not_implemented",
+        "description": "Calendar synchronization service",
+        "critical": true,
+        "blocking": "Full workflow completion"
+      },
+      "dialog_gateway": {
+        "status": "planned",
+        "description": "Central dialog management service"
+      }
+    },
+    "frontend": {
+      "testing_ui": {
+        "status": "implemented",
+        "location": "testing/goal-strategy-test",
+        "technology": "React/Vite/TypeScript",
+        "port": 5173,
+        "features": [
+          "API configuration UI",
+          "Goal input form",
+          "Chat clarification interface",
+          "SMART goal display",
+          "Milestones viewer",
+          "WBS display",
+          "Estimation display"
+        ]
+      },
+      "production_ui": {
+        "status": "planned",
+        "location": "ui/config",
+        "port": 3001
+      }
+    },
+    "infrastructure": {
+      "database": {
+        "type": "PostgreSQL",
+        "version": "14-alpine",
+        "port": 5432
+      },
+      "cache": {
+        "type": "Redis",
+        "version": "7-alpine",
+        "port": 6379
+      },
+      "containerization": {
+        "type": "Docker",
+        "orchestration": "docker-compose"
+      }
+    }
+  },
+  "deployment_environments": {
+    "user": {
+      "config_file": "docker-compose.user.yml",
+      "status": "ready",
+      "issues": ["Missing calendar service", "Requires user API keys"]
+    },
+    "staging": {
+      "config_file": "docker-compose.staging.yml",
+      "status": "ready",
+      "limitations": [
+        "No calendar service",
+        "Data sovereignty not implemented",
+        "Shared OpenAI key privacy concern"
+      ]
+    },
+    "test": {
+      "config_file": "docker-compose.test.yml",
+      "status": "available"
+    },
+    "development": {
+      "config_file": "docker-compose.dev.yml",
+      "status": "available"
+    }
+  },
+  "critical_issues": [
+    {
+      "issue": "Calendar service completely missing",
+      "impact": "Blocks full workflow completion",
+      "priority": "critical"
+    },
+    {
+      "issue": "Data sovereignty framework not implemented",
+      "impact": "Privacy concerns with shared API keys",
+      "priority": "high"
+    },
+    {
+      "issue": "Production UI not implemented",
+      "impact": "Only testing UI available",
+      "priority": "medium"
+    }
+  ],
+  "dependencies": {
+    "runtime": {
+      "node": ">=18.0.0",
+      "npm": ">=9.0.0"
+    },
+    "external_apis": {
+      "openai": {
+        "required": true,
+        "purpose": "Chat clarification and AI processing"
+      },
+      "gmail": {
+        "required": false,
+        "purpose": "Email integration"
+      }
+    }
+  },
+  "testing_infrastructure": {
+    "unit_tests": "Jest + TypeScript",
+    "e2e_tests": "Playwright",
+    "contract_tests": "Pact + Dredd + Schemathesis",
+    "visual_tests": "Playwright visual regression",
+    "performance_tests": "Custom benchmarks"
+  },
+  "analysis_timestamp": "2025-01-23T18:33:19.806Z"
+}

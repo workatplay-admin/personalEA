@@ -1,0 +1,107 @@
+{
+  "swarmId": "swarm-auto-centralized-1750974337538",
+  "agents": {
+    "coordinator": {
+      "name": "Lead Coordinator",
+      "status": "active",
+      "tasksCompleted": [
+        "Created coordination plan",
+        "Performed initial code analysis",
+        "Identified root causes",
+        "Documented initial findings"
+      ],
+      "currentTask": "Monitoring agent progress",
+      "lastUpdate": "2025-01-26T21:45:37Z"
+    },
+    "code-analyzer": {
+      "name": "Code Analyzer",
+      "status": "pending",
+      "assignedTasks": [
+        "Analyze SMARTGoalProcessor.translateGoal() method",
+        "Trace OpenAI prompt construction",
+        "Identify confidence score calculation logic",
+        "Check for hardcoded timeframes"
+      ],
+      "tasksCompleted": [],
+      "currentTask": null,
+      "lastUpdate": null
+    },
+    "pattern-detective": {
+      "name": "Pattern Detective",
+      "status": "pending",
+      "assignedTasks": [
+        "Search for automatic timeframe patterns",
+        "Find confidence score patterns",
+        "Identify default values",
+        "Check OpenAI prompts"
+      ],
+      "tasksCompleted": [],
+      "currentTask": null,
+      "lastUpdate": null
+    },
+    "test-auditor": {
+      "name": "Test Auditor",
+      "status": "pending",
+      "assignedTasks": [
+        "Review test expectations",
+        "Identify missing tests",
+        "Find mock response issues",
+        "Check test coverage"
+      ],
+      "tasksCompleted": [],
+      "currentTask": null,
+      "lastUpdate": null
+    },
+    "ai-prompt-analyst": {
+      "name": "AI Prompt Analyst",
+      "status": "waiting_phase2",
+      "assignedTasks": [
+        "Analyze OpenAI prompt templates",
+        "Identify augmentation instructions",
+        "Check for missing constraints",
+        "Review prompt clarity"
+      ],
+      "tasksCompleted": [],
+      "currentTask": null,
+      "lastUpdate": null
+    },
+    "confidence-calculator": {
+      "name": "Confidence Calculator",
+      "status": "waiting_phase2",
+      "assignedTasks": [
+        "Trace confidence calculation",
+        "Identify high default values",
+        "Check validation logic",
+        "Analyze parseAIResponse()"
+      ],
+      "tasksCompleted": [],
+      "currentTask": null,
+      "lastUpdate": null
+    },
+    "timeframe-investigator": {
+      "name": "Timeframe Investigator",
+      "status": "waiting_phase2",
+      "assignedTasks": [
+        "Find 2-year timeframe source",
+        "Check default timeframe logic",
+        "Analyze timeBound handling",
+        "Identify validation gaps"
+      ],
+      "tasksCompleted": [],
+      "currentTask": null,
+      "lastUpdate": null
+    }
+  },
+  "overallProgress": {
+    "phase1": "10%",
+    "phase2": "0%",
+    "phase3": "0%",
+    "blockers": [],
+    "criticalFindings": [
+      "OpenAI prompts encourage goal augmentation",
+      "High confidence scores hardcoded in mocks",
+      "Interactive mode not default"
+    ]
+  },
+  "nextCheckpoint": "2025-01-26T22:00:00Z"
+}

@@ -1,0 +1,171 @@
+{
+  "service_dependencies": {
+    "goal_strategy_service": {
+      "depends_on": ["postgresql", "redis"],
+      "external_apis": ["openai"],
+      "ports_required": [3000],
+      "environment_variables": {
+        "required": [
+          "NODE_ENV",
+          "DATABASE_URL",
+          "REDIS_URL",
+          "JWT_SECRET",
+          "OPENAI_API_KEY"
+        ],
+        "optional": [
+          "LOG_LEVEL",
+          "CORS_ORIGIN"
+        ]
+      },
+      "startup_commands": [
+        "npm install",
+        "npx prisma generate",
+        "npx prisma migrate deploy",
+        "npm run build",
+        "npm start"
+      ],
+      "health_check": {
+        "endpoint": "/api/v1/health",
+        "expected_response": {"status": "ok"}
+      }
+    },
+    "email_processing_service": {
+      "depends_on": ["postgresql", "redis"],
+      "external_apis": ["openai", "gmail"],
+      "ports_required": [3001],
+      "environment_variables": {
+        "required": [
+          "NODE_ENV",
+          "DATABASE_URL",
+          "REDIS_URL",
+          "JWT_SECRET",
+          "EMAIL_ENCRYPTION_KEY"
+        ],
+        "optional": [
+          "OPENAI_API_KEY",
+          "LOG_LEVEL"
+        ]
+      },
+      "startup_commands": [
+        "npm install",
+        "npx prisma generate",
+        "npx prisma migrate deploy",
+        "npm run build",
+        "npm start"
+      ],
+      "health_check": {
+        "endpoint": "/health",
+        "expected_response": {"status": "healthy"}
+      }
+    },
+    "frontend_testing_ui": {
+      "depends_on": ["goal_strategy_service"],
+      "external_apis": [],
+      "ports_required": [5173],
+      "environment_variables": {
+        "required": [],
+        "optional": [
+          "VITE_API_BASE_URL",
+          "VITE_STAGING_MODE"
+        ]
+      },
+      "startup_commands": [
+        "npm install",
+        "npm run dev"
+      ],
+      "health_check": {
+        "endpoint": "/",
+        "expected_response": "HTML content"
+      }
+    },
+    "postgresql": {
+      "depends_on": [],
+      "external_apis": [],
+      "ports_required": [5432],
+      "environment_variables": {
+        "required": [
+          "POSTGRES_DB",
+          "POSTGRES_USER",
+          "POSTGRES_PASSWORD"
+        ]
+      },
+      "docker_image": "postgres:14-alpine",
+      "volumes": ["postgres_data:/var/lib/postgresql/data"],
+      "health_check": {
+        "command": "pg_isready -U personalea -d personalea"
+      }
+    },
+    "redis": {
+      "depends_on": [],
+      "external_apis": [],
+      "ports_required": [6379],
+      "environment_variables": {
+        "optional": ["REDIS_PASSWORD"]
+      },
+      "docker_image": "redis:7-alpine",
+      "volumes": ["redis_data:/data"],
+      "health_check": {
+        "command": "redis-cli ping"
+      }
+    }
+  },
+  "startup_order": [
+    {
+      "phase": 1,
+      "services": ["postgresql", "redis"],
+      "wait_for_health": true
+    },
+    {
+      "phase": 2,
+      "services": ["goal_strategy_service", "email_processing_service"],
+      "wait_for_health": true
+    },
+    {
+      "phase": 3,
+      "services": ["frontend_testing_ui"],
+      "wait_for_health": false
+    }
+  ],
+  "inter_service_communication": {
+    "frontend_to_goal_strategy": {
+      "protocol": "HTTP REST",
+      "authentication": "JWT Bearer Token",
+      "endpoints": [
+        "/api/v1/auth/generate-jwt",
+        "/api/v1/goals",
+        "/api/v1/milestones",
+        "/api/v1/wbs",
+        "/api/v1/estimations"
+      ]
+    },
+    "goal_strategy_to_openai": {
+      "protocol": "HTTPS",
+      "authentication": "API Key",
+      "purpose": "Chat clarification and AI processing"
+    },
+    "email_service_to_gmail": {
+      "protocol": "OAuth2/IMAP",
+      "authentication": "OAuth2 tokens",
+      "purpose": "Email synchronization"
+    }
+  },
+  "missing_services": {
+    "calendar_service": {
+      "impact": "Cannot sync with calendars or create events",
+      "planned_features": [
+        "Google Calendar sync",
+        "Outlook Calendar sync",
+        "Apple Calendar sync",
+        "CalDAV support"
+      ]
+    },
+    "dialog_gateway": {
+      "impact": "No centralized conversation management",
+      "planned_features": [
+        "Unified chat interface",
+        "Context management",
+        "Multi-service coordination"
+      ]
+    }
+  }
+}

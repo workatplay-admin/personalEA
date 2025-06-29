@@ -30,6 +30,19 @@ curl -sL https://raw.githubusercontent.com/workatplay-admin/personalEA/[1;33m�
 - [❓ FAQ](docs/faq.md) - Common questions and troubleshooting
 - [⚙️ Configuration Guide](docs/configuration-management-plan.md) - Easy configuration options
 
+### 🔒 Privacy & Security
+
+**PersonalEA respects your privacy:**
+- ✅ **Local Deployment**: Your data stays on your hardware
+- ✅ **Email Consent**: Explicit consent required before processing emails  
+- ✅ **LLM Choice**: Use OpenAI, local Llama, or any compatible AI
+- ✅ **No Hardcoded Keys**: Bring your own API keys
+- ✅ **Open Source**: Full transparency, audit the code yourself
+
+**Quick Security Setup:**
+- [🛡️ Security Deployment Guide](docs/SECURITY_DEPLOYMENT_GUIDE.md) - Secure API key setup
+- [🔐 Privacy Implementation Plan](docs/PRIVACY_IMPLEMENTATION_PLAN.md) - User consent & LLM abstraction
+
 ---
 
 ## 🛠️ For Developers

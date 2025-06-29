@@ -1,0 +1,69 @@
+{
+  "verification_timestamp": "2025-06-29T17:08:35Z",
+  "commit_status": "NO_RECENT_COMMIT",
+  "last_commit": {
+    "hash": "42804680272bd6710c6cb7b8b0dfd009c85ccf79",
+    "time": "4 days ago",
+    "message": "feat: Add comprehensive debugging suite and environment diagnostics",
+    "author": "David Gratton <david.gratton@workatplay.com>"
+  },
+  "repository_state": {
+    "branch": "Claude-Flow",
+    "is_clean": false,
+    "total_uncommitted_changes": 111,
+    "breakdown": {
+      "modified_files": 21,
+      "deleted_files": 7,
+      "untracked_files": 83
+    }
+  },
+  "uncommitted_changes": {
+    "modified": [
+      ".claude/config.json",
+      ".env.production",
+      ".env.staging.example",
+      ".gitignore",
+      "README.md",
+      "docker-compose.dev.yml",
+      "docker-compose.user.yml",
+      "memory/data/entries.json",
+      "services/email-processing/Dockerfile",
+      "services/email-processing/package.json",
+      "services/goal-strategy/src/index.ts",
+      "services/goal-strategy/src/routes/goals.ts",
+      "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "testing/goal-strategy-test/playwright.config.ts",
+      "testing/goal-strategy-test/src/components/ApiConfig.tsx",
+      "testing/goal-strategy-test/src/components/ChatClarification.tsx",
+      "testing/goal-strategy-test/src/components/GoalInput.tsx",
+      "testing/goal-strategy-test/src/services/api.ts",
+      "testing/goal-strategy-test/tests/e2e/automated-user-testing.spec.ts",
+      "testing/goal-strategy-test/tests/e2e/page-objects/ApiConfigPage.ts",
+      "testing/goal-strategy-test/vite.config.ts"
+    ],
+    "deleted": [
+      "memory/backups/backup-2025-06-25T17-32-40-778Z.json",
+      "memory/backups/backup-2025-06-25T17-32-43-378Z.json",
+      "memory/backups/backup-2025-06-25T17-32-53-760Z.json",
+      "memory/backups/backup-2025-06-25T17-33-03-237Z.json",
+      "memory/backups/backup-2025-06-25T19-06-21-995Z.json",
+      "memory/backups/backup-2025-06-25T19-06-29-376Z.json",
+      "memory/backups/backup-2025-06-25T19-08-17-972Z.json"
+    ],
+    "untracked_count": 83
+  },
+  "issues_identified": [
+    "No recent commit was made - all changes remain uncommitted",
+    "Large number of untracked files (83) need attention",
+    "Critical configuration files modified but not committed",
+    "Multiple backup files deleted but changes not committed"
+  ],
+  "recommendations": [
+    "Review and stage modified configuration files (.env.production, .gitignore, etc.)",
+    "Decide which untracked files should be added to version control",
+    "Consider adding deployment/ and testing/e2e/ directories if they contain important code",
+    "Create .gitignore entries for files that should not be tracked",
+    "Commit changes in logical groups rather than one large commit",
+    "Consider creating separate commits for: configuration changes, code changes, test additions, and documentation"
+  ]
+}

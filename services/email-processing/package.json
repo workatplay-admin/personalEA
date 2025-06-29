@@ -13,7 +13,12 @@
     "lint:fix": "eslint src/**/*.ts --fix",
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["email", "processing", "ai", "microservice"],
+  "keywords": [
+    "email",
+    "processing",
+    "ai",
+    "microservice"
+  ],
   "author": "PersonalEA Team",
   "license": "MIT",
   "dependencies": {

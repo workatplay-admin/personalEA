@@ -19,7 +19,7 @@
     ],
     "createdAt": "1970-01-01T00:00:00.000Z",
     "updatedAt": "1970-01-01T00:00:00.000Z",
-    "lastAccessedAt": "1970-01-01T00:00:00.000Z"
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z"
   },
   {
     "id": "entry_mc977spv_nsjr1fg1f",
@@ -61,7 +61,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T14:35:14.851Z",
     "updatedAt": "2025-06-23T14:35:14.851Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 1033,
     "compressed": false,
@@ -107,7 +107,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T14:35:18.507Z",
     "updatedAt": "2025-06-23T14:35:18.507Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 1252,
     "compressed": true,
@@ -182,7 +182,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T14:35:20.245Z",
     "updatedAt": "2025-06-23T14:35:20.245Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 1958,
     "compressed": true,
@@ -250,7 +250,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T14:35:32.572Z",
     "updatedAt": "2025-06-23T14:35:32.572Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 1369,
     "compressed": true,
@@ -270,7 +270,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:11:10.484Z",
     "updatedAt": "2025-06-23T18:11:10.484Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 4991,
     "compressed": true,
@@ -290,7 +290,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:11:11.737Z",
     "updatedAt": "2025-06-23T18:11:11.737Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 6888,
     "compressed": true,
@@ -310,7 +310,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:11:23.613Z",
     "updatedAt": "2025-06-23T18:11:23.613Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 6845,
     "compressed": true,
@@ -330,7 +330,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:11:45.377Z",
     "updatedAt": "2025-06-23T18:11:45.377Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 17024,
     "compressed": true,
@@ -372,7 +372,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:48:38.386Z",
     "updatedAt": "2025-06-23T18:48:38.386Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 654,
     "compressed": false,
@@ -420,7 +420,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:50:09.727Z",
     "updatedAt": "2025-06-23T18:50:09.727Z",
-    "lastAccessedAt": "2025-06-24T14:14:02.909Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 703,
     "compressed": false,
@@ -469,7 +469,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:51:59.533Z",
     "updatedAt": "2025-06-23T18:51:59.533Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 828,
     "compressed": false,
@@ -527,7 +527,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:57:57.874Z",
     "updatedAt": "2025-06-23T18:57:57.874Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 886,
     "compressed": false,
@@ -547,7 +547,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-23T18:58:15.714Z",
     "updatedAt": "2025-06-23T18:58:15.714Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2334,
     "compressed": true,
@@ -567,7 +567,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T14:03:27.519Z",
     "updatedAt": "2025-06-24T14:03:27.519Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2961,
     "compressed": true,
@@ -587,7 +587,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T14:12:23.291Z",
     "updatedAt": "2025-06-24T14:12:23.291Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 33645,
     "compressed": true,
@@ -607,7 +607,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T14:12:32.484Z",
     "updatedAt": "2025-06-24T14:12:32.484Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 21515,
     "compressed": true,
@@ -627,7 +627,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T14:12:40.804Z",
     "updatedAt": "2025-06-24T14:12:40.804Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 17240,
     "compressed": true,
@@ -647,7 +647,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T14:12:47.721Z",
     "updatedAt": "2025-06-24T14:12:47.721Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 14598,
     "compressed": true,
@@ -667,7 +667,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T14:13:45.312Z",
     "updatedAt": "2025-06-24T14:13:45.312Z",
-    "lastAccessedAt": "2025-06-24T19:51:41.269Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 10656,
     "compressed": true,
@@ -687,7 +687,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T14:34:44.782Z",
     "updatedAt": "2025-06-24T14:34:44.782Z",
-    "lastAccessedAt": "2025-06-25T16:38:04.165Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 3936,
     "compressed": true,
@@ -707,7 +707,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T15:05:43.244Z",
     "updatedAt": "2025-06-24T15:05:43.244Z",
-    "lastAccessedAt": "2025-06-25T16:38:04.165Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2988,
     "compressed": true,
@@ -727,7 +727,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T15:11:04.669Z",
     "updatedAt": "2025-06-24T15:11:04.669Z",
-    "lastAccessedAt": "2025-06-25T16:38:04.165Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 3806,
     "compressed": true,
@@ -747,7 +747,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T17:34:21.585Z",
     "updatedAt": "2025-06-24T17:34:21.585Z",
-    "lastAccessedAt": "2025-06-25T16:38:04.165Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 6973,
     "compressed": true,
@@ -767,7 +767,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T17:34:39.565Z",
     "updatedAt": "2025-06-24T17:34:39.565Z",
-    "lastAccessedAt": "2025-06-25T16:38:04.165Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 1300,
     "compressed": true,
@@ -787,7 +787,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T17:39:35.022Z",
     "updatedAt": "2025-06-24T17:39:35.022Z",
-    "lastAccessedAt": "2025-06-25T16:57:30.336Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2506,
     "compressed": true,
@@ -807,7 +807,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T17:48:16.092Z",
     "updatedAt": "2025-06-24T17:48:16.092Z",
-    "lastAccessedAt": "2025-06-25T16:57:30.336Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2368,
     "compressed": true,
@@ -868,7 +868,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T17:51:35.232Z",
     "updatedAt": "2025-06-24T17:51:35.232Z",
-    "lastAccessedAt": "2025-06-25T16:57:30.336Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 989,
     "compressed": false,
@@ -904,7 +904,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T18:09:28.385Z",
     "updatedAt": "2025-06-24T18:09:28.385Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 840,
     "compressed": false,
@@ -924,7 +924,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T18:18:04.647Z",
     "updatedAt": "2025-06-24T18:18:04.647Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2731,
     "compressed": true,
@@ -944,7 +944,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T18:23:12.317Z",
     "updatedAt": "2025-06-24T18:23:12.317Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 1785,
     "compressed": true,
@@ -964,7 +964,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T19:52:17.353Z",
     "updatedAt": "2025-06-24T19:52:17.353Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 3685,
     "compressed": true,
@@ -984,7 +984,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T19:52:54.695Z",
     "updatedAt": "2025-06-24T19:52:54.695Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2274,
     "compressed": true,
@@ -1004,7 +1004,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T19:55:58.384Z",
     "updatedAt": "2025-06-24T19:55:58.384Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 2509,
     "compressed": true,
@@ -1024,7 +1024,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T20:38:10.900Z",
     "updatedAt": "2025-06-24T20:38:10.900Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 1419,
     "compressed": true,
@@ -1056,7 +1056,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T21:17:55.390Z",
     "updatedAt": "2025-06-24T21:17:55.390Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 479,
     "compressed": false,
@@ -1086,7 +1086,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T21:35:52.344Z",
     "updatedAt": "2025-06-24T21:35:52.344Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 476,
     "compressed": false,
@@ -1125,7 +1125,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-24T21:36:51.904Z",
     "updatedAt": "2025-06-24T21:36:51.904Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 524,
     "compressed": false,
@@ -1161,7 +1161,7 @@
     "namespace": "swarm-testing-centralized-1750818479518",
     "createdAt": "2025-06-25T02:29:31.311Z",
     "updatedAt": "2025-06-25T02:29:31.311Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z"
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z"
   },
   {
     "id": "entry_mcbdgez8_74q3nidxe",
@@ -1175,7 +1175,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T03:05:26.997Z",
     "updatedAt": "2025-06-25T03:05:26.997Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 4055,
     "compressed": true,
@@ -1204,7 +1204,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T16:39:16.274Z",
     "updatedAt": "2025-06-25T16:39:16.274Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 287,
     "compressed": false,
@@ -1224,7 +1224,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T16:40:43.410Z",
     "updatedAt": "2025-06-25T16:40:43.410Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z",
     "version": 1,
     "size": 202,
     "compressed": false,
@@ -1244,7 +1244,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T16:40:46.785Z",
     "updatedAt": "2025-06-25T16:40:46.785Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
     "version": 1,
     "size": 178,
     "compressed": false,
@@ -1264,7 +1264,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T16:41:53.004Z",
     "updatedAt": "2025-06-25T16:41:53.004Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
     "version": 1,
     "size": 206,
     "compressed": false,
@@ -1284,7 +1284,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T16:41:54.737Z",
     "updatedAt": "2025-06-25T16:41:54.737Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
     "version": 1,
     "size": 148,
     "compressed": false,
@@ -1304,7 +1304,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T16:59:17.011Z",
     "updatedAt": "2025-06-25T16:59:17.011Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
     "version": 1,
     "size": 6381,
     "compressed": true,
@@ -1324,7 +1324,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T17:00:02.639Z",
     "updatedAt": "2025-06-25T17:00:02.639Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
     "version": 1,
     "size": 4021,
     "compressed": true,
@@ -1344,7 +1344,7 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T17:19:01.267Z",
     "updatedAt": "2025-06-25T17:19:01.267Z",
-    "lastAccessedAt": "2025-06-25T19:06:29.305Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
     "version": 1,
     "size": 1728,
     "compressed": true,
@@ -1391,11 +1391,862 @@
     "accessLevel": "shared",
     "createdAt": "2025-06-25T19:08:17.966Z",
     "updatedAt": "2025-06-25T19:08:17.966Z",
-    "lastAccessedAt": "2025-06-25T19:08:17.966Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
     "version": 1,
     "size": 1044,
     "compressed": false,
     "checksum": "7cb54b724d9bef589bb401e3cbe8947b64a980495fe2551cbdc5ddf9797a8148",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mccfdtma_lia5dqqzc",
+    "key": "swarm-auto-centralized-1750884172380/env-setup/config",
+    "value": "{\"status\":\"configured\",\"timestamp\":\"2025-06-25T20:47:10Z\",\"environment_files\":[\".env.production\",\".env.staging\",\".env.user\"],\"configurations\":{\"openai_api_key\":{\"status\":\"configured\",\"source\":\".env.user\",\"applied_to\":[\".env.production\",\".env.staging\"]},\"database\":{\"postgres_password\":\"configured\",\"connection_strings\":\"updated\",\"status\":\"ready\"},\"redis\":{\"redis_password\":\"configured\",\"connection_urls\":\"updated\",\"status\":\"ready\"},\"security\":{\"jwt_secret\":\"configured\",\"session_secret\":\"configured\",\"email_encryption_key\":\"configured\",\"status\":\"secured\"},\"email_service\":{\"encryption_key\":\"configured\",\"oauth_encryption\":\"pending_user_credentials\",\"status\":\"partially_configured\"},\"gemini_api\":{\"status\":\"not_required\",\"note\":\"Milestone service uses OpenAI, not Gemini\"}},\"missing_configurations\":[\"Gmail OAuth credentials\",\"Outlook OAuth credentials\",\"CORS_ORIGIN for production domain\",\"SSL certificates\"],\"notes\":[\"All critical API keys and passwords configured\",\"Email OAuth credentials need user-specific setup\",\"Production domain configuration pending\",\"SSL certificates need to be generated for HTTPS\"],\"validation\":{\"openai_key_format\":\"valid\",\"password_strength\":\"strong\",\"encryption_keys\":\"256-bit secure\"}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-25T20:47:11.410Z",
+    "updatedAt": "2025-06-25T20:47:11.410Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 1386,
+    "compressed": true,
+    "checksum": "4afa918650b737425a7715b5fb5b6bc9d1bc9d23366c2ec85826310877f44e3b",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "key": "swarm-auto-centralized-1750886886211/testing/protocols",
+    "data": {
+      "step": "Testing Protocol Design",
+      "timestamp": "2025-06-25T21:31:22.206Z",
+      "analysis": {
+        "existingStrengths": [
+          "Comprehensive Playwright configuration with multi-browser support",
+          "Advanced Page Object Model implementation",
+          "Realistic user scenarios with persona-based testing",
+          "Sophisticated E2E workflows (10 detailed test cases)",
+          "Performance benchmarking and accessibility compliance",
+          "Contract testing with Pact, Dredd, Schemathesis",
+          "Stress testing with concurrent user simulation",
+          "Network resilience and error recovery testing"
+        ],
+        "enhancementOpportunities": [
+          "Advanced CI/CD pipeline integration",
+          "Enhanced visual regression testing protocols",
+          "Production environment testing workflows",
+          "Advanced cross-browser compatibility matrices",
+          "Automated performance monitoring alerts",
+          "Enhanced error recovery and chaos testing",
+          "Advanced accessibility testing automation"
+        ]
+      },
+      "protocols": {
+        "framework": "Playwright (Primary) + Jest (Unit) + Contract Testing Suite",
+        "configuration": {
+          "multiEnvironment": {
+            "development": {
+              "baseUrl": "http://localhost:5173",
+              "apiUrl": "http://localhost:3001",
+              "workers": "unlimited",
+              "retries": 0
+            },
+            "staging": {
+              "baseUrl": "https://staging.personalea.com",
+              "apiUrl": "https://api-staging.personalea.com",
+              "workers": 2,
+              "retries": 2
+            },
+            "production": {
+              "baseUrl": "https://personalea.com",
+              "apiUrl": "https://api.personalea.com",
+              "workers": 1,
+              "retries": 3
+            }
+          },
+          "browserMatrix": {
+            "desktop": [
+              "chromium",
+              "firefox",
+              "webkit",
+              "msedge"
+            ],
+            "mobile": [
+              "Mobile Chrome",
+              "Mobile Safari",
+              "Mobile Firefox"
+            ],
+            "devices": [
+              "iPhone 12",
+              "Pixel 5",
+              "iPad",
+              "Galaxy S21"
+            ]
+          },
+          "testCategories": [
+            "unit",
+            "integration",
+            "e2e",
+            "visual",
+            "performance",
+            "accessibility",
+            "security",
+            "api-contract",
+            "stress"
+          ]
+        },
+        "workflows": [
+          {
+            "name": "Pre-Commit Testing",
+            "triggers": [
+              "git pre-commit hook"
+            ],
+            "tests": [
+              "unit",
+              "linting",
+              "type-checking",
+              "quick-e2e"
+            ],
+            "timeout": "5 minutes",
+            "failureAction": "block-commit"
+          },
+          {
+            "name": "Pull Request Validation",
+            "triggers": [
+              "GitHub PR creation/update"
+            ],
+            "tests": [
+              "full-e2e",
+              "visual-regression",
+              "accessibility",
+              "api-contract"
+            ],
+            "timeout": "20 minutes",
+            "failureAction": "block-merge"
+          },
+          {
+            "name": "Staging Deployment Verification",
+            "triggers": [
+              "merge to staging branch"
+            ],
+            "tests": [
+              "smoke-tests",
+              "critical-path-e2e",
+              "performance-benchmarks"
+            ],
+            "timeout": "15 minutes",
+            "failureAction": "rollback-deployment"
+          },
+          {
+            "name": "Production Health Monitoring",
+            "triggers": [
+              "production deployment",
+              "scheduled-hourly"
+            ],
+            "tests": [
+              "health-checks",
+              "synthetic-user-journeys",
+              "performance-alerts"
+            ],
+            "timeout": "10 minutes",
+            "failureAction": "alert-team"
+          },
+          {
+            "name": "Chaos Engineering",
+            "triggers": [
+              "scheduled-weekly"
+            ],
+            "tests": [
+              "fault-injection",
+              "load-testing",
+              "failover-testing"
+            ],
+            "timeout": "60 minutes",
+            "failureAction": "generate-report"
+          }
+        ],
+        "cicd": {
+          "githubActions": {
+            "matrices": {
+              "browserTesting": {
+                "os": [
+                  "ubuntu-latest",
+                  "windows-latest",
+                  "macos-latest"
+                ],
+                "browser": [
+                  "chromium",
+                  "firefox",
+                  "webkit"
+                ],
+                "nodeVersion": [
+                  "18.x",
+                  "20.x"
+                ]
+              },
+              "performanceTesting": {
+                "environment": [
+                  "development",
+                  "staging"
+                ],
+                "loadProfile": [
+                  "light",
+                  "moderate",
+                  "heavy"
+                ],
+                "duration": [
+                  "5m",
+                  "15m",
+                  "30m"
+                ]
+              }
+            },
+            "workflows": [
+              {
+                "name": "browser-compatibility-matrix",
+                "file": ".github/workflows/browser-testing.yml",
+                "triggers": [
+                  "pull_request",
+                  "push to main"
+                ],
+                "parallelJobs": 12
+              },
+              {
+                "name": "visual-regression-testing",
+                "file": ".github/workflows/visual-regression.yml",
+                "triggers": [
+                  "pull_request"
+                ],
+                "baselineStorage": "AWS S3"
+              },
+              {
+                "name": "performance-monitoring",
+                "file": ".github/workflows/performance.yml",
+                "triggers": [
+                  "schedule: 0 */6 * * *"
+                ],
+                "alerting": "Slack + PagerDuty"
+              }
+            ]
+          },
+          "qualityGates": {
+            "codeQuality": {
+              "coverage": ">= 85%",
+              "eslintErrors": 0,
+              "typeErrors": 0,
+              "duplicateCode": "<= 3%"
+            },
+            "performanceThresholds": {
+              "firstContentfulPaint": "<= 1.5s",
+              "largestContentfulPaint": "<= 2.5s",
+              "cumulativeLayoutShift": "<= 0.1",
+              "timeToInteractive": "<= 3.5s"
+            },
+            "accessibilityCompliance": {
+              "wcagLevel": "AA",
+              "axeViolations": 0,
+              "colorContrast": ">= 4.5:1",
+              "keyboardNavigation": "100%"
+            }
+          }
+        }
+      },
+      "implementation": {
+        "files": [
+          {
+            "path": ".github/workflows/comprehensive-browser-testing.yml",
+            "purpose": "Multi-browser, multi-OS testing matrix"
+          },
+          {
+            "path": ".github/workflows/visual-regression.yml",
+            "purpose": "Automated visual regression detection"
+          },
+          {
+            "path": ".github/workflows/performance-monitoring.yml",
+            "purpose": "Continuous performance monitoring"
+          },
+          {
+            "path": ".github/workflows/accessibility-compliance.yml",
+            "purpose": "WCAG AA compliance validation"
+          },
+          {
+            "path": ".github/workflows/chaos-engineering.yml",
+            "purpose": "Fault injection and resilience testing"
+          },
+          {
+            "path": "playwright.config.production.ts",
+            "purpose": "Production environment testing configuration"
+          },
+          {
+            "path": "playwright.config.visual.ts",
+            "purpose": "Visual regression testing configuration"
+          },
+          {
+            "path": "testing/protocols/error-recovery.spec.ts",
+            "purpose": "Advanced error recovery scenarios"
+          },
+          {
+            "path": "testing/protocols/performance-benchmarks.spec.ts",
+            "purpose": "Comprehensive performance testing"
+          },
+          {
+            "path": "testing/protocols/accessibility-audit.spec.ts",
+            "purpose": "Automated accessibility compliance"
+          }
+        ],
+        "scripts": [
+          {
+            "name": "test:browser-matrix",
+            "command": "playwright test --config=playwright.config.matrix.ts",
+            "purpose": "Run complete browser compatibility matrix"
+          },
+          {
+            "name": "test:visual-regression",
+            "command": "playwright test --config=playwright.config.visual.ts --update-snapshots",
+            "purpose": "Update and validate visual baselines"
+          },
+          {
+            "name": "test:performance-suite",
+            "command": "playwright test --config=playwright.config.perf.ts --reporter=performance",
+            "purpose": "Comprehensive performance benchmarking"
+          },
+          {
+            "name": "test:accessibility-audit",
+            "command": "playwright test --config=playwright.config.a11y.ts --reporter=accessibility",
+            "purpose": "WCAG compliance validation"
+          },
+          {
+            "name": "test:chaos-engineering",
+            "command": "playwright test testing/chaos/ --config=playwright.config.chaos.ts",
+            "purpose": "Fault injection and resilience testing"
+          },
+          {
+            "name": "test:production-health",
+            "command": "playwright test testing/production/ --config=playwright.config.prod.ts",
+            "purpose": "Production environment health checks"
+          }
+        ]
+      },
+      "recommendations": {
+        "immediate": [
+          "Implement visual regression testing baseline capture",
+          "Set up performance monitoring alerts in CI/CD",
+          "Create production environment testing protocols",
+          "Implement accessibility compliance automation"
+        ],
+        "shortTerm": [
+          "Deploy chaos engineering test suite",
+          "Implement cross-browser compatibility matrices",
+          "Set up performance regression detection",
+          "Create automated error recovery validation"
+        ],
+        "longTerm": [
+          "Implement AI-powered test generation",
+          "Create self-healing test maintenance",
+          "Deploy predictive failure detection",
+          "Implement intelligent test parallelization"
+        ]
+      },
+      "successMetrics": {
+        "qualityMetrics": {
+          "testCoverage": ">= 90%",
+          "e2eReliability": ">= 98%",
+          "performanceRegression": "<= 5%",
+          "accessibilityCompliance": "100%"
+        },
+        "velocityMetrics": {
+          "testExecutionTime": "<= 15 minutes",
+          "falsePosItiveRate": "<= 2%",
+          "testMaintenance": "<= 10% of dev time",
+          "deploymentFrequency": ">= daily"
+        },
+        "businessMetrics": {
+          "userSatisfaction": ">= 95%",
+          "productionIncidents": "<= 1 per month",
+          "timeTo": "<= 2 hours",
+          "featureDeliveryTime": "<= 2 weeks"
+        }
+      }
+    },
+    "timestamp": "2025-06-25T21:31:22.206Z",
+    "createdAt": "1970-01-01T00:00:00.000Z",
+    "updatedAt": "1970-01-01T00:00:00.000Z",
+    "lastAccessedAt": "2025-06-29T17:02:22.151Z"
+  },
+  {
+    "id": "entry_mcdopq34_bco0dx67o",
+    "key": "swarm-maintenance-centralized-1750960390935/environment-agent/config-analysis",
+    "value": "{\"timestamp\":\"2025-06-26T17:55:39.431Z\",\"envFiles\":{\"discovered\":[\".env\",\".env.example\",\".env.production\",\".env.production.example\",\".env.staging\",\".env.staging.example\",\".env.user\",\".env.user.example\",\"services/goal-strategy/.env\",\"services/email-processing/.env\",\"testing/goal-strategy-test/.env\",\"testing/goal-strategy-test/.env.production\"],\"patterns\":{\"production\":\"Contains hardcoded example passwords and placeholders for API keys\",\"staging\":\"Includes privacy violation warnings about shared API keys\",\"gitignore\":\"Properly ignores .env, .env.staging, .env.production, .env.user files\"}},\"secretManagement\":{\"categories\":{\"databases\":{\"secrets\":[\"POSTGRES_PASSWORD\",\"DB_PASSWORD\",\"DATABASE_URL\"],\"pattern\":\"Passwords stored in env files, injected via Docker Compose environment variables\"},\"redis\":{\"secrets\":[\"REDIS_PASSWORD\",\"REDIS_URL\"],\"pattern\":\"Similar to database, passwords in env files\"},\"jwt_session\":{\"secrets\":[\"JWT_SECRET\",\"SESSION_SECRET\"],\"pattern\":\"Random strings generated during setup, stored in env files\"},\"encryption\":{\"secrets\":[\"EMAIL_ENCRYPTION_KEY\",\"ENCRYPTION_KEY\",\"OAUTH_ENCRYPTION_KEY\"],\"pattern\":\"Hex keys for data encryption, generated during setup\"},\"apiKeys\":{\"secrets\":[\"OPENAI_API_KEY\",\"GMAIL_CLIENT_ID\",\"GMAIL_CLIENT_SECRET\"],\"pattern\":\"External service credentials, user-provided in production\"},\"monitoring\":{\"secrets\":[\"GRAFANA_ADMIN_PASSWORD\"],\"pattern\":\"Monitoring service passwords\"}},\"githubActions\":{\"secrets\":[\"AWS_ACCESS_KEY_ID\",\"AWS_SECRET_ACCESS_KEY\",\"PROD_AWS_ACCESS_KEY_ID\",\"PROD_AWS_SECRET_ACCESS_KEY\",\"GITHUB_TOKEN\",\"SLACK_WEBHOOK\",\"SLACK_WEBHOOK_URL\",\"EMAIL_USERNAME\",\"EMAIL_PASSWORD\",\"OPENAI_API_KEY\"],\"usage\":\"Secrets injected via GitHub Actions secrets context during CI/CD\"}},\"deploymentPatterns\":{\"dockerCompose\":{\"method\":\"Environment variables injected via Docker Compose from .env files\",\"example\":\"POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}\",\"services\":[\"postgres\",\"redis\",\"goal-strategy-service\",\"email-processing-service\"]},\"productionDeployment\":{\"script\":\"deployment/scripts/deploy.sh\",\"features\":[\"Loads .env.production file before deployment\",\"Uses export to make env vars available to Docker Compose\",\"Supports rollback with backup restoration\"]},\"setupScripts\":{\"sanitizeScript\":\"scripts/sanitize-env-files.sh\",\"purpose\":\"Replaces sensitive values with placeholders for example files\",\"setupScript\":\"scripts/setup-production-env.sh\",\"purpose2\":\"Interactive script to generate secure secrets and configure production\"}},\"securityPatterns\":{\"strengths\":[\"Proper .gitignore configuration for sensitive files\",\"Separate environment files for different stages\",\"Scripts to generate secure random secrets\",\"Example files with placeholders instead of real secrets\",\"GitHub Actions secrets for CI/CD pipelines\",\"Encryption keys for sensitive data at rest\"],\"concerns\":[\"Staging environment uses shared API keys (documented privacy violation)\",\"Some example files contain base64 encoded example passwords\",\"No centralized secret management system (e.g., HashiCorp Vault)\",\"Secrets stored as plain text in environment files\",\"No automatic secret rotation mechanism\"]},\"recommendations\":[{\"priority\":\"HIGH\",\"issue\":\"Plain text secrets in environment files\",\"recommendation\":\"Implement HashiCorp Vault or AWS Secrets Manager for centralized secret management\"},{\"priority\":\"HIGH\",\"issue\":\"No secret rotation\",\"recommendation\":\"Implement automatic secret rotation for database passwords and API keys\"},{\"priority\":\"MEDIUM\",\"issue\":\"Shared API keys in staging\",\"recommendation\":\"Implement user-specific API key management even in staging environments\"},{\"priority\":\"MEDIUM\",\"issue\":\"Manual secret generation\",\"recommendation\":\"Automate secure secret generation and distribution during deployment\"},{\"priority\":\"LOW\",\"issue\":\"Example passwords in base64\",\"recommendation\":\"Use clear placeholders like YOUR_PASSWORD_HERE consistently\"}],\"privacyCompliance\":{\"dataControl\":{\"status\":\"PARTIAL\",\"note\":\"Production supports user-controlled API keys, but staging violates this principle\"},\"encryption\":{\"status\":\"IMPLEMENTED\",\"note\":\"EMAIL_ENCRYPTION_KEY used for email data encryption\"},\"userConsent\":{\"status\":\"NOT_IMPLEMENTED\",\"note\":\"No consent management for external API calls mentioned in staging config\"}}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T17:56:09.424Z",
+    "updatedAt": "2025-06-26T17:56:09.424Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 4626,
+    "compressed": true,
+    "checksum": "ebbbbffded8689419938cc5dd8055faea9e75a518adffffb35d03ee5e4e80a2d",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdoqoze_ykry0vqlp",
+    "key": "swarm-maintenance-centralized-1750960390935/security-agent/audit-results",
+    "value": "{\"findings\":[{\"severity\":\"CRITICAL\",\"type\":\"Hardcoded Secrets\",\"file\":\".env.production.example\",\"description\":\"Production passwords and secrets are hardcoded in the example file\",\"details\":{\"exposed_secrets\":[\"POSTGRES_PASSWORD=Gdu6Yb1Pigle/K+lJa46ICTm7dRK62N39ZP/zLnzLTU=\",\"REDIS_PASSWORD=2sd2fZNGv0YWKb0dcRcWA702xrAqnl+DKLKwnO4sjIs=\",\"JWT_SECRET=5trLwyBPEbp4IYoBfEx0Z40IyNpcBLI3p2Hn9h7/214=\",\"SESSION_SECRET=fAVTy+UxqeaiqPAnQAY3uvubPvo/cgwZcN4P4OWs0N4=\",\"EMAIL_ENCRYPTION_KEY=20186cfb7c5acbb9abd666dc936ec465914f7c6995a31e3fd4b8c3dc3b828673\"],\"impact\":\"These secrets are exposed in version control and could be used to compromise production systems\"}},{\"severity\":\"HIGH\",\"type\":\"Insecure Secret Loading\",\"file\":\"deployment/scripts/deploy.sh\",\"description\":\"Loads all environment variables into shell using insecure export method\",\"details\":{\"line\":207,\"code\":\"export $(grep -v '^#' \\\"$PROJECT_ROOT/.env.production\\\"  < /dev/null |  xargs)\",\"impact\":\"Exposes all secrets in environment, vulnerable to command injection\"}},{\"severity\":\"HIGH\",\"type\":\"Hardcoded Development Credentials\",\"file\":\"scripts/init-databases.sh\",\"description\":\"Contains hardcoded database credentials\",\"details\":{\"exposed_credentials\":[\"DATABASE_URL=\\\"postgresql://personalea:personalea_dev_password@localhost:5432/personalea\\\"\",\"Username: personalea\",\"Password: personalea_dev_password\"],\"impact\":\"Could be mistakenly used in production if scripts are copied\"}},{\"severity\":\"MEDIUM\",\"type\":\"AWS Credentials in Workflows\",\"file\":\".github/workflows/deploy.yml\",\"description\":\"Multiple GitHub Actions workflows use AWS credentials\",\"details\":{\"workflows\":[\"deploy.yml (lines 196-200, 245-248)\",\"visual-regression.yml (lines 43-48)\"],\"secrets_used\":[\"AWS_ACCESS_KEY_ID\",\"AWS_SECRET_ACCESS_KEY\",\"PROD_AWS_ACCESS_KEY_ID\",\"PROD_AWS_SECRET_ACCESS_KEY\"],\"impact\":\"While properly using GitHub Secrets, ensure these have minimal required permissions\"}},{\"severity\":\"MEDIUM\",\"type\":\"OpenAI API Key Exposure\",\"file\":\"Multiple workflows and test files\",\"description\":\"OpenAI API key is passed in multiple locations\",\"details\":{\"files_affected\":[\".github/workflows/deploy-with-gates.yml (line 128)\",\".github/workflows/visual-regression.yml (lines 77, 185)\",\"Multiple test files use OPENAI_API_KEY environment variable\"],\"impact\":\"API key could be exposed in logs or error messages\"}},{\"severity\":\"MEDIUM\",\"type\":\"Slack Webhook Exposure\",\"file\":\".github/workflows/deploy.yml\",\"description\":\"Slack webhook URL used in multiple places\",\"details\":{\"lines\":[224,287,365],\"secret\":\"SLACK_WEBHOOK\",\"impact\":\"If exposed, could be used to spam Slack channels\"}},{\"severity\":\"LOW\",\"type\":\"Docker Image Security\",\"file\":\"docker-compose.production.yml\",\"description\":\"Some Docker images use 'latest' tag\",\"details\":{\"images\":[\"personalea/goal-strategy:latest\",\"personalea/email-processing:latest\",\"personalea/ui:latest\"],\"impact\":\"Non-deterministic builds, potential for supply chain attacks\"}},{\"severity\":\"LOW\",\"type\":\"Missing Secret Rotation\",\"file\":\"All deployment files\",\"description\":\"No evidence of secret rotation mechanisms\",\"details\":{\"impact\":\"Long-lived secrets increase risk if compromised\"}}],\"risks\":[{\"risk\":\"Complete Production Compromise\",\"description\":\"The hardcoded production secrets in .env.production.example could allow full access to production databases and services\",\"likelihood\":\"HIGH\",\"impact\":\"CRITICAL\"},{\"risk\":\"API Key Abuse\",\"description\":\"Exposed OpenAI API keys could be used to rack up charges or abuse the service\",\"likelihood\":\"MEDIUM\",\"impact\":\"HIGH\"},{\"risk\":\"Database Breach\",\"description\":\"Hardcoded database passwords could lead to unauthorized data access\",\"likelihood\":\"HIGH\",\"impact\":\"CRITICAL\"},{\"risk\":\"CI/CD Pipeline Compromise\",\"description\":\"AWS credentials in workflows could be exploited if GitHub Actions is compromised\",\"likelihood\":\"LOW\",\"impact\":\"HIGH\"}],\"recommendations\":[{\"priority\":\"IMMEDIATE\",\"action\":\"Remove ALL hardcoded secrets from .env.production.example\",\"details\":\"Replace actual secrets with placeholder text like 'CHANGE_ME' or use generated examples that are clearly fake\"},{\"priority\":\"IMMEDIATE\",\"action\":\"Rotate all exposed secrets\",\"details\":\"All secrets found in the repository should be considered compromised and rotated immediately\"},{\"priority\":\"HIGH\",\"action\":\"Implement secure secret management\",\"details\":\"Use AWS Secrets Manager, HashiCorp Vault, or similar for production secrets\"},{\"priority\":\"HIGH\",\"action\":\"Fix insecure environment loading in deploy.sh\",\"details\":\"Use proper secret injection methods instead of exporting all variables\"},{\"priority\":\"MEDIUM\",\"action\":\"Implement secret scanning in CI/CD\",\"details\":\"Add tools like GitHub Secret Scanning, GitLeaks, or TruffleHog to prevent future secret commits\"},{\"priority\":\"MEDIUM\",\"action\":\"Use specific Docker image tags\",\"details\":\"Pin Docker images to specific versions instead of using 'latest'\"},{\"priority\":\"MEDIUM\",\"action\":\"Implement least-privilege AWS IAM policies\",\"details\":\"Ensure AWS credentials used in CI/CD have minimal required permissions\"},{\"priority\":\"LOW\",\"action\":\"Add secret rotation automation\",\"details\":\"Implement automated secret rotation for database passwords and API keys\"},{\"priority\":\"LOW\",\"action\":\"Add .env files to .gitignore validation\",\"details\":\"Add pre-commit hooks to ensure no .env files are accidentally committed\"}],\"summary\":{\"total_findings\":8,\"critical\":1,\"high\":2,\"medium\":3,\"low\":2,\"most_urgent\":\"Remove hardcoded production secrets from .env.production.example immediately\"}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T17:56:54.650Z",
+    "updatedAt": "2025-06-26T17:56:54.650Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 5991,
+    "compressed": true,
+    "checksum": "6d7859e491335bfb652bd5850a5bd9446b2a8ddf43ffff7263db367f44d31555",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdr8rwf_3urbhc7ve",
+    "key": "swarm-maintenance-centralized-1750964660612/agent1/diagnostic_findings",
+    "value": {
+      "timestamp": "2025-06-26T17:59:00Z",
+      "issue": "Port mismatch in goal-strategy service configuration",
+      "findings": {
+        "docker_status": "No goal-strategy containers running",
+        "port_configuration": {
+          "environment_default": 8085,
+          "dockerfile_expose": 3000,
+          "dockerfile_healthcheck": 3000,
+          "docker_compose_production_env": 8085,
+          "docker_compose_production_healthcheck": 3000
+        },
+        "root_cause": "Service configured to run on port 8085 but Dockerfile and healthchecks expect port 3000",
+        "configuration_files_affected": [
+          "/workspaces/personalEA/services/goal-strategy/Dockerfile",
+          "/workspaces/personalEA/docker-compose.production.yml",
+          "/workspaces/personalEA/services/goal-strategy/src/config/environment.ts"
+        ]
+      }
+    },
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T19:06:57.471Z",
+    "updatedAt": "2025-06-26T19:06:57.471Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 706,
+    "compressed": false,
+    "checksum": "e08001d7b92038cefb5e1e551090aa9e02455e821b3fddaa04b08d12704719af",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdrntqk_iewy5yzqs",
+    "key": "swarm-testing-centralized-1750965374497/network-analysis-agent/error-patterns",
+    "value": "{\"error_patterns\":[{\"type\":\"proxy_configuration_mismatch\",\"severity\":\"critical\",\"description\":\"Vite proxy configured to forward /api requests to port 3000, but Goal Strategy service runs on port 8085\",\"file\":\"testing/goal-strategy-test/vite.config.ts\",\"line\":12,\"impact\":\"All API requests from frontend will fail with connection errors\"},{\"type\":\"timeout_handling\",\"severity\":\"medium\",\"description\":\"30-second timeout may be insufficient for complex goal processing\",\"file\":\"testing/goal-strategy-test/src/services/api.ts\",\"line\":55,\"current_value\":\"30000\",\"recommendation\":\"Increase to 60000 for complex AI operations\"},{\"type\":\"error_message_clarity\",\"severity\":\"low\",\"description\":\"Network errors provide user-friendly messages with specific recovery steps\",\"file\":\"testing/goal-strategy-test/src/services/api.ts\",\"lines\":\"214-225\",\"status\":\"well-implemented\"},{\"type\":\"retry_logic\",\"severity\":\"low\",\"description\":\"Exponential backoff implemented for timeout errors\",\"file\":\"testing/goal-strategy-test/src/services/api.ts\",\"lines\":\"109-128\",\"status\":\"well-implemented\"}]}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T19:18:39.692Z",
+    "updatedAt": "2025-06-26T19:18:39.692Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 1202,
+    "compressed": true,
+    "checksum": "de8ac594a9c8bbf363bf38b2e0a1343e28e4343240491e1c5c883c930dbbc49f",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdro8ny_ed6nem76a",
+    "key": "swarm-testing-centralized-1750965374497/network-analysis-agent/network-issues",
+    "value": "{\"critical_issues\":[{\"issue\":\"Port Mismatch in Proxy Configuration\",\"severity\":\"CRITICAL\",\"details\":{\"proxy_target\":\"http://localhost:3000\",\"actual_backend_port\":\"8085\",\"config_file\":\"testing/goal-strategy-test/vite.config.ts\",\"impact\":\"100% API request failure rate\"},\"fix\":\"Update vite.config.ts proxy target from port 3000 to 8085\"},{\"issue\":\"Inconsistent localhost vs 127.0.0.1 usage\",\"severity\":\"MEDIUM\",\"details\":{\"frontend_uses\":\"http://127.0.0.1:5174/\",\"proxy_config_uses\":\"http://localhost:3000\",\"cors_config_uses\":\"both localhost and 127.0.0.1\",\"potential_issues\":\"DNS resolution differences, IPv6 vs IPv4 conflicts\"},\"fix\":\"Standardize on either localhost or 127.0.0.1 throughout\"}],\"environment_variables\":{\"backend_port\":\"8085 (services/goal-strategy/.env)\",\"frontend_port\":\"5174 (vite.config.ts)\",\"cors_origins\":\"http://localhost:5174,http://localhost:5173,http://localhost:3000,http://localhost:8080\"},\"api_configuration\":{\"base_url_logic\":\"Detects Codespaces and adjusts URLs appropriately\",\"health_check_endpoint\":\"/api/v1/health\",\"timeout_handling\":\"5-second timeout for health checks, 30-second for API calls\"}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T19:18:59.038Z",
+    "updatedAt": "2025-06-26T19:18:59.038Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 1250,
+    "compressed": true,
+    "checksum": "1eba81f34753f9fbffc9c4f1705e361012e7763821889238c71764af1f9dd3d0",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdroc7d_2uxlt03u9",
+    "key": "swarm-testing-centralized-1750965374497/api-endpoints-agent/endpoint-mapping",
+    "value": {
+      "frontend_endpoints": {
+        "base_url_logic": "Dynamic: /api/v1 (local) or https://[codespace]-8085.app.github.dev/api/v1 (Codespaces)",
+        "endpoints_used": [
+          "POST /api/v1/goals/translate",
+          "POST /api/v1/goals/:id/clarify",
+          "POST /api/v1/goals/contextual-help",
+          "POST /api/v1/goals/component-question",
+          "POST /api/v1/milestones/generate",
+          "POST /api/v1/wbs/generate",
+          "POST /api/v1/estimations/batch",
+          "POST /api/v1/feedback"
+        ]
+      },
+      "backend_endpoints": {
+        "base_url": "http://localhost:8085/api/v1",
+        "implemented_endpoints": [
+          "POST /api/v1/goals/translate",
+          "POST /api/v1/goals/:id/clarify",
+          "POST /api/v1/milestones/generate",
+          "POST /api/v1/wbs/generate",
+          "POST /api/v1/estimations/batch",
+          "POST /api/v1/feedback"
+        ],
+        "missing_endpoints": [
+          "POST /api/v1/goals/contextual-help",
+          "POST /api/v1/goals/component-question"
+        ]
+      },
+      "mock_server_endpoints": {
+        "has_all_endpoints": true,
+        "additional_endpoints": [
+          "POST /api/v1/goals/contextual-help",
+          "POST /api/v1/goals/component-question"
+        ]
+      }
+    },
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T19:19:03.625Z",
+    "updatedAt": "2025-06-26T19:19:03.625Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 966,
+    "compressed": false,
+    "checksum": "3a20ea66289d01afba3db01c1b79fadeffafb10d4e5de1835f921d9a50d3622b",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdt3x49_v68mymp8t",
+    "key": "swarm-testing-centralized-1750963783825/frontend-debugger/network-analysis",
+    "value": "{\"timestamp\":\"2025-06-26T19:58:00Z\",\"analyzer\":\"Frontend Debugger\",\"findings\":{\"backend_status\":{\"service_running\":true,\"health_endpoint\":\"http://localhost:8085/health\",\"health_response\":\"healthy\",\"running_via\":\"tsx watch (not Docker)\"},\"endpoints_exist\":{\"contextual_help\":\"/api/v1/goals/contextual-help\",\"component_question\":\"/api/v1/goals/component-question\",\"both_registered\":true,\"require_authentication\":true,\"require_scope\":\"goals:write\"},\"error_root_cause\":{\"error_type\":\"401 Unauthorized\",\"error_message\":\"Authorization header is required\",\"reason\":\"Missing or invalid JWT token\",\"not_404\":true,\"not_network_error\":true},\"authentication_flow\":{\"frontend_expects\":{\"jwt_token\":\"Required in apiConfig\",\"openai_api_key\":\"Required in apiConfig or 'ENVIRONMENT_CONFIGURED'\",\"headers_sent\":[\"Authorization: Bearer <jwt>\",\"X-OpenAI-API-Key: <key>\"]},\"backend_requires\":{\"jwt_authentication\":true,\"scopes\":[\"goals:write\"],\"openai_key\":\"From header or environment\"}},\"actual_errors\":[\"User has not configured API credentials (JWT + OpenAI key)\",\"API configuration dialog needs to be completed first\",\"Error messages like 'AI service unavailable' are misleading - should say 'Please configure API credentials'\"],\"recommendations\":[\"Check if ApiConfig component properly sets credentials\",\"Verify JWT token generation/storage\",\"Improve error messages to guide users to configure API first\",\"Add authentication status indicator in UI\"]}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T19:59:10.185Z",
+    "updatedAt": "2025-06-26T19:59:10.185Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 1574,
+    "compressed": true,
+    "checksum": "d3aabc3644cb3c25b43005050aaf6a737f2581502c5bbc9064883056f36a9ffe",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcduwrfv_bf1o7430j",
+    "key": "swarm-auto-centralized-1750970801829/config-scanner/port-settings",
+    "value": {
+      "package.json": {
+        "/workspaces/personalEA/package.json": {
+          "3000": "User install health check",
+          "3001": "User install health check",
+          "8080": "Docs serve (Redocly)",
+          "8083": "Email Service Mock (Prism)",
+          "8085": "Goal Strategy Service Mock (Prism)",
+          "8086": "Calendar Service Mock (Prism)"
+        }
+      },
+      "vite.config": {
+        "/workspaces/personalEA/testing/goal-strategy-test/vite.config.ts": {
+          "3001": "Proxy target for /email-api",
+          "5174": "Vite dev server and preview",
+          "8085": "Proxy target for /api and /health"
+        },
+        "/workspaces/personalEA/testing/goal-strategy-test/vite.config.production.ts": {
+          "5173": "Default from VITE_APP_PORT and VITE_PREVIEW_PORT"
+        }
+      },
+      "playwright.config": {
+        "/workspaces/personalEA/playwright.config.ts": {
+          "3000": "OpenAI API server",
+          "5174": "Base URL and dev server"
+        },
+        "/workspaces/personalEA/testing/goal-strategy-test/playwright.config.ts": {
+          "5174": "Base URL and web server"
+        }
+      },
+      "docker-compose": {
+        "docker-compose.dev.yml": {
+          "3000": "Dialog Gateway (placeholder)",
+          "3001": "Email Processing Service",
+          "3002": "Goal Service (placeholder)",
+          "3003": "Calendar Service (placeholder)",
+          "5432": "PostgreSQL",
+          "6379": "Redis",
+          "8085": "Goal Strategy Backend (maps to internal 3000)"
+        },
+        "docker-compose.user.yml": {
+          "3000": "PersonalEA Web Interface",
+          "3001": "Email Service",
+          "3002": "Config UI",
+          "5432": "PostgreSQL",
+          "6379": "Redis"
+        },
+        "docker-compose.production.yml": {
+          "80": "Nginx HTTP",
+          "443": "Nginx HTTPS",
+          "3001": "Email Processing Service",
+          "3002": "Grafana (maps to internal 3000, bound to 127.0.0.1)",
+          "3100": "Loki (bound to 127.0.0.1)",
+          "5432": "PostgreSQL (bound to 127.0.0.1)",
+          "6379": "Redis (bound to 127.0.0.1)",
+          "8085": "Goal Strategy Service",
+          "9090": "Prometheus (bound to 127.0.0.1)"
+        },
+        "docker-compose.mock.yml": {
+          "6379": "Mock Redis",
+          "8083": "Email Service Mock (maps to internal 4010)",
+          "8085": "Goal Strategy Service Mock (maps to internal 4010)",
+          "8086": "Calendar Service Mock (maps to internal 4010)",
+          "8090": "Mock Data Server (Nginx)"
+        }
+      },
+      "env-files": {
+        ".env": {
+          "80": "HTTP_PORT",
+          "443": "HTTPS_PORT",
+          "3000": "WEB_PORT",
+          "3001": "CONFIG_PORT",
+          "3002": "GRAFANA_ROOT_URL",
+          "5432": "POSTGRES_PORT",
+          "6379": "REDIS_PORT"
+        },
+        ".env.production": {
+          "3000": "GOAL_STRATEGY_PORT",
+          "3001": "EMAIL_SERVICE_PORT",
+          "5173": "FRONTEND_PORT",
+          "5432": "POSTGRES_PORT",
+          "6379": "REDIS_PORT",
+          "8080": "HEALTH_MONITOR_PORT",
+          "8086": "CALENDAR_SERVICE_URL (not implemented)"
+        }
+      },
+      "summary": {
+        "commonly_used_ports": {
+          "80": "HTTP (Nginx)",
+          "443": "HTTPS (Nginx)",
+          "3000": "Primary application/Goal Strategy Service/Dialog Gateway",
+          "3001": "Email Processing Service",
+          "3002": "Goal Service placeholder/Config UI/Grafana (production)",
+          "3003": "Calendar Service (placeholder)",
+          "3100": "Loki",
+          "4010": "Prism Mock Server (internal)",
+          "5173": "Vite frontend default",
+          "5174": "Vite frontend (testing)",
+          "5432": "PostgreSQL",
+          "6379": "Redis",
+          "8080": "Health Monitor Dashboard/Docs serve",
+          "8083": "Email Service Mock",
+          "8085": "Goal Strategy Service/Mock",
+          "8086": "Calendar Service/Mock",
+          "8090": "Mock Data Server",
+          "9090": "Prometheus"
+        },
+        "port_conflicts": [
+          "3000: Used by multiple services (PersonalEA Web, Goal Strategy, Dialog Gateway)",
+          "8085: Used for both Goal Strategy Service and its mock",
+          "3002: Used for Goal Service placeholder, Config UI, and Grafana"
+        ],
+        "environment_specific": {
+          "development": [
+            "3000-3003",
+            "5174",
+            "5432",
+            "6379",
+            "8083-8086"
+          ],
+          "production": [
+            "80",
+            "443",
+            "3000-3002",
+            "5173",
+            "5432",
+            "6379",
+            "8080",
+            "9090",
+            "3100"
+          ],
+          "testing": [
+            "5174",
+            "8083-8086",
+            "8090"
+          ]
+        }
+      }
+    },
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T20:49:35.467Z",
+    "updatedAt": "2025-06-26T20:49:35.467Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 3712,
+    "compressed": true,
+    "checksum": "b0b2c330ef82c4b955a993c5f16b81fae23dae4003bc7dc5104a9d97c93ba447",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdvorn5_6khi4pp59",
+    "key": "swarm-auto-centralized-1750972046138/api-investigator/findings",
+    "value": "{\"step\":\"API Investigation\",\"timestamp\":\"2025-06-26T21:11:12.790Z\",\"errorLocation\":\"Multiple locations identified\",\"errorFlow\":{\"1_frontend_error\":\"ChatClarification.tsx lines 131, 233, 321, 358, 375\",\"2_api_call\":\"api.ts clarifyGoal() line 240-319\",\"3_backend_route\":\"goals.ts /:id/clarify endpoint line 175-284\",\"4_openai_call\":\"smart-goal-processor.ts callOpenAI() line 257-306\",\"5_error_handler\":\"error-handler.ts lines 138-147 catches OpenAI/AI errors and returns 503\"},\"apiEndpoints\":[\"/api/v1/goals/translate\",\"/api/v1/goals/:id/clarify\",\"/api/v1/goals/clarify\",\"/api/v1/goals/component-question\",\"/api/v1/goals/contextual-help\"],\"rootCause\":\"OpenAI API call failures are caught by error handler and converted to 503 Service Unavailable errors\",\"possibleReasons\":[\"Missing or invalid OPENAI_API_KEY in backend environment\",\"OpenAI API rate limiting (429 errors)\",\"Network connectivity issues between backend and OpenAI\",\"Timeout issues (30s timeout configured)\",\"Invalid API key format (should start with sk-)\"],\"keyFindings\":{\"errorHandler\":\"error-handler.ts catches any error with OpenAI or AI in message and returns 503\",\"frontendHandling\":\"Frontend shows generic AI service unavailable message for all backend failures\",\"apiKeyHandling\":\"Backend expects OPENAI_API_KEY from environment or X-OpenAI-API-Key header\",\"proxyConfig\":\"Vite proxy correctly configured to forward /api to localhost:8085\",\"servicesRunning\":\"Both frontend (5174) and backend (8085) services are running\"}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T21:11:22.097Z",
+    "updatedAt": "2025-06-26T21:11:22.097Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 1603,
+    "compressed": true,
+    "checksum": "e6fc1e630fbe2208319e5aee6ed841b776c138e8800f6a0366f8a49097abcb2f",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdvprwd_4yq0vy7lc",
+    "key": "swarm-auto-centralized-1750972046138/api-investigator/chat-endpoints-analysis",
+    "value": "-",
+    "type": "string",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T21:12:09.085Z",
+    "updatedAt": "2025-06-26T21:12:09.085Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 32,
+    "compressed": false,
+    "checksum": "0933fb667296882d8c45abca58ac52e01c8db6f19e626b30de88f0f4ed143ec5",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdwem28_gn5x09u9c",
+    "key": "swarm-auto-centralized-1750973349589/ux-designer/interactive-flow",
+    "value": "{\"chatFlowDesign\":{\"metadata\":{\"version\":\"1.0.0\",\"designType\":\"interactive-smart-goal-flow\",\"created\":\"2025-06-26T21:15:50Z\",\"designer\":\"ux-designer-agent\"},\"flowStructure\":{\"stages\":[\"welcome\",\"initial-goal-capture\",\"specific-refinement\",\"measurable-definition\",\"achievable-assessment\",\"relevant-alignment\",\"time-bound-setting\",\"goal-summary\",\"confirmation-refinement\"],\"conversationStyle\":{\"tone\":\"friendly, encouraging, professional\",\"persona\":\"knowledgeable coach\",\"responseLength\":\"concise but thorough\"}},\"conversationalFlow\":{\"1_welcome\":{\"stage\":\"welcome\",\"prompts\":[{\"type\":\"greeting\",\"message\":\"Hi! I'm here to help you create a SMART goal that will set you up for success. 🎯\\n\\nSMART goals are Specific, Measurable, Achievable, Relevant, and Time-bound. I'll guide you through each element step by step.\\n\\nReady to get started?\",\"expectedResponses\":[\"yes\",\"ready\",\"let's go\",\"sure\"],\"fallbackPrompt\":\"Take your time! When you're ready, just let me know and we'll begin creating your goal together.\"}]},\"2_initialGoalCapture\":{\"stage\":\"initial-goal-capture\",\"prompts\":[{\"type\":\"open-ended\",\"message\":\"Great! Let's start with your idea. What would you like to accomplish? Don't worry about making it perfect - just share what's on your mind.\",\"examples\":[\"• \\\"I want to get healthier\\\"\",\"• \\\"I need to improve my business\\\"\",\"• \\\"I'd like to learn something new\\\"\"],\"validationRules\":{\"minLength\":5,\"maxLength\":500,\"requiresContent\":true},\"clarificationPrompt\":\"That's interesting! Could you tell me a bit more about what you have in mind?\"}]},\"3_specificRefinement\":{\"stage\":\"specific-refinement\",\"introduction\":\"Good start! Now let's make your goal more specific. The clearer we can be, the easier it will be to achieve.\",\"prompts\":[{\"type\":\"guided-refinement\",\"basePrompt\":\"When you say '{user_goal}', what exactly do you want to do?\",\"followUpQuestions\":[\"What specific actions or outcomes are you looking for?\",\"Who or what is involved in this goal?\",\"Where will this happen?\"],\"examples\":{\"vague\":\"Get healthier\",\"specific\":\"Exercise 3 times per week at the local gym focusing on cardio and strength training\"}},{\"type\":\"validation\",\"checkPrompt\":\"So, to make sure I understand correctly, your specific goal is to: {refined_goal}\\n\\nDoes this capture what you want to accomplish?\"}]},\"4_measurableDefinition\":{\"stage\":\"measurable-definition\",\"introduction\":\"Excellent! Now let's figure out how you'll know when you've succeeded. We need a way to measure your progress.\",\"prompts\":[{\"type\":\"measurement-exploration\",\"basePrompt\":\"How will you measure success for this goal? What numbers, milestones, or concrete evidence will show you're making progress?\",\"guidingQuestions\":[\"Is there a number or quantity involved?\",\"What milestones could you track?\",\"How will you know when you've achieved it?\"],\"categoryPrompts\":{\"quantitative\":\"What specific numbers or amounts are you targeting?\",\"qualitative\":\"What observable changes or outcomes will indicate success?\",\"milestone\":\"What key milestones will mark your progress?\"}},{\"type\":\"measurement-validation\",\"prompt\":\"Perfect! So we'll measure your progress by: {measurements}\\n\\nWill this give you a clear way to track how you're doing?\"}]},\"5_achievableAssessment\":{\"stage\":\"achievable-assessment\",\"introduction\":\"Now let's make sure this goal is challenging but realistic. I want to help you succeed!\",\"prompts\":[{\"type\":\"feasibility-check\",\"questions\":[\"Given your current situation, what resources (time, money, skills) will you need?\",\"What might make this challenging?\",\"What advantages or strengths do you have that will help?\"],\"adjustmentPrompt\":\"Based on what you've told me, would you like to adjust the goal to make it more achievable while still being meaningful?\"},{\"type\":\"confidence-scale\",\"prompt\":\"On a scale of 1-10, how confident are you that you can achieve this goal with effort and commitment?\",\"responses\":{\"low\":\"Let's adjust this to boost your confidence. What would make this more achievable?\",\"medium\":\"Good! That's a healthy balance of challenge and achievability.\",\"high\":\"Great confidence! Should we make it a bit more challenging to keep you engaged?\"}}]},\"6_relevantAlignment\":{\"stage\":\"relevant-alignment\",\"introduction\":\"Let's make sure this goal aligns with what's important to you right now.\",\"prompts\":[{\"type\":\"relevance-exploration\",\"questions\":[\"Why is this goal important to you personally?\",\"How does this fit with your other priorities or goals?\",\"What positive changes will achieving this bring to your life?\"],\"deepeningPrompt\":\"That's meaningful. Tell me more about how this connects to your bigger picture.\"},{\"type\":\"motivation-check\",\"prompt\":\"When you think about working on this goal, what excites you most?\",\"validationPrompt\":\"It sounds like this goal really matters to you because {reasons}. Is that right?\"}]},\"7_timeBoundSetting\":{\"stage\":\"time-bound-setting\",\"introduction\":\"Finally, let's set a timeline. Having a deadline creates urgency and helps you plan.\",\"prompts\":[{\"type\":\"timeline-exploration\",\"basePrompt\":\"When would you like to achieve this goal by?\",\"refinementQuestions\":[\"Is this timeline realistic given what you need to do?\",\"Would you like to set any milestone dates along the way?\",\"What's your ideal completion date vs. your must-complete-by date?\"]},{\"type\":\"milestone-setting\",\"prompt\":\"Let's break this down. What key milestones should we track between now and {end_date}?\",\"template\":\"By {date}, I will have {milestone}\"}]},\"8_goalSummary\":{\"stage\":\"goal-summary\",\"introduction\":\"Fantastic! Let's review your SMART goal:\",\"summaryTemplate\":{\"format\":\"📋 Your SMART Goal:\\n\\n**Goal:** {specific_goal}\\n\\n**Specific:** {specific_details}\\n**Measurable:** {measurements}\\n**Achievable:** {achievability_factors}\\n**Relevant:** {relevance_reasons}\\n**Time-bound:** {timeline}\\n\\n**Key Milestones:**\\n{milestones}\",\"alternativeFormat\":\"I will {specific_action} as measured by {metric} by {deadline} because {relevance}.\"},\"confirmationPrompt\":\"How does this look? Would you like to adjust anything?\"},\"9_confirmationRefinement\":{\"stage\":\"confirmation-refinement\",\"prompts\":[{\"type\":\"final-check\",\"message\":\"Before we finalize, let me ask:\\n1. Does this goal excite and motivate you?\\n2. Is there anything that feels unclear or needs adjustment?\\n3. Are you ready to commit to this goal?\",\"refinementOptions\":[\"Adjust the timeline\",\"Modify the measurements\",\"Change the scope\",\"Add/remove milestones\",\"Goal looks perfect!\"]},{\"type\":\"commitment\",\"prompt\":\"Excellent! Your SMART goal is ready. Would you like me to help you create an action plan for getting started?\",\"closingMessage\":\"Remember, a goal without a plan is just a wish. You've taken the first important step. Good luck! 🌟\"}]}},\"interactionPatterns\":{\"clarificationLoops\":{\"maxAttempts\":3,\"strategies\":[\"Provide examples\",\"Ask more specific questions\",\"Offer multiple choice options\",\"Break down into smaller parts\"]},\"validationPatterns\":{\"alwaysConfirm\":true,\"allowBacktracking\":true,\"saveProgress\":true},\"errorHandling\":{\"vagueness\":\"I'd love to help make that clearer. Could you give me more details about {aspect}?\",\"conflict\":\"I notice this might conflict with {previous_input}. How would you like to resolve this?\",\"unrealistic\":\"That's ambitious! Let's explore how to make this more achievable while keeping it meaningful.\",\"confusion\":\"I want to make sure I understand. Let me ask a different way...\"}},\"adaptiveElements\":{\"userTypes\":{\"novice\":{\"moreExamples\":true,\"simplerLanguage\":true,\"additionalGuidance\":true},\"experienced\":{\"fasterPace\":true,\"fewerExamples\":false,\"advancedOptions\":true}},\"contextualHelp\":{\"triggers\":[\"help\",\"explain\",\"what does that mean\",\"I don't understand\"],\"responses\":{\"specific\":\"Being specific means clearly defining what you want to do, who's involved, where it happens, and which aspects you'll focus on.\",\"measurable\":\"Measurable means having concrete criteria for tracking progress - numbers, milestones, or observable outcomes.\",\"achievable\":\"Achievable means the goal is realistic given your resources, time, and circumstances - challenging but possible.\",\"relevant\":\"Relevant means the goal matters to you personally and aligns with your values, priorities, and bigger objectives.\",\"timebound\":\"Time-bound means having a clear deadline and timeline with specific dates for completion and milestones.\"}}},\"visualElements\":{\"progressIndicator\":\"Step {current} of 9: {stage_name}\",\"icons\":{\"specific\":\"🎯\",\"measurable\":\"📊\",\"achievable\":\"💪\",\"relevant\":\"❤️\",\"timebound\":\"⏰\"},\"formatting\":{\"userInput\":\"italic\",\"systemPrompt\":\"normal\",\"examples\":\"blockquote\",\"summary\":\"bold\"}},\"dataCollection\":{\"fieldsToStore\":[\"initial_goal\",\"specific_goal\",\"measurements\",\"resources_needed\",\"relevance_reasons\",\"timeline\",\"milestones\",\"confidence_level\",\"final_smart_goal\"],\"sessionTracking\":{\"trackProgress\":true,\"allowResume\":true,\"savePartialGoals\":true}}}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T21:31:27.920Z",
+    "updatedAt": "2025-06-26T21:31:27.920Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 9546,
+    "compressed": true,
+    "checksum": "e72cbb52a5b031d0a24f0e1e206d9c913d227ec5482082b89793e8cb8140f832",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mcdyaywn_tjd3va18c",
+    "key": "swarm-auto-centralized-1750976431170/bug-investigator/root-cause",
+    "value": "# SMART Goal Processor Bug: Root Cause Analysis\n\n## Bug Summary\nThe SMART goal processor fails to properly update component scores after user clarifications. When a user provides specific information that should improve a component's confidence score from 20% to 50% or higher, the system does not update the scores and continues asking for the same information.\n\n## Root Cause Analysis\n\n### Issue 1: Frontend Sends All Components Together\n**Location:** `/workspaces/personalEA/testing/goal-strategy-test/src/components/ChatClarification.tsx`\n**Lines:** 375-407\n\nThe frontend collects clarifications in a state object:\n```javascript\n// Line 376-380\nconst newClarifications = {\n  ...collectedClarifications,\n  [currentComponent.key]: userInput  // Only current component has user input\n}\nsetCollectedClarifications(newClarifications)\n```\n\nBut then sends ALL components (including empty ones) to the backend:\n```javascript\n// Line 403-407\nconst response = await goalAPI.clarifyGoal(\n  goal.id, \n  newClarifications,  // This includes all components, not just the current one\n  goalContext,\n  conversationHistory\n)\n```\n\n### Issue 2: API Transforms All Components Into Clarification Format\n**Location:** `/workspaces/personalEA/testing/goal-strategy-test/src/services/api.ts`\n**Lines:** 255-263\n\nThe API transforms the clarifications object into an array that includes ALL components:\n```javascript\nconst response = await api.post<APIResponse<Goal>>(`/goals/${goalId}/clarify`, {\n  clarifications: Object.entries(clarifications).map(([key, value]) => ({\n    question: `What is the ${key} aspect of your goal?`,\n    answer: value,  // This will be empty string for components user hasn't addressed\n    smartCriterion: key\n  })),\n  goalContext,\n  conversationHistory\n})\n```\n\n### Issue 3: Backend Processes All Components Together\n**Location:** `/workspaces/personalEA/services/goal-strategy/src/routes/goals.ts`\n**Lines:** 218-233\n\nThe backend endpoint processes ALL clarifications at once:\n```javascript\nif (clarifications && Array.isArray(clarifications)) {\n  const clarificationAnswers: ClarificationAnswer[] = clarifications.map((c: any) => ({\n    question: c.question,\n    answer: c.answer,\n    smartCriterion: c.smartCriterion\n  }));\n\n  const result = await smartGoalProcessor.processClarifications(\n    goal.rawGoal || goal.title,\n    goal.smartCriteria as any,\n    clarificationAnswers,  // Includes empty answers for components not yet addressed\n    userApiKey\n  );\n```\n\n### Issue 4: AI Prompt Instructs Low Confidence for All Components\n**Location:** `/workspaces/personalEA/services/goal-strategy/src/services/smart-goal-processor.ts`\n**Lines:** 294-336\n\nThe `buildClarificationPrompt` method has correct rules but they're undermined:\n```javascript\n// Line 309-315\nCRITICAL RULES:\n1. ONLY update the specific component(s) the user addressed\n2. DO NOT add details the user didn't provide\n3. DO NOT assume achievability or relevance without the user confirming it\n4. Keep confidence LOW (0.3-0.5) unless the user provided comprehensive details\n```\n\nThe AI is being asked to process multiple components where most have empty answers, causing it to:\n1. Reset all component confidences to low values (0.3-0.5)\n2. Overwrite previously good scores with low scores\n3. Keep asking for information already provided\n\n## Why Scores Don't Update\n\n1. **Empty Answers:** When the user clarifies the \"specific\" component, the system also sends empty answers for \"measurable\", \"achievable\", \"relevant\", and \"timeBound\" components.\n\n2. **AI Interpretation:** The AI sees empty answers and interprets this as \"user didn't provide information for these components\", so it sets their confidence to low values.\n\n3. **Overwriting Good Data:** Even if a component previously had 70% confidence, the empty answer causes the AI to reset it to 20-30%.\n\n4. **Prompt Contradiction:** The prompt says \"ONLY update the specific component(s) the user addressed\" but then provides data for ALL components, creating confusion.\n\n## Specific Example Scenario\n\n1. User clarifies \"specific\" component: \"hobby racing at local track\"\n2. Frontend sends:\n   ```json\n   {\n     \"specific\": \"hobby racing at local track\",\n     \"measurable\": \"\",\n     \"achievable\": \"\",\n     \"relevant\": \"\",\n     \"timeBound\": \"\"\n   }\n   ```\n3. Backend transforms to clarifications array with 5 items (4 are empty)\n4. AI sees 5 clarifications, 4 with empty answers\n5. AI updates all 5 components, setting 4 to low confidence due to empty answers\n6. Result: Only specific might improve slightly, others reset to low values\n\n## Line Numbers for Fixes Needed\n\n1. **Frontend Fix Needed:** `ChatClarification.tsx` lines 403-407\n   - Only send the current component being clarified, not all components\n\n2. **API Fix Needed:** `api.ts` lines 255-263\n   - Filter out components with empty values before sending\n\n3. **Backend Fix Needed:** `goals.ts` lines 218-233\n   - Process only non-empty clarifications\n   - Preserve existing scores for components not being updated\n\n4. **Prompt Enhancement:** `smart-goal-processor.ts` lines 294-336\n   - Make prompt more explicit about ignoring components with empty answers\n\n## State Persistence Issue\n\nThe system doesn't properly preserve previous component scores when processing new clarifications. Each clarification request causes a full rewrite of all SMART criteria, not just the component being addressed.\n\n## Recommended Solution\n\n1. **Frontend:** Send only the component currently being clarified\n2. **Backend:** Merge updates instead of replacing entire criteria\n3. **AI Prompt:** Explicitly instruct to ignore empty answers\n4. **State Management:** Implement proper merging logic to preserve unchanged components\n\nThis bug causes a frustrating user experience where progress is lost and the system appears to ignore user input.",
+    "type": "string",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-26T22:24:37.175Z",
+    "updatedAt": "2025-06-26T22:24:37.175Z",
+    "lastAccessedAt": "2025-06-29T17:09:27.820Z",
+    "version": 1,
+    "size": 6245,
+    "compressed": true,
+    "checksum": "be80fd36e77b44ae66e6337efe9701416a9ad25d4263595fb696ec9c31c7785d",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mchxfeuc_oyw6uy4wd",
+    "key": "swarm-auto-centralized-1751216900917/file-reviewer/recommendations",
+    "value": "-",
+    "type": "string",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-29T17:11:09.540Z",
+    "updatedAt": "2025-06-29T17:11:09.540Z",
+    "lastAccessedAt": "2025-06-29T17:11:09.540Z",
+    "version": 1,
+    "size": 32,
+    "compressed": false,
+    "checksum": "0933fb667296882d8c45abca58ac52e01c8db6f19e626b30de88f0f4ed143ec5",
+    "references": [],
+    "dependencies": []
+  },
+  {
+    "id": "entry_mchxftb2_lkw2buo4c",
+    "key": "swarm-auto-centralized-1751216900917/staging-coordinator/staged-files",
+    "value": "{\"timestamp\":\"2025-06-29T17:10:00Z\",\"stagedFiles\":{\"modified\":[\".claude/config.json\",\".env.production\",\".env.staging.example\",\".gitignore\",\"README.md\",\"docker-compose.dev.yml\",\"docker-compose.user.yml\",\"memory/data/entries.json\",\"services/email-processing/Dockerfile\",\"services/email-processing/package.json\",\"services/goal-strategy/src/index.ts\",\"services/goal-strategy/src/routes/goals.ts\",\"services/goal-strategy/src/services/smart-goal-processor.ts\",\"testing/goal-strategy-test/playwright.config.ts\",\"testing/goal-strategy-test/src/components/ApiConfig.tsx\",\"testing/goal-strategy-test/src/components/ChatClarification.tsx\",\"testing/goal-strategy-test/src/components/GoalInput.tsx\",\"testing/goal-strategy-test/src/services/api.ts\",\"testing/goal-strategy-test/tests/e2e/automated-user-testing.spec.ts\",\"testing/goal-strategy-test/tests/e2e/page-objects/ApiConfigPage.ts\",\"testing/goal-strategy-test/vite.config.ts\"],\"added\":[\".env.production.example\",\".github/workflows/automated-testing.yml\",\".github/workflows/comprehensive-browser-testing.yml\",\".github/workflows/deploy-with-gates.yml\",\".github/workflows/deploy.yml\",\".github/workflows/parallel-browser-testing.yml\",\".github/workflows/secure-deploy.yml\",\".github/workflows/visual-regression.yml\",\"deployment/monitoring/*\",\"deployment/scripts/*\",\"docker-compose.monitoring.yml\",\"docker-compose.production.yml\",\"docker-compose.testing.yml\",\"docs/PRIVACY_IMPLEMENTATION_PLAN.md\",\"docs/SECURE_LLM_TESTING_STRATEGY.md\",\"docs/SECURITY_DEPLOYMENT_GUIDE.md\",\"docs/security/*\",\"playwright.config.production.ts\",\"scripts/init-databases.sh\",\"scripts/sanitize-env-files.sh\",\"scripts/setup-production-env.sh\",\"services/goal-strategy/Dockerfile\",\"services/goal-strategy/src/routes/goals-chat-endpoints.ts\",\"testing/e2e/*\",\"testing/goal-strategy-test/public/debug-chat.html\",\"testing/goal-strategy-test/public/test-connection.html\",\"testing/goal-strategy-test/src/components/InteractiveGoalDisplay.tsx\",\"testing/goal-strategy-test/src/components/ProductionErrorBoundary.tsx\",\"testing/goal-strategy-test/src/services/api.production.ts\",\"testing/goal-strategy-test/tests/e2e/*.spec.ts\",\"testing/goal-strategy-test/tests/e2e/utils/smart-goal-test-utils.ts\",\"testing/goal-strategy-test/vite.config.production.ts\"],\"deleted\":[\"memory/backups/backup-2025-06-25T17-32-40-778Z.json\",\"memory/backups/backup-2025-06-25T17-32-43-378Z.json\",\"memory/backups/backup-2025-06-25T17-32-53-760Z.json\",\"memory/backups/backup-2025-06-25T17-33-03-237Z.json\",\"memory/backups/backup-2025-06-25T19-06-21-995Z.json\",\"memory/backups/backup-2025-06-25T19-06-29-376Z.json\",\"memory/backups/backup-2025-06-25T19-08-17-972Z.json\"]},\"categories\":{\"configuration\":[\".claude/config.json\",\".env.production\",\".env.production.example\",\".env.staging.example\",\".gitignore\"],\"deployment\":[\"docker-compose.*.yml\",\"deployment/*\",\".github/workflows/*\",\"scripts/*\"],\"services\":[\"services/email-processing/*\",\"services/goal-strategy/*\"],\"testing\":[\"testing/*\",\"playwright.config.production.ts\"],\"documentation\":[\"README.md\",\"docs/*\"],\"memory\":[\"memory/data/entries.json\",\"memory/backups/* (deleted)\"]},\"notStaged\":[\"test-*.js files (temporary test scripts)\",\"memory/backups/recent backup files\",\"memory/data/swarm-* directories (swarm-specific data)\",\"bug-analysis.json\",\"debug-page-structure.js\",\"reports/\",\"test-results/\",\"CICD_SECURITY_ANALYSIS.md\",\"COMPREHENSIVE_TESTING_PROTOCOL.md\",\"SECURITY_ALERT.md\",\".env.production.example.backup\",\".env.production.example.new\"],\"reasoning\":{\"staged\":\"Staged all core application files, deployment configurations, CI/CD workflows, essential documentation, and test specifications. These represent the main codebase and infrastructure changes.\",\"notStaged\":\"Excluded temporary test scripts, debug files, analysis reports, and duplicate environment files to keep the commit focused on production-ready changes.\"}}",
+    "type": "object",
+    "namespace": "default",
+    "tags": [],
+    "metadata": {},
+    "owner": "system",
+    "accessLevel": "shared",
+    "createdAt": "2025-06-29T17:11:28.286Z",
+    "updatedAt": "2025-06-29T17:11:28.286Z",
+    "lastAccessedAt": "2025-06-29T17:11:28.286Z",
+    "version": 1,
+    "size": 4096,
+    "compressed": true,
+    "checksum": "14ddd7d7ff637eac4776f4f5481a67a945a6f92d1ce595983314b4b349b70ee5",
     "references": [],
     "dependencies": []
   }

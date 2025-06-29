@@ -1,0 +1,188 @@
+# PersonalEA Recording Rules
+# Pre-computed metrics for improved query performance
+
+groups:
+  - name: api_metrics
+    interval: 30s
+    rules:
+      # API request rate by service
+      - record: service:http_requests:rate5m
+        expr: |
+          sum by (service, method, status) (
+            rate(http_requests_total[5m])
+          )
+
+      # API error rate by service
+      - record: service:http_errors:rate5m
+        expr: |
+          sum by (service) (
+            rate(http_requests_total{status=~"5.."}[5m])
+          )
+
+      # API success rate by service
+      - record: service:http_success_rate:ratio5m
+        expr: |
+          sum by (service) (rate(http_requests_total{status=~"2.."}[5m]))
+          /
+          sum by (service) (rate(http_requests_total[5m]))
+
+      # 95th percentile response time
+      - record: service:http_request_duration:p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (service, le) (
+              rate(http_request_duration_seconds_bucket[5m])
+            )
+          )
+
+      # 99th percentile response time
+      - record: service:http_request_duration:p99_5m
+        expr: |
+          histogram_quantile(0.99,
+            sum by (service, le) (
+              rate(http_request_duration_seconds_bucket[5m])
+            )
+          )
+
+  - name: resource_usage
+    interval: 30s
+    rules:
+      # Container CPU usage percentage
+      - record: container:cpu_usage:percentage
+        expr: |
+          sum by (container_label_com_docker_compose_service) (
+            rate(container_cpu_usage_seconds_total[5m])
+          ) * 100
+
+      # Container memory usage percentage
+      - record: container:memory_usage:percentage
+        expr: |
+          (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100
+
+      # Node CPU usage
+      - record: node:cpu_usage:percentage
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+      # Node memory usage
+      - record: node:memory_usage:percentage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+
+  - name: database_metrics
+    interval: 30s
+    rules:
+      # PostgreSQL active connections ratio
+      - record: postgres:connections:usage_ratio
+        expr: |
+          sum(pg_stat_activity_count) by (instance)
+          /
+          sum(pg_settings_max_connections) by (instance)
+
+      # PostgreSQL transaction rate
+      - record: postgres:transactions:rate5m
+        expr: |
+          sum by (instance, datname) (
+            rate(pg_stat_database_xact_commit[5m]) +
+            rate(pg_stat_database_xact_rollback[5m])
+          )
+
+      # PostgreSQL cache hit ratio
+      - record: postgres:cache_hit:ratio
+        expr: |
+          sum(pg_stat_database_blks_hit) by (instance, datname)
+          /
+          (sum(pg_stat_database_blks_hit) by (instance, datname) +
+           sum(pg_stat_database_blks_read) by (instance, datname))
+
+  - name: redis_metrics
+    interval: 30s
+    rules:
+      # Redis memory usage ratio
+      - record: redis:memory:usage_ratio
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes
+
+      # Redis hit rate
+      - record: redis:cache_hit:ratio
+        expr: |
+          rate(redis_keyspace_hits_total[5m])
+          /
+          (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m]))
+
+      # Redis operations per second
+      - record: redis:operations:rate1m
+        expr: |
+          sum(rate(redis_commands_processed_total[1m])) by (instance)
+
+  - name: business_metrics
+    interval: 30s
+    rules:
+      # Goals processing rate
+      - record: goals:processing:rate5m
+        expr: |
+          sum(rate(goals_processed_total[5m])) by (status)
+
+      # Average goal processing time
+      - record: goals:processing_time:avg5m
+        expr: |
+          rate(goal_processing_duration_seconds_sum[5m])
+          /
+          rate(goal_processing_duration_seconds_count[5m])
+
+      # Email processing rate
+      - record: emails:processing:rate5m
+        expr: |
+          sum(rate(emails_processed_total[5m])) by (status)
+
+      # Email queue depth trend
+      - record: emails:queue_depth:trend5m
+        expr: |
+          deriv(emails_queue_size[5m])
+
+      # OpenAI API usage rate
+      - record: openai:requests:rate5m
+        expr: |
+          sum(rate(openai_api_requests_total[5m])) by (endpoint, status)
+
+      # OpenAI API cost estimation (tokens * estimated cost per token)
+      - record: openai:estimated_cost:rate5m
+        expr: |
+          sum(rate(openai_tokens_used_total[5m])) * 0.000002
+
+  - name: availability
+    interval: 30s
+    rules:
+      # Service availability (5-minute window)
+      - record: service:availability:ratio5m
+        expr: |
+          avg_over_time(up[5m])
+
+      # API endpoint availability
+      - record: endpoint:availability:ratio5m
+        expr: |
+          avg_over_time(probe_success[5m])
+
+  - name: capacity_planning
+    interval: 5m
+    rules:
+      # Predicted disk usage (linear extrapolation)
+      - record: disk:usage:predicted_days_until_full
+        expr: |
+          node_filesystem_avail_bytes{mountpoint="/"}
+          /
+          (deriv(node_filesystem_avail_bytes{mountpoint="/"}[1h]) * -86400)
+
+      # Database growth rate (GB per day)
+      - record: postgres:size:growth_rate_gb_per_day
+        expr: |
+          deriv(pg_database_size_bytes[1d]) / 1073741824
+
+      # Memory pressure score (0-100)
+      - record: system:memory_pressure:score
+        expr: |
+          (
+            (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 50 +
+            (rate(node_vmstat_pgmajfault[5m]) / 100) * 30 +
+            (node_memory_SwapCached_bytes / node_memory_SwapTotal_bytes) * 20
+          )

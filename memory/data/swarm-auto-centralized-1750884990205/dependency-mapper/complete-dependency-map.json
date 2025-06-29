@@ -1,0 +1,222 @@
+{
+  "goalStrategyModule": {
+    "name": "@personalea/goal-strategy-service",
+    "version": "1.0.0",
+    "type": "microservice",
+    "port": 3000,
+    "apiPath": "/api/v1/goals",
+    "database": "PostgreSQL",
+    "directDependencies": {
+      "runtime": [
+        "@prisma/client",
+        "bcryptjs",
+        "compression",
+        "cors",
+        "date-fns",
+        "dotenv",
+        "express",
+        "express-rate-limit",
+        "helmet",
+        "jsonwebtoken",
+        "openai",
+        "uuid",
+        "winston",
+        "zod"
+      ],
+      "development": [
+        "@types/bcryptjs",
+        "@types/compression",
+        "@types/cors",
+        "@types/express",
+        "@types/jest",
+        "@types/jsonwebtoken",
+        "@types/node",
+        "@types/supertest",
+        "@types/uuid",
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser",
+        "eslint",
+        "jest",
+        "jest-playwright-preset",
+        "playwright",
+        "@playwright/test",
+        "prisma",
+        "supertest",
+        "ts-jest",
+        "tsx",
+        "typescript"
+      ]
+    },
+    "sharedResources": {
+      "database": {
+        "type": "PostgreSQL",
+        "sharedWith": ["email-processing-service"],
+        "schemas": ["public"],
+        "models": [
+          "Goal",
+          "GoalMetric",
+          "GoalClarification",
+          "Milestone",
+          "MilestoneProgress",
+          "Task",
+          "TaskDependency",
+          "TaskEstimate",
+          "SimilarTask",
+          "EstimationHistory",
+          "TaskSchedule",
+          "TeamCapacity",
+          "CapacityAllocation",
+          "GoalTemplate",
+          "WorkflowPattern"
+        ]
+      },
+      "cache": {
+        "type": "Redis",
+        "sharedWith": ["email-processing-service"],
+        "purpose": "Session management, caching, rate limiting"
+      },
+      "authentication": {
+        "library": "@personalea/auth",
+        "mechanism": "JWT",
+        "sharedWith": ["email-processing-service"]
+      }
+    },
+    "apiEndpoints": [
+      "/api/v1/goals/transform",
+      "/api/v1/goals/clarify",
+      "/api/v1/goals/:id",
+      "/api/v1/goals/:id/metrics",
+      "/api/v1/milestones",
+      "/api/v1/health"
+    ]
+  },
+  "servicesWithDirectDependency": {
+    "goal-strategy-test": {
+      "name": "goal-strategy-test",
+      "type": "frontend-test-app",
+      "dependencies": [
+        "axios (for API calls to goal-strategy)",
+        "openai (for direct OpenAI integration testing)"
+      ],
+      "connectionPoints": [
+        "API calls to http://localhost:8085/api/v1/goals/*",
+        "Mock API server on port 8085",
+        "OpenAI API server testing"
+      ]
+    },
+    "client-dev-kit": {
+      "name": "personalea-client-dev-kit",
+      "type": "SDK/client-library",
+      "dependencies": [
+        "axios",
+        "date-fns"
+      ],
+      "connectionPoints": [
+        "Type generation from goal-strategy-service-api-v1.yaml",
+        "Example scripts for goal service integration"
+      ]
+    },
+    "personalea-root": {
+      "name": "personal-ea",
+      "type": "monorepo-root",
+      "connectionPoints": [
+        "Mock server on port 8085",
+        "OpenAPI specs for goal-strategy service",
+        "Contract testing with Pact",
+        "Integration testing scripts"
+      ]
+    }
+  },
+  "servicesWithIndirectDependency": {
+    "email-processing-service": {
+      "name": "@personalea/email-processing-service",
+      "type": "microservice",
+      "port": 3001,
+      "sharedResources": [
+        "PostgreSQL database (same instance)",
+        "Redis cache (same instance)",
+        "JWT authentication (same secret)"
+      ],
+      "potentialIntegrations": [
+        "Could extract action items from emails to create goals",
+        "Could send email notifications for goal milestones"
+      ]
+    },
+    "nginx": {
+      "name": "nginx-reverse-proxy",
+      "type": "infrastructure",
+      "connectionPoints": [
+        "Routes /api/goals/* to goal-strategy-service",
+        "Load balancing across goal-strategy replicas",
+        "SSL termination"
+      ]
+    },
+    "monitoring-stack": {
+      "components": ["prometheus", "grafana", "loki", "promtail"],
+      "connectionPoints": [
+        "Metrics collection from goal-strategy service",
+        "Log aggregation",
+        "Performance monitoring"
+      ]
+    }
+  },
+  "isolatedComponents": {
+    "automation-docs-tooling": {
+      "name": "personalea-docs-tooling",
+      "type": "development-tool",
+      "noDirectDependency": true,
+      "purpose": "Documentation generation and automation"
+    },
+    "conversation-quality": {
+      "name": "personalea-conversation-quality",
+      "type": "testing-framework",
+      "dependencies": ["axios"],
+      "purpose": "AI-validates-AI conversation quality testing",
+      "noDirectDependency": true
+    },
+    "shared-auth": {
+      "name": "@personalea/auth",
+      "type": "shared-library",
+      "usedBy": ["goal-strategy-service", "email-processing-service"],
+      "purpose": "Shared authentication utilities"
+    }
+  },
+  "deploymentTopology": {
+    "production": {
+      "goal-strategy-replicas": 2,
+      "networks": ["backend", "frontend"],
+      "exposedPorts": {
+        "internal": 3000,
+        "external": "via nginx"
+      },
+      "resourceLimits": {
+        "cpu": "1 core",
+        "memory": "1GB",
+        "reservations": {
+          "cpu": "0.5 core",
+          "memory": "512MB"
+        }
+      }
+    }
+  },
+  "testingDependencies": {
+    "unitTests": {
+      "framework": "Jest",
+      "mocks": ["OpenAI API", "Prisma client"]
+    },
+    "integrationTests": {
+      "tools": ["Supertest", "Playwright", "MSW"],
+      "testApps": ["goal-strategy-test"]
+    },
+    "contractTests": {
+      "tools": ["Pact", "Schemathesis", "Dredd"],
+      "specifications": ["goal-strategy-service-api-v1.yaml"]
+    }
+  },
+  "criticalDependencies": [
+    "PostgreSQL (data persistence)",
+    "Redis (caching and sessions)",
+    "OpenAI API (core functionality)",
+    "JWT (authentication)"
+  ]
+}

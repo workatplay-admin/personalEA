@@ -1,0 +1,74 @@
+{
+  "bug_id": "SMART-GOAL-SCORE-UPDATE-FAILURE",
+  "severity": "critical",
+  "discovered_at": "2025-06-26T22:14:00Z",
+  "analyzed_by": "Lead Coordinator",
+  "summary": "SMART goal processor fails to update confidence scores despite users providing specific, detailed answers",
+  
+  "root_cause": {
+    "location": "services/goal-strategy/src/services/smart-goal-processor.ts",
+    "method": "buildClarificationPrompt",
+    "lines": "294-336",
+    "description": "The AI prompt explicitly constrains confidence scores to 0.3-0.5 range and prevents proper score updates even when users provide comprehensive information"
+  },
+  
+  "problematic_prompt_rules": [
+    "Keep confidence LOW (0.3-0.5) unless the user provided comprehensive details",
+    "ONLY update the specific component(s) the user addressed",
+    "DO NOT add details the user didn't provide (no timeframes, metrics, or assessments they didn't mention)",
+    "DO NOT assume achievability or relevance without the user confirming it"
+  ],
+  
+  "bug_reproduction": {
+    "step1": "User provides initial goal (e.g., 'Learn to race')",
+    "step2": "System correctly identifies low specificity (20%)",
+    "step3": "System asks for more specific details",
+    "step4": "User provides detailed answer (e.g., 'hobby racing at local track')",
+    "step5": "System updates specific component but keeps confidence artificially low (30-50%)",
+    "step6": "System continues asking for information already implicitly provided"
+  },
+  
+  "impact": {
+    "user_experience": "Frustrating loop where users repeatedly provide information but system fails to recognize improvements",
+    "functionality": "Core SMART goal refinement process is broken",
+    "data_flow": "Confidence scores remain stuck at low values despite quality improvements"
+  },
+  
+  "affected_endpoints": [
+    "/api/v1/goals/clarify",
+    "/api/v1/goals/:id/clarify"
+  ],
+  
+  "related_files": [
+    {
+      "path": "services/goal-strategy/src/services/smart-goal-processor.ts",
+      "methods": ["processClarifications", "buildClarificationPrompt", "parseAIResponse"]
+    },
+    {
+      "path": "services/goal-strategy/src/routes/goals.ts",
+      "methods": ["POST /clarify", "POST /:id/clarify"]
+    }
+  ],
+  
+  "proposed_fix": {
+    "approach": "Revise the buildClarificationPrompt method to allow dynamic confidence scoring based on answer quality",
+    "changes_needed": [
+      "Remove artificial confidence score constraints (0.3-0.5)",
+      "Allow AI to properly evaluate answer comprehensiveness",
+      "Enable updating multiple components if user's answer addresses them",
+      "Add logic to recognize when sufficient information has been provided"
+    ],
+    "example_revised_prompt": "Evaluate the user's input objectively. If they provided specific, measurable details, update confidence accordingly (0.7-1.0 for comprehensive answers). Update all components their answer addresses."
+  },
+  
+  "test_cases_needed": [
+    "Test confidence score increases appropriately with detailed answers",
+    "Test multiple components update when answer addresses multiple criteria",
+    "Test system recognizes when clarification is complete",
+    "Test edge cases with partial or ambiguous answers"
+  ],
+  
+  "priority": "CRITICAL",
+  "estimated_fix_time": "2-3 hours",
+  "assigned_to": "Development team"
+}

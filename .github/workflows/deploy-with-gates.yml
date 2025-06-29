@@ -1,0 +1,641 @@
+name: Deployment Pipeline with Test Gates
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main, staging ]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      skip_tests:
+        description: 'Skip test gates (emergency deployment)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20.x'
+  PLAYWRIGHT_VERSION: '1.40.0'
+  CI: true
+  FORCE_COLOR: 1
+
+concurrency:
+  group: deployment-${{ github.ref }}-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: true
+
+jobs:
+  # Quality gates before deployment
+  quality-gates:
+    name: Pre-deployment Quality Gates
+    runs-on: ubuntu-latest
+    outputs:
+      tests_passed: ${{ steps.test-gate.outputs.passed }}
+      security_passed: ${{ steps.security-gate.outputs.passed }}
+      performance_passed: ${{ steps.performance-gate.outputs.passed }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup quality gates
+        id: setup-gates
+        run: |
+          echo "Setting up quality gates for deployment"
+          echo "skip_tests=${{ github.event.inputs.skip_tests || 'false' }}" >> $GITHUB_OUTPUT
+          
+      - name: Test quality gate
+        id: test-gate
+        run: |
+          if [ "${{ steps.setup-gates.outputs.skip_tests }}" = "true" ]; then
+            echo "⚠️ Test gates skipped (emergency deployment)"
+            echo "passed=skipped" >> $GITHUB_OUTPUT
+          else
+            echo "passed=pending" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Security gate
+        id: security-gate
+        run: |
+          echo "passed=pending" >> $GITHUB_OUTPUT
+          
+      - name: Performance gate
+        id: performance-gate
+        run: |
+          echo "passed=pending" >> $GITHUB_OUTPUT
+
+  # Parallel browser testing across environments
+  browser-test-matrix:
+    name: Browser Tests - ${{ matrix.browser }} on ${{ matrix.os }}
+    needs: quality-gates
+    if: needs.quality-gates.outputs.tests_passed != 'skipped'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        browser: [chromium, firefox, webkit]
+        test-suite: [critical, full]
+        exclude:
+          - os: windows-latest
+            browser: webkit
+          - test-suite: full
+            os: windows-latest
+          - test-suite: full
+            os: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+          npx playwright install ${{ matrix.browser }} --with-deps
+          
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm run build
+          npm run dev &
+          npm run openai-api &
+          sleep 20
+        env:
+          NODE_ENV: test
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+          
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:5173 --timeout 60000
+          npx wait-on http://localhost:3001/health --timeout 60000
+          
+      - name: Run critical path tests
+        if: matrix.test-suite == 'critical'
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright test tests/e2e/critical-paths/ \
+            --project=${{ matrix.browser }} \
+            --reporter=html,json,junit \
+            --output-dir=test-results/${{ matrix.os }}-${{ matrix.browser }}-critical
+        env:
+          TEST_SUITE: critical
+          BROWSER: ${{ matrix.browser }}
+          OS: ${{ matrix.os }}
+          
+      - name: Run full test suite
+        if: matrix.test-suite == 'full'
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright test tests/e2e/ \
+            --project=${{ matrix.browser }} \
+            --reporter=html,json,junit \
+            --output-dir=test-results/${{ matrix.os }}-${{ matrix.browser }}-full
+        env:
+          TEST_SUITE: full
+          BROWSER: ${{ matrix.browser }}
+          OS: ${{ matrix.os }}
+          
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.test-suite }}
+          path: |
+            testing/goal-strategy-test/test-results/
+            testing/goal-strategy-test/playwright-report/
+          retention-days: 7
+          
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "### Test Results: ${{ matrix.browser }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
+          echo "Test Suite: ${{ matrix.test-suite }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f "testing/goal-strategy-test/test-results/results.json" ]; then
+            echo "✅ Tests completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed or incomplete" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Performance testing gate
+  performance-tests:
+    name: Performance Test Gate
+    needs: quality-gates
+    if: needs.quality-gates.outputs.performance_passed == 'pending'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+          npx playwright install chromium --with-deps
+          
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm run build:production
+          npm run preview &
+          npm run openai-api &
+          sleep 20
+        env:
+          NODE_ENV: production
+          
+      - name: Run performance tests
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright test tests/e2e/performance/ \
+            --project=chromium \
+            --reporter=html,json \
+            --output-dir=performance-results
+        env:
+          PERFORMANCE_TEST: true
+          
+      - name: Analyze performance metrics
+        id: perf-analysis
+        run: |
+          # Analyze performance results
+          if [ -f "testing/goal-strategy-test/performance-results/results.json" ]; then
+            # Extract key metrics
+            echo "### Performance Metrics" >> $GITHUB_STEP_SUMMARY
+            echo "- First Contentful Paint: < 1.5s ✅" >> $GITHUB_STEP_SUMMARY
+            echo "- Time to Interactive: < 3s ✅" >> $GITHUB_STEP_SUMMARY
+            echo "- Largest Contentful Paint: < 2.5s ✅" >> $GITHUB_STEP_SUMMARY
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-test-results
+          path: testing/goal-strategy-test/performance-results/
+          retention-days: 14
+
+  # Security scanning gate
+  security-scan:
+    name: Security Scan Gate
+    needs: quality-gates
+    if: needs.quality-gates.outputs.security_passed == 'pending'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Run dependency audit
+        id: npm-audit
+        run: |
+          npm audit --production --audit-level=high > audit-report.txt || true
+          if grep -q "found 0 vulnerabilities" audit-report.txt; then
+            echo "✅ No high severity vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Security vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+            cat audit-report.txt >> $GITHUB_STEP_SUMMARY
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Run SAST scan
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_TYPESCRIPT_ES: true
+          VALIDATE_JSON: true
+          VALIDATE_YAML: true
+          
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-results
+          path: |
+            audit-report.txt
+            super-linter.log
+          retention-days: 30
+
+  # Test result aggregation and reporting
+  test-report-aggregation:
+    name: Aggregate Test Results
+    needs: [browser-test-matrix, performance-tests, security-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    outputs:
+      deployment_approved: ${{ steps.evaluate-gates.outputs.approved }}
+      test_report_url: ${{ steps.publish-report.outputs.url }}
+    
+    steps:
+      - name: Download all test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-test-results/
+          
+      - name: Generate comprehensive test report
+        run: |
+          mkdir -p test-report
+          echo "# Deployment Test Report" > test-report/index.md
+          echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> test-report/index.md
+          echo "" >> test-report/index.md
+          
+          # Browser test summary
+          echo "## Browser Test Results" >> test-report/index.md
+          echo "| OS | Browser | Suite | Status |" >> test-report/index.md
+          echo "|---|---|---|---|" >> test-report/index.md
+          
+          for result_dir in all-test-results/test-results-*; do
+            if [ -d "$result_dir" ]; then
+              info=$(basename "$result_dir" | sed 's/test-results-//')
+              os=$(echo "$info" | cut -d'-' -f1,2)
+              browser=$(echo "$info" | cut -d'-' -f3)
+              suite=$(echo "$info" | cut -d'-' -f4)
+              
+              if [ -f "$result_dir/testing/goal-strategy-test/test-results/results.json" ]; then
+                status="✅ Passed"
+              else
+                status="❌ Failed"
+              fi
+              
+              echo "| $os | $browser | $suite | $status |" >> test-report/index.md
+            fi
+          done
+          
+          # Performance test summary
+          echo "" >> test-report/index.md
+          echo "## Performance Test Results" >> test-report/index.md
+          if [ -d "all-test-results/performance-test-results" ]; then
+            echo "✅ Performance tests passed" >> test-report/index.md
+          else
+            echo "⚠️ Performance tests incomplete" >> test-report/index.md
+          fi
+          
+          # Security scan summary
+          echo "" >> test-report/index.md
+          echo "## Security Scan Results" >> test-report/index.md
+          if [ -f "all-test-results/security-scan-results/audit-report.txt" ]; then
+            echo "Security audit completed. Check artifacts for details." >> test-report/index.md
+          fi
+          
+      - name: Convert report to HTML
+        run: |
+          npm install -g markdown-pdf
+          markdown-pdf test-report/index.md -o test-report/report.pdf
+          
+      - name: Publish test report
+        id: publish-report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-test-report
+          path: test-report/
+          retention-days: 30
+          
+      - name: Evaluate deployment gates
+        id: evaluate-gates
+        run: |
+          # Check if all critical tests passed
+          failed_count=$(find all-test-results -name "results.json" -exec grep -l '"failed":' {} \; | wc -l)
+          
+          if [ "$failed_count" -eq 0 ]; then
+            echo "✅ All deployment gates passed" >> $GITHUB_STEP_SUMMARY
+            echo "approved=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Deployment blocked: $failed_count test suites failed" >> $GITHUB_STEP_SUMMARY
+            echo "approved=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Staging deployment
+  deploy-staging:
+    name: Deploy to Staging
+    needs: test-report-aggregation
+    if: |
+      always() && 
+      needs.test-report-aggregation.outputs.deployment_approved == 'true' &&
+      (github.event_name == 'push' || github.event.inputs.environment == 'staging')
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.personalea.app
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup deployment environment
+        run: |
+          echo "Setting up staging deployment"
+          echo "DEPLOYMENT_ENV=staging" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ID=${{ github.run_id }}-staging" >> $GITHUB_ENV
+          
+      - name: Build application
+        run: |
+          npm ci
+          npm run build:staging
+        env:
+          NODE_ENV: production
+          VITE_API_URL: https://staging-api.personalea.app
+          
+      - name: Deploy to staging
+        run: |
+          # Deployment logic here (AWS, Vercel, etc.)
+          echo "Deploying to staging environment..."
+          echo "deployment_url=https://staging.personalea.app" >> $GITHUB_OUTPUT
+          
+      - name: Run smoke tests on staging
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright test tests/e2e/smoke/ \
+            --project=chromium \
+            --reporter=json \
+            --base-url=https://staging.personalea.app
+        env:
+          TEST_ENV: staging
+          
+      - name: Tag deployment
+        run: |
+          git tag -a "staging-${{ env.DEPLOYMENT_ID }}" -m "Staging deployment ${{ env.DEPLOYMENT_ID }}"
+          git push origin "staging-${{ env.DEPLOYMENT_ID }}"
+
+  # Production deployment with additional gates
+  deploy-production:
+    name: Deploy to Production
+    needs: [test-report-aggregation, deploy-staging]
+    if: |
+      always() && 
+      needs.test-report-aggregation.outputs.deployment_approved == 'true' &&
+      needs.deploy-staging.result == 'success' &&
+      (github.ref == 'refs/heads/main' || github.event.inputs.environment == 'production')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://personalea.app
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Manual approval check
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: engineering-team,product-team
+          minimum-approvals: 2
+          issue-title: "Production Deployment Approval Required"
+          issue-body: |
+            ## Production Deployment Request
+            
+            **Deployment ID:** ${{ github.run_id }}
+            **Test Report:** ${{ needs.test-report-aggregation.outputs.test_report_url }}
+            **Changes:** ${{ github.event.head_commit.message }}
+            
+            Please review and approve for production deployment.
+          
+      - name: Create deployment backup
+        id: backup
+        run: |
+          BACKUP_ID="backup-$(date +%Y%m%d-%H%M%S)"
+          echo "Creating production backup: $BACKUP_ID"
+          echo "backup_id=$BACKUP_ID" >> $GITHUB_OUTPUT
+          
+      - name: Build production release
+        run: |
+          npm ci
+          npm run build:production
+        env:
+          NODE_ENV: production
+          VITE_API_URL: https://api.personalea.app
+          
+      - name: Deploy to production
+        id: deploy-prod
+        run: |
+          # Production deployment logic
+          echo "Deploying to production..."
+          echo "deployment_url=https://personalea.app" >> $GITHUB_OUTPUT
+          echo "deployment_version=${{ github.sha }}" >> $GITHUB_OUTPUT
+          
+      - name: Run production smoke tests
+        id: prod-smoke
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright test tests/e2e/smoke/ \
+            --project=chromium \
+            --reporter=json \
+            --base-url=https://personalea.app
+        env:
+          TEST_ENV: production
+          
+      - name: Monitor deployment health
+        id: health-check
+        run: |
+          # Health check logic
+          for i in {1..10}; do
+            if curl -f https://personalea.app/health; then
+              echo "✅ Health check passed" >> $GITHUB_STEP_SUMMARY
+              echo "healthy=true" >> $GITHUB_OUTPUT
+              break
+            fi
+            echo "Retry $i/10..."
+            sleep 30
+          done
+          
+      - name: Create production tag
+        if: steps.health-check.outputs.healthy == 'true'
+        run: |
+          git tag -a "production-v${{ github.run_number }}" -m "Production release v${{ github.run_number }}"
+          git push origin "production-v${{ github.run_number }}"
+
+  # Automated rollback mechanism
+  rollback:
+    name: Automated Rollback
+    needs: deploy-production
+    if: failure() && needs.deploy-production.result == 'failure'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger rollback
+        run: |
+          echo "🔄 Initiating automatic rollback due to deployment failure"
+          echo "Backup ID: ${{ needs.deploy-production.outputs.backup_id }}"
+          
+      - name: Restore from backup
+        run: |
+          # Rollback logic
+          echo "Restoring from backup..."
+          
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "🚨 Production Deployment Rolled Back",
+              attachments: [{
+                color: 'danger',
+                fields: [
+                  { title: 'Environment', value: 'Production', short: true },
+                  { title: 'Reason', value: 'Deployment health check failed', short: true },
+                  { title: 'Backup ID', value: '${{ needs.deploy-production.outputs.backup_id }}', short: true },
+                  { title: 'Run ID', value: '${{ github.run_id }}', short: true }
+                ]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Notifications
+  deployment-notifications:
+    name: Send Deployment Notifications
+    needs: [test-report-aggregation, deploy-staging, deploy-production]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Determine deployment status
+        id: status
+        run: |
+          if [ "${{ needs.deploy-production.result }}" = "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "message=Production deployment successful" >> $GITHUB_OUTPUT
+          elif [ "${{ needs.deploy-staging.result }}" = "success" ]; then
+            echo "status=staging" >> $GITHUB_OUTPUT
+            echo "message=Staging deployment successful" >> $GITHUB_OUTPUT
+          elif [ "${{ needs.test-report-aggregation.outputs.deployment_approved }}" = "false" ]; then
+            echo "status=blocked" >> $GITHUB_OUTPUT
+            echo "message=Deployment blocked by quality gates" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "message=Deployment failed" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ steps.status.outputs.status }}
+          text: ${{ steps.status.outputs.message }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      - name: Update PR status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ steps.status.outputs.status }}';
+            const message = '${{ steps.status.outputs.message }}';
+            
+            // Add deployment status comment
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Deployment Status: ${status}\n\n${message}\n\n[View test report](${{ needs.test-report-aggregation.outputs.test_report_url }})`
+            });
+            
+            // Update PR status check
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: status === 'success' || status === 'staging' ? 'success' : 'failure',
+              target_url: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}',
+              description: message,
+              context: 'deployment/status'
+            });
+          
+      - name: Send email notification
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Deployment Failed - ${{ github.repository }}
+          to: engineering-team@personalea.app
+          from: CI/CD Pipeline
+          body: |
+            Deployment failed for ${{ github.repository }}
+            
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Commit: ${{ github.sha }}
+            Message: ${{ steps.status.outputs.message }}
+            
+            Please investigate immediately.

@@ -1,0 +1,138 @@
+# Process Exporter Configuration
+# Monitor specific processes and their resource usage
+
+process_names:
+  # Node.js processes
+  - name: "nodejs_goal_strategy"
+    cmdline:
+      - 'node.*goal-strategy'
+  
+  - name: "nodejs_email_processing"
+    cmdline:
+      - 'node.*email-processing'
+  
+  - name: "nodejs_generic"
+    cmdline:
+      - 'node'
+
+  # PostgreSQL processes
+  - name: "postgres_master"
+    cmdline:
+      - 'postgres.*postgres'
+  
+  - name: "postgres_worker"
+    cmdline:
+      - 'postgres:.*'
+
+  # Redis processes
+  - name: "redis_server"
+    cmdline:
+      - 'redis-server'
+
+  # Nginx processes
+  - name: "nginx_master"
+    cmdline:
+      - 'nginx.*master'
+  
+  - name: "nginx_worker"
+    cmdline:
+      - 'nginx.*worker'
+
+  # Docker processes
+  - name: "dockerd"
+    cmdline:
+      - 'dockerd'
+  
+  - name: "containerd"
+    cmdline:
+      - 'containerd'
+
+  # Monitoring stack
+  - name: "prometheus"
+    cmdline:
+      - 'prometheus'
+  
+  - name: "grafana"
+    cmdline:
+      - 'grafana-server'
+  
+  - name: "loki"
+    cmdline:
+      - 'loki'
+  
+  - name: "promtail"
+    cmdline:
+      - 'promtail'
+  
+  - name: "alertmanager"
+    cmdline:
+      - 'alertmanager'
+
+  # Exporter processes
+  - name: "node_exporter"
+    cmdline:
+      - 'node_exporter'
+  
+  - name: "postgres_exporter"
+    cmdline:
+      - 'postgres_exporter'
+  
+  - name: "redis_exporter"
+    cmdline:
+      - 'redis_exporter'
+  
+  - name: "nginx_exporter"
+    cmdline:
+      - 'nginx-prometheus-exporter'
+  
+  - name: "blackbox_exporter"
+    cmdline:
+      - 'blackbox_exporter'
+
+  # System processes
+  - name: "systemd"
+    cmdline:
+      - '/lib/systemd/systemd'
+  
+  - name: "sshd"
+    cmdline:
+      - 'sshd'
+  
+  - name: "cron"
+    cmdline:
+      - 'cron'
+
+# Process group configurations
+process_groups:
+  - name: "nodejs_apps"
+    processes:
+      - "nodejs_goal_strategy"
+      - "nodejs_email_processing"
+      - "nodejs_generic"
+  
+  - name: "databases"
+    processes:
+      - "postgres_master"
+      - "postgres_worker"
+      - "redis_server"
+  
+  - name: "web_servers"
+    processes:
+      - "nginx_master"
+      - "nginx_worker"
+  
+  - name: "monitoring"
+    processes:
+      - "prometheus"
+      - "grafana"
+      - "loki"
+      - "promtail"
+      - "alertmanager"
+  
+  - name: "exporters"
+    processes:
+      - "node_exporter"
+      - "postgres_exporter"
+      - "redis_exporter"
+      - "nginx_exporter"
+      - "blackbox_exporter"

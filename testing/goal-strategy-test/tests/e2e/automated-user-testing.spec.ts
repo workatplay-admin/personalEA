@@ -44,15 +44,13 @@ test.describe('Automated User Testing Suite - Complete User Journey', () => {
 
   test('User Journey 1: First-time user configures API and creates a simple goal', async ({ page }) => {
     // Step 1: User lands on the app and sees API configuration
-    await expect(page.locator('h2:has-text("API Configuration")')).toBeVisible();
+    await expect(page.locator('h2:has-text("OpenAI API Key Required")')).toBeVisible();
     
-    // Step 2: User enters API key and URL
+    // Step 2: User enters API key
     const apiKeyInput = page.locator('input[placeholder*="API key"]');
-    const apiUrlInput = page.locator('input[placeholder*="API URL"]');
-    const saveButton = page.locator('button:has-text("Save Configuration")');
+    const saveButton = page.locator('button:has-text("Configure API")');
     
     await apiKeyInput.fill(API_KEY);
-    await apiUrlInput.fill(API_URL);
     await saveButton.click();
     
     // Step 3: Verify configuration saved and moved to goal input

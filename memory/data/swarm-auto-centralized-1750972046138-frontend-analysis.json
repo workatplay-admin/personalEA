@@ -1,0 +1,51 @@
+{
+  "step": "Frontend Debug Analysis",
+  "timestamp": "2025-06-26T22:20:46.138Z",
+  "chatComponents": [
+    "/workspaces/personalEA/testing/goal-strategy-test/src/components/ChatClarification.tsx",
+    "/workspaces/personalEA/testing/goal-strategy-test/src/components/ChatErrorBoundary.tsx",
+    "/workspaces/personalEA/testing/goal-strategy-test/src/components/ProductionErrorBoundary.tsx"
+  ],
+  "apiServices": [
+    "/workspaces/personalEA/testing/goal-strategy-test/src/services/api.ts",
+    "/workspaces/personalEA/testing/goal-strategy-test/src/services/api.production.ts"
+  ],
+  "errorHandling": {
+    "chatErrorBoundary": "Catches React errors in chat component, saves conversation state to localStorage",
+    "productionErrorBoundary": "Generic error boundary with error reporting and user-friendly UI",
+    "apiErrorHandling": "Multiple layers - axios interceptors, custom ApiError class, retry logic",
+    "userMessages": {
+      "API_KEY_MISSING": "Please configure your OpenAI API key first",
+      "TIMEOUT": "Request timed out. Try simplifying your goal description",
+      "NETWORK_ERROR": "Unable to connect to the server",
+      "404": "Component question endpoint not found",
+      "401": "Your OpenAI API key appears to be invalid",
+      "429": "Rate limit exceeded",
+      "500+": "Server error - usually temporary"
+    }
+  },
+  "messageFlow": {
+    "initialMessage": "Generated client-side in initializeChat() - no API call needed",
+    "componentQuestions": "POST /api/v1/goals/component-question - generates dynamic questions",
+    "userReplies": "POST /api/v1/goals/{goalId}/clarify - processes clarifications",
+    "helpRequests": "POST /api/v1/goals/contextual-help - provides assistance when user says 'I dont know'",
+    "errorFlow": "API error -> Axios interceptor -> Error transformation -> User-friendly message in chat"
+  },
+  "keyFindings": [
+    "First message works because its generated client-side, not from API",
+    "Subsequent messages fail if backend endpoints are not implemented",
+    "Error messages are specific: 'System not responsive' for general failures",
+    "Production API service has more robust error handling than development",
+    "Chat component expects specific response structures from backend",
+    "Timeout handling includes retry logic with exponential backoff",
+    "API configuration is stored in session storage (production) or memory (dev)"
+  ],
+  "debuggingTips": [
+    "Check browser Network tab for failed API calls",
+    "Look for 404 errors on /component-question and /contextual-help endpoints",
+    "Verify OpenAI API key is being sent in headers",
+    "Check if goal ID is properly saved and retrieved",
+    "Monitor console for detailed error logging",
+    "Test endpoints directly with test scripts in root directory"
+  ]
+}

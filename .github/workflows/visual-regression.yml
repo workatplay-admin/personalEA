@@ -1,0 +1,193 @@
+name: Visual Regression Testing
+
+on:
+  pull_request:
+    branches: [ main, staging ]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      update_baselines:
+        description: 'Update visual baselines'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  NODE_VERSION: '20.x'
+  BASELINE_BUCKET: 'personalea-visual-baselines'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for baseline comparison
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx playwright install chromium
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Download baseline screenshots
+        run: |
+          mkdir -p testing/visual-baselines
+          aws s3 sync s3://${{ env.BASELINE_BUCKET }}/baselines/ testing/visual-baselines/ || echo "No existing baselines found"
+          
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm ci
+          npm run build
+          npm run dev &
+          npm run openai-api &
+          sleep 15
+          
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:5173 --timeout 60000
+          npx wait-on http://localhost:3001/health --timeout 60000
+          
+      - name: Run visual regression tests
+        run: |
+          npx playwright test \
+            --config=playwright.config.visual.ts \
+            --project=chromium \
+            --reporter=html,json \
+            ${{ github.event.inputs.update_baselines == 'true' && '--update-snapshots' || '' }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          UPDATE_BASELINES: ${{ github.event.inputs.update_baselines }}
+          
+      - name: Upload visual diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-diffs
+          path: |
+            test-results/
+            testing/visual-baselines/
+            playwright-report/
+          retention-days: 14
+          
+      - name: Upload new baselines
+        if: github.event.inputs.update_baselines == 'true'
+        run: |
+          aws s3 sync testing/visual-baselines/ s3://${{ env.BASELINE_BUCKET }}/baselines/
+          
+      - name: Comment PR with visual diff results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '## 📷 Visual Regression Test Results\n\n';
+            
+            try {
+              const reportData = fs.readFileSync('test-results/results.json', 'utf8');
+              const results = JSON.parse(reportData);
+              
+              const failed = results.suites.filter(s => s.outcome === 'failed');
+              
+              if (failed.length > 0) {
+                comment += '❌ **Visual differences detected:**\n\n';
+                failed.forEach(suite => {
+                  comment += `- **${suite.title}**: ${suite.tests.length} test(s) failed\n`;
+                });
+                comment += '\n🔍 View detailed diff images in the [workflow artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n';
+                comment += '📝 If these changes are intentional, re-run this workflow with "Update visual baselines" checked.';
+              } else {
+                comment += '✅ **No visual regressions detected!**';
+              }
+            } catch (error) {
+              comment += '⚠️ Unable to parse test results. Check workflow logs for details.';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  cross-browser-visual:
+    name: Cross-Browser Visual Testing
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 25
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+        viewport: 
+          - { width: 1280, height: 720, name: 'desktop' }
+          - { width: 768, height: 1024, name: 'tablet' }
+          - { width: 375, height: 667, name: 'mobile' }
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx playwright install ${{ matrix.browser }}
+          
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm ci
+          npm run build
+          npm run dev &
+          npm run openai-api &
+          sleep 15
+          
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:5173 --timeout 60000
+          npx wait-on http://localhost:3001/health --timeout 60000
+          
+      - name: Run cross-browser visual tests
+        run: |
+          npx playwright test tests/e2e/visual-regression.spec.ts \
+            --project=${{ matrix.browser }} \
+            --reporter=json \
+            --output-dir=test-results/${{ matrix.browser }}-${{ matrix.viewport.name }}
+        env:
+          VIEWPORT_WIDTH: ${{ matrix.viewport.width }}
+          VIEWPORT_HEIGHT: ${{ matrix.viewport.height }}
+          BROWSER: ${{ matrix.browser }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          
+      - name: Upload cross-browser results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-${{ matrix.browser }}-${{ matrix.viewport.name }}
+          path: test-results/
+          retention-days: 7

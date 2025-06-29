@@ -1,0 +1,467 @@
+name: Parallel Browser Testing Suite
+
+on:
+  pull_request:
+    branches: [ main, staging, develop ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      test_pattern:
+        description: 'Test file pattern to run'
+        required: false
+        default: '**/*.spec.ts'
+      max_parallel_jobs:
+        description: 'Maximum parallel test jobs'
+        required: false
+        default: '10'
+        type: number
+
+env:
+  NODE_VERSION: '20.x'
+  PLAYWRIGHT_VERSION: '1.40.0'
+  TEST_TIMEOUT: 300000  # 5 minutes per test
+  RETRY_ATTEMPTS: 2
+
+jobs:
+  # Dynamic test discovery and sharding
+  test-discovery:
+    name: Discover and Shard Tests
+    runs-on: ubuntu-latest
+    outputs:
+      test-matrix: ${{ steps.create-matrix.outputs.matrix }}
+      total-shards: ${{ steps.create-matrix.outputs.total-shards }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+          
+      - name: Discover test files
+        id: discover-tests
+        run: |
+          cd testing/goal-strategy-test
+          
+          # Find all test files matching pattern
+          TEST_PATTERN="${{ github.event.inputs.test_pattern || '**/*.spec.ts' }}"
+          find tests -name "*.spec.ts" -type f | grep -E "$TEST_PATTERN" > test-files.txt
+          
+          # Count total tests
+          TOTAL_TESTS=$(wc -l < test-files.txt)
+          echo "Found $TOTAL_TESTS test files"
+          echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+          
+      - name: Create test matrix
+        id: create-matrix
+        run: |
+          cd testing/goal-strategy-test
+          
+          # Calculate optimal shard count
+          TOTAL_TESTS=${{ steps.discover-tests.outputs.total_tests }}
+          MAX_PARALLEL="${{ github.event.inputs.max_parallel_jobs || 10 }}"
+          
+          # Determine shard count (min 1, max MAX_PARALLEL)
+          if [ $TOTAL_TESTS -lt $MAX_PARALLEL ]; then
+            SHARD_COUNT=$TOTAL_TESTS
+          else
+            SHARD_COUNT=$MAX_PARALLEL
+          fi
+          
+          # Create matrix JSON
+          MATRIX_JSON='{"include":['
+          
+          for i in $(seq 1 $SHARD_COUNT); do
+            if [ $i -gt 1 ]; then
+              MATRIX_JSON+=','
+            fi
+            MATRIX_JSON+='{"shard":"'$i'/'$SHARD_COUNT'","index":'$i'}'
+          done
+          
+          MATRIX_JSON+=']}'
+          
+          echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+          echo "total-shards=$SHARD_COUNT" >> $GITHUB_OUTPUT
+          
+          # Save test distribution plan
+          echo "Test sharding plan: $SHARD_COUNT shards for $TOTAL_TESTS tests" >> $GITHUB_STEP_SUMMARY
+
+  # Parallel test execution
+  parallel-tests:
+    name: Tests - Shard ${{ matrix.shard }}
+    needs: test-discovery
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.test-discovery.outputs.test-matrix) }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}-shard-${{ matrix.index }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}-
+            
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+          npx playwright install chromium firefox webkit --with-deps
+          
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm run build
+          npm run dev &
+          npm run openai-api &
+          
+          # Wait for services with exponential backoff
+          for i in {1..10}; do
+            if curl -f http://localhost:5173 && curl -f http://localhost:3001/health; then
+              echo "Services ready!"
+              break
+            fi
+            echo "Waiting for services... (attempt $i/10)"
+            sleep $((2**i))
+          done
+        env:
+          NODE_ENV: test
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+          
+      - name: Run tests (Shard ${{ matrix.shard }})
+        run: |
+          cd testing/goal-strategy-test
+          
+          # Run tests with sharding
+          npx playwright test \
+            --shard=${{ matrix.shard }} \
+            --reporter=blob,json,junit \
+            --retries=${{ env.RETRY_ATTEMPTS }} \
+            --timeout=${{ env.TEST_TIMEOUT }} \
+            --workers=4 \
+            --output-dir=test-results/shard-${{ matrix.index }}
+        env:
+          TEST_SHARD: ${{ matrix.shard }}
+          FORCE_COLOR: 1
+          
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-shard-${{ matrix.index }}
+          path: testing/goal-strategy-test/blob-report/
+          retention-days: 7
+          
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-shard-${{ matrix.index }}
+          path: |
+            testing/goal-strategy-test/test-results/
+            testing/goal-strategy-test/playwright-report/
+          retention-days: 7
+          
+      - name: Generate shard summary
+        if: always()
+        run: |
+          echo "### Shard ${{ matrix.shard }} Results" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "testing/goal-strategy-test/test-results/results.json" ]; then
+            # Parse results
+            PASSED=$(jq '.stats.expected' testing/goal-strategy-test/test-results/results.json)
+            FAILED=$(jq '.stats.unexpected' testing/goal-strategy-test/test-results/results.json)
+            FLAKY=$(jq '.stats.flaky' testing/goal-strategy-test/test-results/results.json)
+            SKIPPED=$(jq '.stats.skipped' testing/goal-strategy-test/test-results/results.json)
+            
+            echo "- ✅ Passed: $PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "- ❌ Failed: $FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔄 Flaky: $FLAKY" >> $GITHUB_STEP_SUMMARY
+            echo "- ⏭️ Skipped: $SKIPPED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ No test results found for shard ${{ matrix.shard }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Cross-browser parallel testing
+  cross-browser-parallel:
+    name: Cross-Browser - ${{ matrix.browser }} (${{ matrix.os }})
+    needs: test-discovery
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        browser: [chromium, firefox, webkit]
+        exclude:
+          - os: windows-latest
+            browser: webkit
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+          npx playwright install ${{ matrix.browser }} --with-deps
+          
+      - name: Run critical path tests
+        run: |
+          cd testing/goal-strategy-test
+          npm run build
+          npm run dev &
+          npm run openai-api &
+          sleep 20
+          
+          npx playwright test tests/e2e/critical-paths/ \
+            --project=${{ matrix.browser }} \
+            --reporter=json,junit \
+            --workers=2
+        env:
+          BROWSER: ${{ matrix.browser }}
+          OS: ${{ matrix.os }}
+          
+      - name: Upload cross-browser results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-browser-${{ matrix.os }}-${{ matrix.browser }}
+          path: testing/goal-strategy-test/test-results/
+          retention-days: 7
+
+  # Merge and analyze all test results
+  merge-reports:
+    name: Merge Test Reports
+    needs: [parallel-tests, cross-browser-parallel]
+    if: always()
+    runs-on: ubuntu-latest
+    outputs:
+      test-report-url: ${{ steps.publish-report.outputs.url }}
+      total-passed: ${{ steps.analyze-results.outputs.passed }}
+      total-failed: ${{ steps.analyze-results.outputs.failed }}
+      coverage: ${{ steps.analyze-results.outputs.coverage }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Download all blob reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: blob-report-*
+          path: all-blob-reports/
+          
+      - name: Merge test reports
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright merge-reports --reporter=html,json ./all-blob-reports
+          
+      - name: Analyze merged results
+        id: analyze-results
+        run: |
+          cd testing/goal-strategy-test
+          
+          if [ -f "playwright-report/results.json" ]; then
+            TOTAL_PASSED=$(jq '.stats.expected' playwright-report/results.json)
+            TOTAL_FAILED=$(jq '.stats.unexpected' playwright-report/results.json)
+            TOTAL_FLAKY=$(jq '.stats.flaky' playwright-report/results.json)
+            TOTAL_SKIPPED=$(jq '.stats.skipped' playwright-report/results.json)
+            TOTAL_TESTS=$((TOTAL_PASSED + TOTAL_FAILED + TOTAL_FLAKY + TOTAL_SKIPPED))
+            
+            # Calculate pass rate
+            if [ $TOTAL_TESTS -gt 0 ]; then
+              PASS_RATE=$((TOTAL_PASSED * 100 / TOTAL_TESTS))
+            else
+              PASS_RATE=0
+            fi
+            
+            echo "passed=$TOTAL_PASSED" >> $GITHUB_OUTPUT
+            echo "failed=$TOTAL_FAILED" >> $GITHUB_OUTPUT
+            echo "coverage=$PASS_RATE" >> $GITHUB_OUTPUT
+            
+            # Generate comprehensive summary
+            echo "# 📊 Test Execution Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## Overall Statistics" >> $GITHUB_STEP_SUMMARY
+            echo "- **Total Tests:** $TOTAL_TESTS" >> $GITHUB_STEP_SUMMARY
+            echo "- **Passed:** $TOTAL_PASSED ✅" >> $GITHUB_STEP_SUMMARY
+            echo "- **Failed:** $TOTAL_FAILED ❌" >> $GITHUB_STEP_SUMMARY
+            echo "- **Flaky:** $TOTAL_FLAKY 🔄" >> $GITHUB_STEP_SUMMARY
+            echo "- **Skipped:** $TOTAL_SKIPPED ⏭️" >> $GITHUB_STEP_SUMMARY
+            echo "- **Pass Rate:** ${PASS_RATE}%" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## Execution Details" >> $GITHUB_STEP_SUMMARY
+            echo "- **Total Shards:** ${{ needs.test-discovery.outputs.total-shards }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Parallel Jobs:** $(ls all-blob-reports | wc -l)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Duration:** ${{ github.run_time }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Generate HTML report
+        run: |
+          cd testing/goal-strategy-test
+          mkdir -p final-report
+          cp -r playwright-report/* final-report/
+          
+          # Add custom styling and branding
+          cat > final-report/custom.css << EOF
+          .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+          }
+          .test-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+          }
+          .stat-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+          }
+          EOF
+          
+      - name: Publish HTML report
+        id: publish-report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-merged
+          path: testing/goal-strategy-test/final-report/
+          retention-days: 30
+          
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const passed = ${{ steps.analyze-results.outputs.passed || 0 }};
+            const failed = ${{ steps.analyze-results.outputs.failed || 0 }};
+            const coverage = ${{ steps.analyze-results.outputs.coverage || 0 }};
+            
+            const comment = `## 🧪 Browser Test Results
+            
+            | Metric | Value |
+            |--------|--------|
+            | ✅ Passed | ${passed} |
+            | ❌ Failed | ${failed} |
+            | 📊 Coverage | ${coverage}% |
+            | ⚡ Shards | ${{ needs.test-discovery.outputs.total-shards }} |
+            
+            [📄 View Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            <details>
+            <summary>Execution Details</summary>
+            
+            - **Parallel Jobs:** Successfully executed across multiple shards
+            - **Cross-Browser:** Tested on Chrome, Firefox, and Safari
+            - **Platforms:** Ubuntu, Windows, and macOS
+            
+            </details>`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # Performance monitoring during tests
+  performance-monitoring:
+    name: Performance Monitoring
+    needs: parallel-tests
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Download test metrics
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: all-test-metrics/
+          
+      - name: Analyze performance metrics
+        run: |
+          echo "# ⚡ Performance Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Analyze test execution times
+          for metrics_dir in all-test-metrics/*/; do
+            if [ -f "$metrics_dir/results.json" ]; then
+              SHARD=$(basename "$metrics_dir" | sed 's/test-results-shard-//')
+              DURATION=$(jq '.duration' "$metrics_dir/results.json" 2>/dev/null || echo "N/A")
+              echo "- Shard $SHARD: ${DURATION}ms" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          
+          # Calculate average execution time
+          TOTAL_DURATION=$(find all-test-metrics -name "results.json" -exec jq '.duration' {} \; | awk '{sum+=$1} END {print sum}')
+          SHARD_COUNT=$(find all-test-metrics -name "results.json" | wc -l)
+          
+          if [ $SHARD_COUNT -gt 0 ]; then
+            AVG_DURATION=$((TOTAL_DURATION / SHARD_COUNT))
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Average Shard Duration:** ${AVG_DURATION}ms" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Store performance data
+        run: |
+          mkdir -p performance-data
+          
+          # Create performance report
+          cat > performance-data/report.json << EOF
+          {
+            "run_id": "${{ github.run_id }}",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "total_duration": $TOTAL_DURATION,
+            "shard_count": $SHARD_COUNT,
+            "average_duration": ${AVG_DURATION:-0},
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}"
+          }
+          EOF
+          
+      - name: Upload performance data
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-metrics
+          path: performance-data/
+          retention-days: 90

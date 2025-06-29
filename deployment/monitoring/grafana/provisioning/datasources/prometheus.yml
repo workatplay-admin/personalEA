@@ -1,0 +1,91 @@
+# PersonalEA Grafana Data Sources Configuration
+apiVersion: 1
+
+datasources:
+  # Prometheus for metrics
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    uid: prometheus-uid
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      httpMethod: POST
+      timeInterval: "15s"
+      queryTimeout: "60s"
+      # Enable metric metadata API
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQuerying: true
+      incrementalQueryOverlapWindow: 10m
+      # Custom HTTP headers
+      customQueryParameters: 
+    secureJsonFields: {}
+    version: 1
+    editable: true
+
+  # Loki for logs
+  - name: Loki
+    type: loki
+    access: proxy
+    orgId: 1
+    uid: loki-uid
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: prometheus-uid
+          matcherRegex: "traceID=(\\w+)"
+          name: TraceID
+          url: '$${__value.raw}'
+          urlDisplayLabel: 'View Trace'
+        # Extract metrics from logs
+        - datasourceUid: prometheus-uid
+          matcherRegex: "service=\"([^\"]+)\""
+          name: Service
+          url: '/explore?orgId=1&left=["now-1h","now","Prometheus",{"expr":"up{job=\"$${__value.raw}\"}"}]'
+          urlDisplayLabel: 'View Service Metrics'
+    version: 1
+    editable: true
+
+  # PostgreSQL for direct database queries (optional)
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    orgId: 1
+    uid: postgres-uid
+    url: postgres:5432
+    user: personalea
+    database: personalea
+    jsonData:
+      sslmode: 'require'
+      maxOpenConns: 0
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+      postgresVersion: 14
+      timescaledb: false
+    secureJsonData:
+      password: '${POSTGRES_PASSWORD}'
+    version: 1
+    editable: true
+
+  # Redis metrics (if redis_exporter is added)
+  - name: Redis
+    type: redis-datasource
+    access: proxy
+    orgId: 1
+    uid: redis-uid
+    url: redis://redis:6379
+    jsonData:
+      poolSize: 10
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    secureJsonData:
+      password: '${REDIS_PASSWORD}'
+    version: 1
+    editable: true

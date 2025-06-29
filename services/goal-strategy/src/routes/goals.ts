@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { authenticateJWT, requireScopes } from '@/middleware/auth';
 import { logger } from '@/utils/logger';
 import { smartGoalProcessor, RawGoalInput, ClarificationAnswer } from '@/services/smart-goal-processor';
+import { contextualHelpHandler, componentQuestionHandler } from './goals-chat-endpoints';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -16,7 +17,8 @@ const translateGoalSchema = z.object({
     resources: z.array(z.string()).optional(),
     constraints: z.array(z.string()).optional(),
     priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).optional()
-  }).optional()
+  }).optional(),
+  mode: z.enum(['automatic', 'interactive']).optional().default('automatic')
 });
 
 const clarifyGoalSchema = z.object({
@@ -96,7 +98,7 @@ router.use(authenticateJWT);
  */
 router.post('/translate', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
   try {
-    const { raw_goal, context } = translateGoalSchema.parse(req.body);
+    const { raw_goal, context, mode } = translateGoalSchema.parse(req.body);
     const correlationId = req.correlationId || Math.random().toString(36).substring(7);
     const userApiKey = req.headers['x-openai-api-key'] as string;
 
@@ -104,6 +106,7 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
       correlationId,
       userId: req.user?.id,
       rawGoal: raw_goal,
+      mode,
       hasUserApiKey: !!userApiKey
     });
 
@@ -128,15 +131,28 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
           constraints: context.constraints,
           priority: context.priority
         }).filter(([_, value]) => value !== undefined)
-      ) as any : undefined
+      ) as any : undefined,
+      mode
     };
 
     const result = await smartGoalProcessor.translateGoal(input, userApiKey);
 
+    // Save the goal to database so clarify endpoint can find it
+    const savedGoal = await prisma.goal.create({
+      data: {
+        id: correlationId, // Use correlation ID as goal ID
+        userId: req.user!.id,
+        title: result.smartGoal,
+        rawGoal: raw_goal,
+        smartCriteria: result.smartCriteria as any,
+        status: 'ACTIVE'
+      }
+    });
+
     res.json({
       success: true,
       data: {
-        id: correlationId,
+        id: savedGoal.id,
         title: result.smartGoal,
         description: result.smartGoal,
         criteria: result.smartCriteria,
@@ -146,10 +162,127 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
         correlation_id: correlationId,
         status: 'DRAFT',
         priority: 'MEDIUM',
+        mode: result.mode,
+        needsRefinement: result.needsRefinement,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
     });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/v1/goals/:id/clarify
+ * Get clarification questions for a specific goal
+ */
+router.post('/:id/clarify', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+  try {
+    const goalId = req.params['id']!;
+    const { clarifications, goalContext } = req.body;
+    const correlationId = req.correlationId || Math.random().toString(36).substring(7);
+
+    logger.info('Goal clarification request for specific goal', {
+      correlationId,
+      userId: req.user?.id,
+      goalId,
+      hasClarifications: !!clarifications,
+      hasContext: !!goalContext
+    });
+
+    // Get existing goal
+    const goal = await prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId: req.user!.id
+      },
+      include: {
+        clarifications: true
+      }
+    });
+
+    if (!goal) {
+      res.status(404).json({
+        error: {
+          code: 'GOAL_NOT_FOUND',
+          message: 'Goal not found or access denied',
+          correlationId
+        }
+      });
+      return;
+    }
+
+    // If clarifications are provided, process them
+    if (clarifications && Array.isArray(clarifications)) {
+      const clarificationAnswers: ClarificationAnswer[] = clarifications.map((c: any) => ({
+        question: c.question,
+        answer: c.answer,
+        smartCriterion: c.smartCriterion
+      }));
+
+      const userApiKey = req.headers['x-openai-api-key'] as string;
+      
+      const result = await smartGoalProcessor.processClarifications(
+        goal.rawGoal || goal.title,
+        goal.smartCriteria as any,
+        clarificationAnswers,
+        userApiKey
+      );
+
+      // Update goal with improved SMART criteria
+      const updatedGoal = await prisma.goal.update({
+        where: { id: goalId },
+        data: {
+          title: result.smartGoal,
+          smartCriteria: result.smartCriteria as any,
+          updatedAt: new Date()
+        }
+      });
+
+      // Save clarification answers
+      await Promise.all(clarifications.map((clarification: any) => 
+        prisma.goalClarification.create({
+          data: {
+            goalId,
+            question: clarification.question,
+            answer: clarification.answer,
+            smartCriterion: clarification.smartCriterion,
+            status: 'ANSWERED'
+          }
+        })
+      ));
+
+      res.json({
+        success: true,
+        data: {
+          ...updatedGoal,
+          confidence: result.confidence,
+          remaining_questions: result.clarificationQuestions,
+          updatedAt: updatedGoal.updatedAt.toISOString()
+        },
+        correlation_id: correlationId
+      });
+    } else {
+      // Just return the current goal state with any pending clarifications
+      const pendingClarifications = goal.clarifications.filter(c => c.status === 'PENDING');
+      
+      res.json({
+        success: true,
+        data: {
+          ...goal,
+          clarification_questions: pendingClarifications.map(c => ({
+            id: c.id,
+            question: c.question,
+            smartCriterion: c.smartCriterion
+          })),
+          confidence: 0.75, // Default confidence
+          updatedAt: goal.updatedAt.toISOString()
+        },
+        correlation_id: correlationId
+      });
+    }
 
   } catch (error) {
     next(error);
@@ -697,5 +830,165 @@ router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, r
     next(error);
   }
 });
+
+// Import chat endpoint handlers
+import { contextualHelpHandler, componentQuestionHandler } from './goals-chat-endpoints';
+
+/**
+ * POST /api/v1/goals/interactive-refine
+ * Interactive goal refinement through chat
+ */
+router.post('/interactive-refine', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+  try {
+    const { goal_id, component, user_response, conversation_history } = req.body;
+    const correlationId = req.correlationId || Math.random().toString(36).substring(7);
+    const userApiKey = req.headers['x-openai-api-key'] as string;
+
+    logger.info('Interactive goal refinement request', {
+      correlationId,
+      userId: req.user?.id,
+      goalId: goal_id,
+      component,
+      hasUserResponse: !!user_response
+    });
+
+    // Get existing goal
+    const goal = await prisma.goal.findFirst({
+      where: {
+        id: goal_id,
+        userId: req.user!.id
+      }
+    });
+
+    if (!goal) {
+      res.status(404).json({
+        error: {
+          code: 'GOAL_NOT_FOUND',
+          message: 'Goal not found or access denied',
+          correlationId
+        }
+      });
+      return;
+    }
+
+    // Build prompt for refinement
+    const systemPrompt = `You are helping refine a goal interactively. The user has provided input about the "${component}" component.
+Original goal: "${goal.rawGoal || goal.title}"
+User's response: "${user_response}"
+
+Based on this input, suggest how to improve the ${component} aspect of their goal.
+Provide:
+1. An improved description for this component
+2. Specific suggestions for further refinement
+3. A follow-up question if more clarification is needed
+
+Respond in JSON format:
+{
+  "improvedComponent": "string",
+  "suggestions": ["string"],
+  "followUpQuestion": "string or null",
+  "confidenceIncrease": number (0-0.3)
+}`;
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...(conversation_history || [])
+    ];
+
+    const apiKey = userApiKey || env.OPENAI_API_KEY;
+    const aiResponse = await smartGoalProcessor['callOpenAI'](systemPrompt, correlationId, apiKey);
+    const refinementResult = JSON.parse(smartGoalProcessor['stripMarkdownCodeBlocks'](aiResponse));
+
+    // Update the specific component in the goal's SMART criteria
+    const updatedCriteria = goal.smartCriteria as any;
+    if (updatedCriteria[component]) {
+      updatedCriteria[component].value = refinementResult.improvedComponent;
+      updatedCriteria[component].confidence = Math.min(
+        1,
+        (updatedCriteria[component].confidence || 0.5) + refinementResult.confidenceIncrease
+      );
+    }
+
+    // Update goal in database
+    const updatedGoal = await prisma.goal.update({
+      where: { id: goal_id },
+      data: {
+        smartCriteria: updatedCriteria,
+        updatedAt: new Date()
+      }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        goal_id,
+        component,
+        improvedValue: refinementResult.improvedComponent,
+        suggestions: refinementResult.suggestions,
+        followUpQuestion: refinementResult.followUpQuestion,
+        updatedConfidence: updatedCriteria[component]?.confidence || 0,
+        overallProgress: calculateOverallProgress(updatedCriteria)
+      },
+      correlation_id: correlationId
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/v1/goals/analyze-without-transform
+ * Analyze a goal without automatic transformation
+ */
+router.post('/analyze-without-transform', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+  try {
+    const { raw_goal, context } = req.body;
+    const correlationId = req.correlationId || Math.random().toString(36).substring(7);
+    const userApiKey = req.headers['x-openai-api-key'] as string;
+
+    logger.info('Goal analysis without transformation request', {
+      correlationId,
+      userId: req.user?.id,
+      rawGoal: raw_goal
+    });
+
+    const input: RawGoalInput = {
+      goal: raw_goal,
+      context,
+      mode: 'interactive'
+    };
+
+    const analysis = await smartGoalProcessor.analyzeGoalInteractive(input, userApiKey);
+
+    res.json({
+      success: true,
+      data: {
+        rawGoal: analysis.rawGoal,
+        analysis: analysis.analysis,
+        smartComponents: analysis.smartComponents,
+        confidence: analysis.confidence,
+        recommendedQuestions: analysis.recommendedQuestions
+      },
+      correlation_id: correlationId
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Helper function to calculate overall progress
+function calculateOverallProgress(criteria: any): number {
+  const components = ['specific', 'measurable', 'achievable', 'relevant', 'timeBound'];
+  const totalConfidence = components.reduce((sum, comp) => {
+    return sum + (criteria[comp]?.confidence || 0);
+  }, 0);
+  return (totalConfidence / components.length) * 100;
+}
+
+// Chat endpoints
+router.post('/contextual-help', authenticateJWT, requireScopes(['goals:write']), contextualHelpHandler);
+router.post('/component-question', authenticateJWT, requireScopes(['goals:write']), componentQuestionHandler);
 
 export default router;

@@ -171,6 +171,7 @@ export const goalAPI = {
 
       const response = await api.post<APIResponse<Goal>>(`/goals/translate?t=${timestamp}&cb=${cacheBuster}`, {
         raw_goal: originalGoal,
+        mode: 'interactive'
       })
       
       if (!response.data.success || !response.data.data) {
@@ -243,19 +244,78 @@ export const goalAPI = {
         throw new Error('API configuration not set. Please configure authentication credentials.')
       }
 
-      const response = await api.post<APIResponse<Goal>>(`/goals/${goalId}/clarify`, {
+      console.log('API: clarifyGoal called with:', {
+        goalId,
         clarifications,
         goalContext,
-        conversationHistory,
+        conversationHistoryLength: conversationHistory?.length || 0
+      })
+
+      // Call the backend endpoint with proper format
+      const response = await api.post<APIResponse<Goal>>(`/goals/${goalId}/clarify`, {
+        clarifications: Object.entries(clarifications).map(([key, value]) => ({
+          question: `What is the ${key} aspect of your goal?`,
+          answer: value,
+          smartCriterion: key
+        })),
+        goalContext,
+        conversationHistory
       })
       
-      if (!response.data.success || !response.data.data) {
+      console.log('API: clarifyGoal response:', response.data)
+      
+      if (!response.data.success) {
+        // Check if AI needs follow-up
+        if ((response.data as any).data?.needsFollowUp) {
+          // Return the response as-is for follow-up handling
+          return response.data as any
+        }
         throw new Error(response.data.error || 'Failed to clarify goal')
       }
       
-      return response.data.data
-    } catch (error) {
+      // Transform the response to match Goal interface
+      const goalData = response.data.data
+      if (!goalData) {
+        throw new Error('No goal data in response')
+      }
+      
+      // Ensure the response has the expected Goal structure
+      const transformedGoal: Goal = {
+        id: goalData.id || goalId,
+        title: goalData.title,
+        description: goalData.description || '',
+        criteria: {
+          specific: goalData.smart_criteria?.specific || goalData.smartCriteria?.specific || { value: '', confidence: 0 },
+          measurable: goalData.smart_criteria?.measurable || goalData.smartCriteria?.measurable || { value: '', confidence: 0, metrics: [] },
+          achievable: goalData.smart_criteria?.achievable || goalData.smartCriteria?.achievable || { value: '', confidence: 0 },
+          relevant: goalData.smart_criteria?.relevant || goalData.smartCriteria?.relevant || { value: '', confidence: 0 },
+          timeBound: goalData.smart_criteria?.timeBound || goalData.smartCriteria?.timeBound || { value: '', confidence: 0 }
+        },
+        confidence: goalData.confidence || 0.5,
+        status: goalData.status || 'active',
+        correlation_id: goalData.correlation_id || (response.data as any).correlation_id,
+        created_at: goalData.created_at || new Date().toISOString(),
+        updated_at: goalData.updated_at || new Date().toISOString(),
+        aiFeedback: (response.data as any).message || (response.data as any).aiFeedback,
+        clarification_questions: goalData.clarification_questions || goalData.additional_questions || goalData.remaining_questions || []
+      }
+      
+      return transformedGoal
+    } catch (error: any) {
       console.error('Error clarifying goal:', error)
+      console.error('Error response:', error.response?.data)
+      
+      // Enhance error messages
+      if (error.response?.status === 404) {
+        const err = new Error('Goal not found')
+        ;(err as any).userMessage = 'The goal could not be found. It may have been deleted or you may not have access to it.'
+        throw err
+      } else if (error.response?.status === 400) {
+        const err = new Error('Invalid request')
+        ;(err as any).userMessage = error.response.data?.error || 'The clarification request was invalid. Please try again.'
+        throw err
+      }
+      
       throw error
     }
   },

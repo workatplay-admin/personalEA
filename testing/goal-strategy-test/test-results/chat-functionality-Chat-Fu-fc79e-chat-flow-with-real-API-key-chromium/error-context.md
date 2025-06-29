@@ -1,0 +1,117 @@
+# Page snapshot
+
+```yaml
+- heading "Goal & Strategy Service Testing" [level=1]
+- paragraph: AI-powered goal breakdown with conversational SMART goal refinement
+- navigation "Progress":
+  - list:
+    - listitem:
+      - img
+      - paragraph: API Config
+      - paragraph: Configure authentication
+    - listitem:
+      - img
+      - paragraph: Goal Input
+      - paragraph: Enter your goal
+    - listitem:
+      - img
+      - paragraph: SMART Translation
+      - paragraph: AI converts to SMART goal
+    - listitem:
+      - img
+      - paragraph: Milestones
+      - paragraph: Break into milestones
+    - listitem:
+      - img
+      - paragraph: Work Breakdown
+      - paragraph: Create task structure
+    - listitem:
+      - img
+      - paragraph: Estimation
+      - paragraph: Estimate time & effort
+- img
+- heading "SMART Goal Generated" [level=2]
+- paragraph: Working with AI to refine your SMART goal. The goal will update in real-time as we chat.
+- img
+- heading "Your SMART Goal" [level=3]
+- img
+- text: Updating in real-time
+- img
+- heading "To achieve the position of Senior Developer at my current company by completing all necessary training, mastering key skills required for the role, and successfully leading a major project within the next 18 months." [level=2]
+- img
+- text: 70% Confidence
+- heading "Specific" [level=4]
+- text: 80%
+- paragraph: Achieving the position of Senior Developer involves completing necessary training, mastering key skills, and leading a major project.
+- paragraph: "Needs clarification:"
+- list:
+  - listitem: Exact skills and training required
+- heading "Measurable" [level=4]
+- text: 70%
+- paragraph: Progress can be measured by training completion, skill proficiency assessments, and successful project leadership.
+- paragraph: "Needs clarification:"
+- list:
+  - listitem: Specific project success criteria
+  - listitem: Skill assessment methods
+- heading "Achievable" [level=4]
+- text: 60%
+- paragraph: Assuming access to necessary resources and support from the company, this goal is realistic.
+- paragraph: "Needs clarification:"
+- list:
+  - listitem: Current skill level
+  - listitem: Available resources and support
+- heading "Relevant" [level=4]
+- text: 90%
+- paragraph: This goal is important for career advancement and personal growth within the field of software development.
+- heading "Time-bound" [level=4]
+- text: 70%
+- paragraph: The deadline for achieving this goal is set for 18 months from now.
+- paragraph: "Needs clarification:"
+- list:
+  - listitem: Start date
+- heading "Status" [level=4]
+- paragraph: "Missing:"
+- paragraph: Exact skills and training required, Specific project success criteria, Skill assessment methods, Current skill level, Available resources and support, Start date
+- heading "Clarification Needed" [level=4]:
+  - img
+  - text: Clarification Needed
+- list:
+  - listitem: • What specific skills and training are required to become a Senior Developer at your company?
+  - listitem: • Can you provide more details on how project success will be measured?
+  - listitem: • What methods will be used for skill assessment?
+  - listitem: • What is your current skill level in the key areas required for the Senior Developer role?
+  - listitem: • What resources and support are available to you for achieving this goal?
+  - listitem: • When do you plan to start working towards this goal?
+- heading "📊 Improvement Progress" [level=4]
+- text: specific 80% measurable 70% achievable 60% relevant 90% Time-bound 70%
+- img
+- heading "AI Clarification Assistant" [level=3]
+- img
+- heading "SMART Goal Assistant" [level=3]
+- paragraph: "Working on: Specific"
+- img
+- text: "Hello! I'm your SMART Goal Refinement Assistant. 🎯 I've analyzed your goal \"To achieve the position of Senior Developer at my current company by completing all necessary training, mastering key skills required for the role, and successfully leading a major project within the next 18 months.\" and it currently has a 70% confidence score. There are several areas where we can make it more specific, measurable, and actionable. I'll guide you through each SMART component systematically: •"
+- strong: Specific
+- text: "- Making it clear and focused •"
+- strong: Measurable
+- text: "- Adding concrete metrics •"
+- strong: Achievable
+- text: "- Ensuring it's realistic •"
+- strong: Relevant
+- text: "- Confirming it aligns with your priorities •"
+- strong: Time-bound
+- text: "- Setting clear deadlines As we chat, your goal will update in real-time on the left. Ready to begin? Let's start with the first component!"
+- img
+- text: "\"Can you list the specific training programs and key skills you need to focus on to qualify for the Senior Developer position, and do you have a particular project in mind that you're aiming to lead?\""
+- textbox "Tell me about specific... (or say \"I don't know\" for suggestions)"
+- button [disabled]:
+  - img
+- button "Regenerate Goal":
+  - img
+  - text: Regenerate Goal
+- button "🧹 Clear Cache"
+- button "Continue to Milestones":
+  - text: Continue to Milestones
+  - img
+- button "Start Over"
+```

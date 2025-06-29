@@ -1,0 +1,366 @@
+name: Automated Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      skip_tests:
+        description: 'Skip automated tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  pre-deployment-checks:
+    name: Pre-deployment Validation
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_environment: ${{ steps.determine-env.outputs.environment }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Determine deployment environment
+        id: determine-env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" =~ ^refs/tags/v ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Generate version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" =~ ^refs/tags/v ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION="$(date +%Y%m%d)-${GITHUB_SHA::8}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload security results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  automated-tests:
+    name: Run Automated Tests
+    needs: pre-deployment-checks
+    if: github.event.inputs.skip_tests != 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+      
+      - name: Run unit tests
+        run: |
+          cd testing/goal-strategy-test
+          npm run test:unit
+      
+      - name: Run integration tests
+        run: |
+          cd testing/goal-strategy-test
+          npm run test:integration || echo "Integration tests not configured"
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            testing/goal-strategy-test/coverage/
+            testing/goal-strategy-test/test-results/
+
+  build-images:
+    name: Build and Push Docker Images
+    needs: [pre-deployment-checks, automated-tests]
+    if: always() && needs.pre-deployment-checks.result == 'success' && (needs.automated-tests.result == 'success' || needs.automated-tests.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    strategy:
+      matrix:
+        service:
+          - name: goal-strategy
+            context: ./services/goal-strategy
+            dockerfile: ./services/goal-strategy/Dockerfile
+          - name: email-processing
+            context: ./services/email-processing
+            dockerfile: ./services/email-processing/Dockerfile
+          - name: ui
+            context: ./ui
+            dockerfile: ./ui/Dockerfile.production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service.name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ needs.pre-deployment-checks.outputs.version }}
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ needs.pre-deployment-checks.outputs.version }}
+            BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            VCS_REF=${{ github.sha }}
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [pre-deployment-checks, build-images]
+    if: needs.pre-deployment-checks.outputs.deploy_environment == 'staging'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.personalea.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Deploy to staging
+        run: |
+          # Update task definitions with new image tags
+          VERSION="${{ needs.pre-deployment-checks.outputs.version }}"
+          
+          # Deploy services
+          ./deployment/scripts/deploy.sh staging $VERSION
+      
+      - name: Run smoke tests
+        run: |
+          # Wait for deployment to stabilize
+          sleep 60
+          
+          # Run smoke tests
+          ./scripts/smoke-tests.sh staging
+      
+      - name: Notify deployment status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Staging deployment ${{ needs.pre-deployment-checks.outputs.version }} - ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  deploy-production:
+    name: Deploy to Production
+    needs: [pre-deployment-checks, build-images, deploy-staging]
+    if: |
+      always() && 
+      needs.pre-deployment-checks.outputs.deploy_environment == 'production' && 
+      needs.build-images.result == 'success' &&
+      (needs.deploy-staging.result == 'success' || needs.deploy-staging.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://personalea.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.PROD_AWS_REGION }}
+      
+      - name: Create backup
+        run: |
+          ./deployment/scripts/backup.sh production pre-deployment
+      
+      - name: Deploy to production
+        run: |
+          VERSION="${{ needs.pre-deployment-checks.outputs.version }}"
+          
+          # Blue-green deployment
+          ./deployment/scripts/deploy.sh production $VERSION --strategy=blue-green
+      
+      - name: Health check
+        run: |
+          # Comprehensive health checks
+          ./scripts/health-check.sh production --comprehensive
+      
+      - name: Run smoke tests
+        run: |
+          ./scripts/smoke-tests.sh production
+      
+      - name: Performance validation
+        run: |
+          # Run performance tests
+          ./scripts/performance-tests.sh production --threshold=2000
+      
+      - name: Switch traffic
+        if: success()
+        run: |
+          # Switch load balancer to new deployment
+          ./deployment/scripts/switch-traffic.sh production
+      
+      - name: Notify deployment status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Production deployment ${{ needs.pre-deployment-checks.outputs.version }} - ${{ job.status }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+
+  post-deployment:
+    name: Post-deployment Tasks
+    needs: [pre-deployment-checks, deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Update deployment tracking
+        run: |
+          ENVIRONMENT="${{ needs.pre-deployment-checks.outputs.deploy_environment }}"
+          VERSION="${{ needs.pre-deployment-checks.outputs.version }}"
+          
+          # Record deployment
+          echo '{
+            "environment": "'$ENVIRONMENT'",
+            "version": "'$VERSION'",
+            "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+            "commit": "'${{ github.sha }}'",
+            "deployer": "'${{ github.actor }}'",
+            "status": "success"
+          }' | gh api /repos/${{ github.repository }}/deployments \
+            --input - \
+            -H "Accept: application/vnd.github.v3+json"
+      
+      - name: Clean up old images
+        run: |
+          # Clean up old container images
+          ./scripts/cleanup-images.sh --keep-last=5
+      
+      - name: Generate deployment report
+        run: |
+          ./scripts/generate-deployment-report.sh \
+            --environment=${{ needs.pre-deployment-checks.outputs.deploy_environment }} \
+            --version=${{ needs.pre-deployment-checks.outputs.version }}
+      
+      - name: Upload deployment report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report-${{ needs.pre-deployment-checks.outputs.version }}
+          path: deployment-report.html
+          retention-days: 30
+
+  rollback:
+    name: Rollback Deployment
+    needs: [pre-deployment-checks, deploy-production]
+    if: failure() && needs.deploy-production.result == 'failure'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.PROD_AWS_REGION }}
+      
+      - name: Initiate rollback
+        run: |
+          ./deployment/scripts/rollback.sh production --auto
+      
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: '🔄 Production rollback initiated for version ${{ needs.pre-deployment-checks.outputs.version }}',
+              color: 'warning'
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}

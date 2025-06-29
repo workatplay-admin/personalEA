@@ -1,0 +1,103 @@
+{
+  "docker_compose_files_analyzed": {
+    "docker-compose.yml": "File does not exist",
+    "docker-compose.dev.yml": "Analyzed successfully",
+    "docker-compose.user.yml": "Analyzed successfully", 
+    "docker-compose.production.yml": "Analyzed successfully",
+    "docker-compose.testing.yml": "Analyzed successfully",
+    "docker-compose.monitoring.yml": "Analyzed successfully"
+  },
+  "port_mappings": {
+    "development": {
+      "postgres": "5432:5432",
+      "redis": "6379:6379",
+      "email-service": "3001:3001",
+      "goal-service": "3002:3002 (placeholder)",
+      "goal-strategy-backend": "8085:3000",
+      "calendar-service": "3003:3003 (placeholder)",
+      "dialog-gateway": "3000:3000 (placeholder)"
+    },
+    "user_testing": {
+      "personalea-web": "3000:3000",
+      "db": "5432:5432",
+      "redis": "6379:6379",
+      "email-service": "3001:3001",
+      "config-ui": "3002:3002"
+    },
+    "production": {
+      "postgres": "127.0.0.1:5432:5432 (localhost only)",
+      "redis": "127.0.0.1:6379:6379 (localhost only)",
+      "nginx": "${HTTP_PORT:-80}:80 and ${HTTPS_PORT:-443}:443",
+      "prometheus": "127.0.0.1:9090:9090 (localhost only)",
+      "grafana": "127.0.0.1:3002:3000 (localhost only)",
+      "loki": "127.0.0.1:3100:3100 (localhost only)",
+      "note": "Services like goal-strategy, email-processing, and ui are behind nginx reverse proxy"
+    },
+    "testing": {
+      "personalea-web": "3000:3000",
+      "db": "5432:5432",
+      "redis": "6379:6379",
+      "email-service": "3001:3001",
+      "config-ui": "3002:3002"
+    },
+    "monitoring": {
+      "prometheus": "127.0.0.1:9090:9090",
+      "grafana": "127.0.0.1:3000:3000",
+      "alertmanager": "127.0.0.1:9093:9093",
+      "loki": "127.0.0.1:3100:3100",
+      "node-exporter": "127.0.0.1:9100:9100",
+      "cadvisor": "127.0.0.1:8080:8080",
+      "postgres-exporter": "127.0.0.1:9187:9187",
+      "redis-exporter": "127.0.0.1:9121:9121",
+      "nginx-exporter": "127.0.0.1:9113:9113",
+      "blackbox-exporter": "127.0.0.1:9115:9115",
+      "pushgateway": "127.0.0.1:9091:9091",
+      "jaeger": {
+        "agent_zipkin_thrift": "127.0.0.1:5775:5775/udp",
+        "agent_jaeger_thrift": "127.0.0.1:6831:6831/udp",
+        "agent_jaeger_thrift_binary": "127.0.0.1:6832:6832/udp",
+        "agent_configs": "127.0.0.1:5778:5778",
+        "ui": "127.0.0.1:16686:16686",
+        "jaeger_thrift": "127.0.0.1:14268:14268",
+        "grpc": "127.0.0.1:14250:14250",
+        "zipkin": "127.0.0.1:9411:9411",
+        "otlp_grpc": "127.0.0.1:4317:4317",
+        "otlp_http": "127.0.0.1:4318:4318"
+      },
+      "tempo": {
+        "tempo": "127.0.0.1:3200:3200",
+        "tempo_grpc": "127.0.0.1:9095:9095",
+        "otlp_grpc": "127.0.0.1:4317:4317",
+        "otlp_http": "127.0.0.1:4318:4318",
+        "zipkin": "127.0.0.1:9411:9411"
+      }
+    }
+  },
+  "unique_ports_summary": {
+    "web_services": ["80", "443", "3000", "3001", "3002", "3003", "8085"],
+    "databases": ["5432", "6379"],
+    "monitoring": ["8080", "9090", "9091", "9093", "9095", "9100", "9113", "9115", "9121", "9187", "3100", "3200"],
+    "tracing": ["4317", "4318", "5775", "5778", "6831", "6832", "9411", "14250", "14268", "16686"]
+  },
+  "security_notes": {
+    "production": "Most services in production are bound to localhost (127.0.0.1) for security, with nginx as the main entry point",
+    "development": "All ports are exposed directly for easier development access",
+    "monitoring": "All monitoring services are localhost-only to prevent external access to metrics"
+  },
+  "timestamp": "2025-06-26T20:06:41Z",
+  "analysis_notes": {
+    "port_conflicts": {
+      "note": "Some ports appear in multiple configurations but may conflict",
+      "examples": [
+        "Port 3000 used by dialog-gateway (dev), personalea-web (user/testing), and grafana (monitoring)",
+        "Port 9411 used by both jaeger and tempo for zipkin compatibility",
+        "Port 4317/4318 used by both jaeger and tempo for OTLP"
+      ]
+    },
+    "recommendations": {
+      "development": "Consider using different port ranges for different environments to avoid conflicts",
+      "production": "Good security practice observed with localhost-only bindings",
+      "monitoring": "Comprehensive monitoring stack but watch for resource usage with all exporters"
+    }
+  }
+}

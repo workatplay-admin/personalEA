@@ -1,0 +1,694 @@
+openapi: 3.0.0
+info:
+  title: PersonalEA Goal-Setting API v2
+  description: Interactive goal-setting API with user-driven verification
+  version: 2.0.0
+  
+servers:
+  - url: https://api.personalea.com/v2
+    description: Production server
+  - url: http://localhost:3002/api/v2
+    description: Development server
+
+paths:
+  /goals/sessions:
+    post:
+      summary: Initialize a new goal-setting session
+      operationId: createGoalSession
+      tags:
+        - Goal Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mode
+              properties:
+                mode:
+                  type: string
+                  enum: [interactive, guided, analysis_only]
+                  description: Processing mode for the session
+                initialGoal:
+                  type: string
+                  description: Optional initial goal statement
+                  minLength: 5
+                  maxLength: 500
+                userApiKey:
+                  type: string
+                  description: Optional user's OpenAI API key
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCreatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                  
+  /goals/sessions/{sessionId}:
+    get:
+      summary: Get current session state
+      operationId: getGoalSession
+      tags:
+        - Goal Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalSession'
+        '404':
+          $ref: '#/components/responses/NotFound'
+          
+  /goals/sessions/{sessionId}/respond:
+    post:
+      summary: Submit user response to current prompt
+      operationId: respondToPrompt
+      tags:
+        - Goal Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - response
+                - responseType
+              properties:
+                response:
+                  type: string
+                  description: User's response to the prompt
+                responseType:
+                  type: string
+                  enum: [text, selection, numeric, date, boolean]
+                metadata:
+                  type: object
+                  description: Additional context for the response
+      responses:
+        '200':
+          description: Response processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InteractionResult'
+                
+  /goals/analyze:
+    post:
+      summary: Analyze goal without transformation
+      operationId: analyzeGoal
+      tags:
+        - Goal Analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - goal
+              properties:
+                goal:
+                  type: string
+                  minLength: 5
+                  maxLength: 500
+                includeQuestions:
+                  type: boolean
+                  default: true
+                userApiKey:
+                  type: string
+      responses:
+        '200':
+          description: Goal analysis results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalAnalysis'
+                
+  /goals/verify:
+    post:
+      summary: Submit verification answers
+      operationId: submitVerificationAnswers
+      tags:
+        - Goal Verification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sessionId
+                - answers
+              properties:
+                sessionId:
+                  type: string
+                  format: uuid
+                answers:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/VerificationAnswer'
+      responses:
+        '200':
+          description: Verification processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResult'
+                
+  /goals/context:
+    post:
+      summary: Submit user context information
+      operationId: submitUserContext
+      tags:
+        - User Context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sessionId
+                - context
+              properties:
+                sessionId:
+                  type: string
+                  format: uuid
+                context:
+                  $ref: '#/components/schemas/UserContext'
+      responses:
+        '200':
+          description: Context submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextValidation'
+                
+  /goals/context-questions:
+    get:
+      summary: Get context-specific questions
+      operationId: getContextQuestions
+      tags:
+        - User Context
+      parameters:
+        - name: criterionType
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [specific, measurable, achievable, relevant, timeBound]
+        - name: existingContext
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Context questions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  questions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContextQuestion'
+                      
+  /goals/sessions/{sessionId}/finalize:
+    post:
+      summary: Finalize goal and create in system
+      operationId: finalizeGoal
+      tags:
+        - Goal Sessions
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                adjustments:
+                  type: object
+                  description: Final adjustments to the goal
+      responses:
+        '201':
+          description: Goal created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+
+components:
+  schemas:
+    GoalSession:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        mode:
+          type: string
+          enum: [interactive, guided, analysis_only]
+        currentStage:
+          $ref: '#/components/schemas/GoalStage'
+        goalData:
+          type: object
+          properties:
+            raw:
+              type: string
+            refined:
+              type: string
+            smartCriteria:
+              $ref: '#/components/schemas/SMARTCriteria'
+            userContext:
+              $ref: '#/components/schemas/UserContext'
+            verificationAnswers:
+              type: array
+              items:
+                $ref: '#/components/schemas/VerificationAnswer'
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationEntry'
+        metadata:
+          type: object
+          properties:
+            startedAt:
+              type: string
+              format: date-time
+            lastUpdatedAt:
+              type: string
+              format: date-time
+            completionStatus:
+              type: string
+              enum: [in_progress, paused, completed, abandoned]
+              
+    GoalStage:
+      type: string
+      enum:
+        - welcome
+        - initial_capture
+        - specific_refinement
+        - measurable_definition
+        - achievable_assessment
+        - relevant_alignment
+        - timebound_setting
+        - summary_review
+        - finalization
+        
+    SMARTCriteria:
+      type: object
+      properties:
+        specific:
+          $ref: '#/components/schemas/CriterionDetail'
+        measurable:
+          allOf:
+            - $ref: '#/components/schemas/CriterionDetail'
+            - type: object
+              properties:
+                metrics:
+                  type: array
+                  items:
+                    type: string
+        achievable:
+          $ref: '#/components/schemas/CriterionDetail'
+        relevant:
+          $ref: '#/components/schemas/CriterionDetail'
+        timeBound:
+          allOf:
+            - $ref: '#/components/schemas/CriterionDetail'
+            - type: object
+              properties:
+                deadline:
+                  type: string
+                  format: date
+                milestones:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Milestone'
+                    
+    CriterionDetail:
+      type: object
+      properties:
+        value:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        verified:
+          type: boolean
+          default: false
+        missing:
+          type: array
+          items:
+            type: string
+            
+    UserContext:
+      type: object
+      properties:
+        timeframePreferences:
+          type: object
+          properties:
+            preferredDuration:
+              type: string
+            constraints:
+              type: array
+              items:
+                type: string
+            flexibility:
+              type: string
+              enum: [fixed, flexible, open]
+        lifeAlignment:
+          type: object
+          properties:
+            currentPriorities:
+              type: array
+              items:
+                type: string
+            values:
+              type: array
+              items:
+                type: string
+            obligations:
+              type: array
+              items:
+                type: string
+            availableTime:
+              type: number
+              description: Hours per week available for goal
+        resources:
+          type: object
+          properties:
+            budget:
+              type: number
+            skills:
+              type: array
+              items:
+                type: string
+            support:
+              type: array
+              items:
+                type: string
+            tools:
+              type: array
+              items:
+                type: string
+                
+    VerificationAnswer:
+      type: object
+      required:
+        - questionId
+        - question
+        - answer
+        - smartCriterion
+      properties:
+        questionId:
+          type: string
+        questionType:
+          type: string
+          enum:
+            - timeframe_clarification
+            - achievability_check
+            - life_alignment
+            - resource_assessment
+            - motivation_validation
+        question:
+          type: string
+        answer:
+          type: string
+        smartCriterion:
+          type: string
+          enum: [specific, measurable, achievable, relevant, timeBound]
+        timestamp:
+          type: string
+          format: date-time
+          
+    ConversationEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum: [system_prompt, user_response, clarification, validation]
+        content:
+          type: string
+        metadata:
+          type: object
+          
+    InteractionResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        updatedSession:
+          $ref: '#/components/schemas/GoalSession'
+        nextStep:
+          type: object
+          properties:
+            stage:
+              $ref: '#/components/schemas/GoalStage'
+            prompt:
+              type: string
+            promptType:
+              type: string
+              enum: [open_ended, multiple_choice, scale, date_selection]
+            options:
+              type: array
+              items:
+                type: string
+            validation:
+              type: object
+              
+    GoalAnalysis:
+      type: object
+      properties:
+        currentState:
+          type: object
+          properties:
+            strengths:
+              type: array
+              items:
+                type: string
+            gaps:
+              type: array
+              items:
+                type: string
+            clarity:
+              type: number
+              minimum: 0
+              maximum: 1
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationQuestion'
+            
+    VerificationQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        question:
+          type: string
+        why:
+          type: string
+          description: Explanation of why this question is important
+        criterion:
+          type: string
+          enum: [specific, measurable, achievable, relevant, timeBound]
+        required:
+          type: boolean
+          
+    VerificationResult:
+      type: object
+      properties:
+        updatedCriteria:
+          $ref: '#/components/schemas/SMARTCriteria'
+        additionalQuestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationQuestion'
+        readyForFinalization:
+          type: boolean
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          
+    ContextQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        question:
+          type: string
+        type:
+          type: string
+          enum: [text, selection, numeric, date, boolean]
+        options:
+          type: array
+          items:
+            type: string
+        helpText:
+          type: string
+        required:
+          type: boolean
+          
+    ContextValidation:
+      type: object
+      properties:
+        contextComplete:
+          type: boolean
+        missingAreas:
+          type: array
+          items:
+            type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+            
+    Goal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        smartCriteria:
+          $ref: '#/components/schemas/SMARTCriteria'
+        status:
+          type: string
+          enum: [DRAFT, ACTIVE, ON_HOLD, COMPLETED, CANCELLED]
+        priority:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        targetDate:
+          type: string
+          format: date
+        sessionId:
+          type: string
+          format: uuid
+        verificationComplete:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          
+    Milestone:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        targetDate:
+          type: string
+          format: date
+        completed:
+          type: boolean
+          default: false
+          
+    SessionCreatedResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+        nextStep:
+          type: object
+          properties:
+            stage:
+              $ref: '#/components/schemas/GoalStage'
+            prompt:
+              type: string
+            
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              details:
+                type: object
+                
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+security:
+  - bearerAuth: []

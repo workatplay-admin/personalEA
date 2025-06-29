@@ -1,0 +1,411 @@
+name: Automated Browser Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run comprehensive tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - smoke
+        - regression
+        - performance
+        - stress
+      browser:
+        description: 'Browser to test'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - chromium
+        - firefox
+        - webkit
+        - mobile
+
+env:
+  NODE_VERSION: '18'
+  PLAYWRIGHT_VERSION: '1.40.0'
+  CI: true
+  FORCE_COLOR: 1
+
+jobs:
+  setup:
+    name: Setup and Pre-flight Checks
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      cache-key: ${{ steps.cache-key.outputs.key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Generate cache key
+        id: cache-key
+        run: echo "key=${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+
+      - name: Set test matrix
+        id: set-matrix
+        run: |
+          if [ "${{ github.event.inputs.test_suite }}" = "smoke" ]; then
+            echo "matrix={\"include\":[{\"name\":\"smoke\",\"tests\":\"tests/e2e/phase1/goal-to-smart.spec.ts\",\"browser\":\"chromium\"}]}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.inputs.test_suite }}" = "performance" ]; then
+            echo "matrix={\"include\":[{\"name\":\"performance\",\"tests\":\"tests/e2e/comprehensive-e2e-suite.spec.ts -g 'Performance'\",\"browser\":\"chromium\"}]}" >> $GITHUB_OUTPUT
+          else
+            echo "matrix={\"include\":[{\"name\":\"comprehensive\",\"tests\":\"tests/e2e/\",\"browser\":\"all\"}]}" >> $GITHUB_OUTPUT
+          fi
+
+  lint-and-typecheck:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+
+      - name: Run ESLint
+        run: cd testing/goal-strategy-test && npm run lint
+
+      - name: Run TypeScript type check
+        run: cd testing/goal-strategy-test && npm run typecheck
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+
+      - name: Run unit tests
+        run: cd testing/goal-strategy-test && npm run test:unit
+
+      - name: Upload unit test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: testing/goal-strategy-test/coverage/
+
+  browser-tests:
+    name: Browser Tests - ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    needs: [setup, lint-and-typecheck]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+
+      - name: Install Playwright Browsers
+        run: cd testing/goal-strategy-test && npx playwright install --with-deps
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm run dev &
+          npm run openai-api &
+          sleep 30
+        env:
+          NODE_ENV: test
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:5173 --timeout 60000
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run Playwright tests
+        run: |
+          cd testing/goal-strategy-test
+          if [ "${{ matrix.browser }}" = "all" ]; then
+            npx playwright test ${{ matrix.tests }}
+          else
+            npx playwright test ${{ matrix.tests }} --project=${{ matrix.browser }}
+          fi
+        env:
+          NODE_ENV: test
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+          USE_REAL_API: ${{ secrets.OPENAI_API_KEY != '' }}
+          BASE_URL: http://localhost:5173
+          API_URL: http://localhost:3000
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results-${{ matrix.name }}
+          path: |
+            testing/goal-strategy-test/playwright-report/
+            testing/goal-strategy-test/test-results/
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-videos-${{ matrix.name }}
+          path: testing/goal-strategy-test/test-results/videos/
+
+  performance-tests:
+    name: Performance & Load Tests
+    runs-on: ubuntu-latest
+    needs: [setup, browser-tests]
+    if: github.event_name == 'schedule' || github.event.inputs.test_suite == 'performance' || github.event.inputs.test_suite == 'all'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+
+      - name: Install Playwright Browsers
+        run: cd testing/goal-strategy-test && npx playwright install --with-deps chromium
+
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm run dev &
+          npm run openai-api &
+          sleep 30
+        env:
+          NODE_ENV: test
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-key' }}
+
+      - name: Run performance tests
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright test tests/e2e/comprehensive-e2e-suite.spec.ts -g "Performance|Stress" --project=chromium
+        env:
+          NODE_ENV: test
+          PERFORMANCE_TEST: true
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-test-results
+          path: testing/goal-strategy-test/test-results/
+
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    needs: [setup, browser-tests]
+    if: github.event_name == 'pull_request' || github.event_name == 'schedule'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+
+      - name: Install Playwright Browsers
+        run: cd testing/goal-strategy-test && npx playwright install --with-deps chromium
+
+      - name: Start test services
+        run: |
+          cd testing/goal-strategy-test
+          npm run dev &
+          npm run openai-api &
+          sleep 30
+        env:
+          NODE_ENV: test
+
+      - name: Run visual regression tests
+        run: |
+          cd testing/goal-strategy-test
+          npx playwright test tests/e2e/visual-regression.spec.ts --project=chromium
+        env:
+          NODE_ENV: test
+          UPDATE_SNAPSHOTS: false
+
+      - name: Upload visual diff artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-regression-diffs
+          path: testing/goal-strategy-test/test-results/
+
+  security-tests:
+    name: Security & Vulnerability Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd testing/goal-strategy-test && npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+
+      - name: Run security linting
+        run: cd testing/goal-strategy-test && npx eslint . --ext .ts,.tsx --config .eslintrc.security.js
+
+  test-report:
+    name: Generate Test Report
+    runs-on: ubuntu-latest
+    needs: [unit-tests, browser-tests, performance-tests, visual-regression, security-tests]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: test-artifacts
+
+      - name: Generate comprehensive test report
+        run: |
+          mkdir -p test-report
+          echo "# Test Execution Report" > test-report/README.md
+          echo "" >> test-report/README.md
+          echo "## Test Summary" >> test-report/README.md
+          echo "- **Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> test-report/README.md
+          echo "- **Commit:** ${{ github.sha }}" >> test-report/README.md
+          echo "- **Branch:** ${{ github.ref_name }}" >> test-report/README.md
+          echo "- **Trigger:** ${{ github.event_name }}" >> test-report/README.md
+          echo "" >> test-report/README.md
+          
+          # List all test artifacts
+          echo "## Test Artifacts" >> test-report/README.md
+          find test-artifacts -type f -name "*.json" -o -name "*.html" -o -name "*.xml" | sort >> test-report/README.md
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: comprehensive-test-report
+          path: test-report/
+
+  deploy-test-results:
+    name: Deploy Test Results
+    runs-on: ubuntu-latest
+    needs: [test-report]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download test report
+        uses: actions/download-artifact@v4
+        with:
+          name: comprehensive-test-report
+          path: test-report
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: test-report
+          destination_dir: test-reports/${{ github.run_number }}
+
+  notification:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [browser-tests, performance-tests, visual-regression, security-tests]
+    if: always() && (failure() || success())
+    
+    steps:
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "🚨 Test suite failed for commit ${{ github.sha }}"
+          echo "Check the workflow results at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ All tests passed for commit ${{ github.sha }}"
+          echo "View results at: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

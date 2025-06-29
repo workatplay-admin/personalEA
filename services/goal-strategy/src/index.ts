@@ -99,11 +99,12 @@ const apiRouter = express.Router();
 
 // Environment configuration endpoint for frontend
 apiRouter.get('/config/environment', (req, res) => {
+  // Always report no environment configuration to force manual setup
   res.json({
     success: true,
     data: {
-      environmentConfigured: !!env.OPENAI_API_KEY,
-      message: env.OPENAI_API_KEY ? 'OpenAI API key configured in environment' : 'No environment API key configured'
+      environmentConfigured: false,
+      message: 'No environment API key configured'
     }
   });
 });

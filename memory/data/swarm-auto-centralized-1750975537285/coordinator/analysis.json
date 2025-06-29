@@ -1,0 +1,71 @@
+{
+  "timestamp": "2025-06-26T23:45:00Z",
+  "issue": "SMART Goal Clarification Flow Issue",
+  "currentBehavior": {
+    "description": "The ChatClarification component cycles through all SMART components sequentially regardless of confidence scores",
+    "problemAreas": [
+      "Sequential processing through componentIndex (lines 96, 395-399)",
+      "No prioritization based on confidence scores",
+      "Moves to next component after each response",
+      "Doesn't check if current component needs more refinement",
+      "All components are processed even if they have high confidence"
+    ],
+    "codeReferences": {
+      "componentIndex": "Line 96: state variable tracking current position",
+      "startNextComponent": "Lines 144-147: Uses componentIndex to move sequentially",
+      "progressionLogic": "Lines 395-399: Always increments componentIndex after response",
+      "noConfidenceCheck": "No logic to check if confidence >= 90% before moving on"
+    }
+  },
+  "desiredBehavior": {
+    "description": "Prioritize low-scoring components and refine until 90%+ confidence",
+    "requirements": [
+      "Focus on the lowest scoring aspects first",
+      "Keep clarifying that aspect until it reaches 90%+",
+      "Skip aspects already above 90%",
+      "Don't cycle through all aspects if they don't need clarification"
+    ]
+  },
+  "proposedSolution": {
+    "keyChanges": [
+      "Replace componentIndex with dynamic component selection based on confidence",
+      "Add getNextComponent() function to find lowest confidence component < 90%",
+      "Modify handleSendMessage to check confidence after each response",
+      "Add shouldContinueRefinement() to determine if more clarification needed",
+      "Skip components with confidence >= 90% from the start"
+    ],
+    "implementationSteps": [
+      {
+        "step": 1,
+        "description": "Create function to get components sorted by confidence",
+        "code": "const getComponentsByConfidence = () => SMART_COMPONENTS.filter(c => goal.criteria[c.key].confidence < 0.9).sort((a, b) => goal.criteria[a.key].confidence - goal.criteria[b.key].confidence)"
+      },
+      {
+        "step": 2,
+        "description": "Replace componentIndex with dynamic selection",
+        "code": "const getNextLowConfidenceComponent = () => getComponentsByConfidence()[0] || null"
+      },
+      {
+        "step": 3,
+        "description": "Modify startNextComponent to use priority logic",
+        "code": "Check if any components need refinement before completing"
+      },
+      {
+        "step": 4,
+        "description": "Update handleSendMessage to check confidence after update",
+        "code": "If current component confidence < 0.9, continue with same component"
+      }
+    ]
+  },
+  "affectedFiles": [
+    "/workspaces/personalEA/testing/goal-strategy-test/src/components/ChatClarification.tsx"
+  ],
+  "testingStrategy": {
+    "scenarios": [
+      "Goal with all low confidence - should start with lowest",
+      "Goal with mixed confidence - should skip high confidence components",
+      "Single low confidence component - should focus only on that",
+      "Component reaches 90% after refinement - should move to next lowest"
+    ]
+  }
+}

@@ -18,10 +18,16 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
       // Always use the proxied endpoint to avoid CSP issues in Codespaces
       console.log('🔧 Testing backend connection via proxy...');
       
+      // Create timeout controller
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
       const response = await fetch('/api/v1/health', {
         method: 'GET',
-        signal: AbortSignal.timeout(5000) // 5 second timeout
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         console.error('🔧 Backend health check failed:', response.status);
@@ -30,8 +36,8 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
       
       console.log('🔧 Backend connection successful');
       return true;
-    } catch (error) {
-      console.error('🔧 Backend connection test failed:', error);
+    } catch (error: any) {
+      console.error('🔧 Backend connection test failed:', error.message || error);
       return false;
     }
   }

@@ -1,0 +1,282 @@
+{
+  "chatFlowDesign": {
+    "metadata": {
+      "version": "1.0.0",
+      "designType": "interactive-smart-goal-flow",
+      "created": "2025-06-26T21:15:50Z",
+      "designer": "ux-designer-agent"
+    },
+    "flowStructure": {
+      "stages": [
+        "welcome",
+        "initial-goal-capture",
+        "specific-refinement",
+        "measurable-definition",
+        "achievable-assessment",
+        "relevant-alignment",
+        "time-bound-setting",
+        "goal-summary",
+        "confirmation-refinement"
+      ],
+      "conversationStyle": {
+        "tone": "friendly, encouraging, professional",
+        "persona": "knowledgeable coach",
+        "responseLength": "concise but thorough"
+      }
+    },
+    "conversationalFlow": {
+      "1_welcome": {
+        "stage": "welcome",
+        "prompts": [
+          {
+            "type": "greeting",
+            "message": "Hi! I'm here to help you create a SMART goal that will set you up for success. 🎯\n\nSMART goals are Specific, Measurable, Achievable, Relevant, and Time-bound. I'll guide you through each element step by step.\n\nReady to get started?",
+            "expectedResponses": ["yes", "ready", "let's go", "sure"],
+            "fallbackPrompt": "Take your time! When you're ready, just let me know and we'll begin creating your goal together."
+          }
+        ]
+      },
+      "2_initialGoalCapture": {
+        "stage": "initial-goal-capture",
+        "prompts": [
+          {
+            "type": "open-ended",
+            "message": "Great! Let's start with your idea. What would you like to accomplish? Don't worry about making it perfect - just share what's on your mind.",
+            "examples": [
+              "• \"I want to get healthier\"",
+              "• \"I need to improve my business\"", 
+              "• \"I'd like to learn something new\""
+            ],
+            "validationRules": {
+              "minLength": 5,
+              "maxLength": 500,
+              "requiresContent": true
+            },
+            "clarificationPrompt": "That's interesting! Could you tell me a bit more about what you have in mind?"
+          }
+        ]
+      },
+      "3_specificRefinement": {
+        "stage": "specific-refinement",
+        "introduction": "Good start! Now let's make your goal more specific. The clearer we can be, the easier it will be to achieve.",
+        "prompts": [
+          {
+            "type": "guided-refinement",
+            "basePrompt": "When you say '{user_goal}', what exactly do you want to do?",
+            "followUpQuestions": [
+              "What specific actions or outcomes are you looking for?",
+              "Who or what is involved in this goal?",
+              "Where will this happen?"
+            ],
+            "examples": {
+              "vague": "Get healthier",
+              "specific": "Exercise 3 times per week at the local gym focusing on cardio and strength training"
+            }
+          },
+          {
+            "type": "validation",
+            "checkPrompt": "So, to make sure I understand correctly, your specific goal is to: {refined_goal}\n\nDoes this capture what you want to accomplish?"
+          }
+        ]
+      },
+      "4_measurableDefinition": {
+        "stage": "measurable-definition",
+        "introduction": "Excellent! Now let's figure out how you'll know when you've succeeded. We need a way to measure your progress.",
+        "prompts": [
+          {
+            "type": "measurement-exploration",
+            "basePrompt": "How will you measure success for this goal? What numbers, milestones, or concrete evidence will show you're making progress?",
+            "guidingQuestions": [
+              "Is there a number or quantity involved?",
+              "What milestones could you track?",
+              "How will you know when you've achieved it?"
+            ],
+            "categoryPrompts": {
+              "quantitative": "What specific numbers or amounts are you targeting?",
+              "qualitative": "What observable changes or outcomes will indicate success?",
+              "milestone": "What key milestones will mark your progress?"
+            }
+          },
+          {
+            "type": "measurement-validation",
+            "prompt": "Perfect! So we'll measure your progress by: {measurements}\n\nWill this give you a clear way to track how you're doing?"
+          }
+        ]
+      },
+      "5_achievableAssessment": {
+        "stage": "achievable-assessment",
+        "introduction": "Now let's make sure this goal is challenging but realistic. I want to help you succeed!",
+        "prompts": [
+          {
+            "type": "feasibility-check",
+            "questions": [
+              "Given your current situation, what resources (time, money, skills) will you need?",
+              "What might make this challenging?",
+              "What advantages or strengths do you have that will help?"
+            ],
+            "adjustmentPrompt": "Based on what you've told me, would you like to adjust the goal to make it more achievable while still being meaningful?"
+          },
+          {
+            "type": "confidence-scale",
+            "prompt": "On a scale of 1-10, how confident are you that you can achieve this goal with effort and commitment?",
+            "responses": {
+              "low": "Let's adjust this to boost your confidence. What would make this more achievable?",
+              "medium": "Good! That's a healthy balance of challenge and achievability.",
+              "high": "Great confidence! Should we make it a bit more challenging to keep you engaged?"
+            }
+          }
+        ]
+      },
+      "6_relevantAlignment": {
+        "stage": "relevant-alignment",
+        "introduction": "Let's make sure this goal aligns with what's important to you right now.",
+        "prompts": [
+          {
+            "type": "relevance-exploration",
+            "questions": [
+              "Why is this goal important to you personally?",
+              "How does this fit with your other priorities or goals?",
+              "What positive changes will achieving this bring to your life?"
+            ],
+            "deepeningPrompt": "That's meaningful. Tell me more about how this connects to your bigger picture."
+          },
+          {
+            "type": "motivation-check",
+            "prompt": "When you think about working on this goal, what excites you most?",
+            "validationPrompt": "It sounds like this goal really matters to you because {reasons}. Is that right?"
+          }
+        ]
+      },
+      "7_timeBoundSetting": {
+        "stage": "time-bound-setting", 
+        "introduction": "Finally, let's set a timeline. Having a deadline creates urgency and helps you plan.",
+        "prompts": [
+          {
+            "type": "timeline-exploration",
+            "basePrompt": "When would you like to achieve this goal by?",
+            "refinementQuestions": [
+              "Is this timeline realistic given what you need to do?",
+              "Would you like to set any milestone dates along the way?",
+              "What's your ideal completion date vs. your must-complete-by date?"
+            ]
+          },
+          {
+            "type": "milestone-setting",
+            "prompt": "Let's break this down. What key milestones should we track between now and {end_date}?",
+            "template": "By {date}, I will have {milestone}"
+          }
+        ]
+      },
+      "8_goalSummary": {
+        "stage": "goal-summary",
+        "introduction": "Fantastic! Let's review your SMART goal:",
+        "summaryTemplate": {
+          "format": "📋 Your SMART Goal:\n\n**Goal:** {specific_goal}\n\n**Specific:** {specific_details}\n**Measurable:** {measurements}\n**Achievable:** {achievability_factors}\n**Relevant:** {relevance_reasons}\n**Time-bound:** {timeline}\n\n**Key Milestones:**\n{milestones}",
+          "alternativeFormat": "I will {specific_action} as measured by {metric} by {deadline} because {relevance}."
+        },
+        "confirmationPrompt": "How does this look? Would you like to adjust anything?"
+      },
+      "9_confirmationRefinement": {
+        "stage": "confirmation-refinement",
+        "prompts": [
+          {
+            "type": "final-check",
+            "message": "Before we finalize, let me ask:\n1. Does this goal excite and motivate you?\n2. Is there anything that feels unclear or needs adjustment?\n3. Are you ready to commit to this goal?",
+            "refinementOptions": [
+              "Adjust the timeline",
+              "Modify the measurements", 
+              "Change the scope",
+              "Add/remove milestones",
+              "Goal looks perfect!"
+            ]
+          },
+          {
+            "type": "commitment",
+            "prompt": "Excellent! Your SMART goal is ready. Would you like me to help you create an action plan for getting started?",
+            "closingMessage": "Remember, a goal without a plan is just a wish. You've taken the first important step. Good luck! 🌟"
+          }
+        ]
+      }
+    },
+    "interactionPatterns": {
+      "clarificationLoops": {
+        "maxAttempts": 3,
+        "strategies": [
+          "Provide examples",
+          "Ask more specific questions",
+          "Offer multiple choice options",
+          "Break down into smaller parts"
+        ]
+      },
+      "validationPatterns": {
+        "alwaysConfirm": true,
+        "allowBacktracking": true,
+        "saveProgress": true
+      },
+      "errorHandling": {
+        "vagueness": "I'd love to help make that clearer. Could you give me more details about {aspect}?",
+        "conflict": "I notice this might conflict with {previous_input}. How would you like to resolve this?",
+        "unrealistic": "That's ambitious! Let's explore how to make this more achievable while keeping it meaningful.",
+        "confusion": "I want to make sure I understand. Let me ask a different way..."
+      }
+    },
+    "adaptiveElements": {
+      "userTypes": {
+        "novice": {
+          "moreExamples": true,
+          "simplerLanguage": true,
+          "additionalGuidance": true
+        },
+        "experienced": {
+          "fasterPace": true,
+          "fewerExamples": false,
+          "advancedOptions": true
+        }
+      },
+      "contextualHelp": {
+        "triggers": ["help", "explain", "what does that mean", "I don't understand"],
+        "responses": {
+          "specific": "Being specific means clearly defining what you want to do, who's involved, where it happens, and which aspects you'll focus on.",
+          "measurable": "Measurable means having concrete criteria for tracking progress - numbers, milestones, or observable outcomes.",
+          "achievable": "Achievable means the goal is realistic given your resources, time, and circumstances - challenging but possible.",
+          "relevant": "Relevant means the goal matters to you personally and aligns with your values, priorities, and bigger objectives.",
+          "timebound": "Time-bound means having a clear deadline and timeline with specific dates for completion and milestones."
+        }
+      }
+    },
+    "visualElements": {
+      "progressIndicator": "Step {current} of 9: {stage_name}",
+      "icons": {
+        "specific": "🎯",
+        "measurable": "📊",
+        "achievable": "💪",
+        "relevant": "❤️",
+        "timebound": "⏰"
+      },
+      "formatting": {
+        "userInput": "italic",
+        "systemPrompt": "normal",
+        "examples": "blockquote",
+        "summary": "bold"
+      }
+    },
+    "dataCollection": {
+      "fieldsToStore": [
+        "initial_goal",
+        "specific_goal",
+        "measurements",
+        "resources_needed",
+        "relevance_reasons",
+        "timeline",
+        "milestones",
+        "confidence_level",
+        "final_smart_goal"
+      ],
+      "sessionTracking": {
+        "trackProgress": true,
+        "allowResume": true,
+        "savePartialGoals": true
+      }
+    }
+  }
+}

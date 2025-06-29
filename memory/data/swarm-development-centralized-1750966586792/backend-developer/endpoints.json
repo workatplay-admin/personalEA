@@ -1,0 +1,53 @@
+{
+  "analysis": {
+    "timestamp": "2025-01-26T00:00:00Z",
+    "findings": {
+      "existing_endpoints": {
+        "goals": {
+          "POST /api/v1/goals/translate": "Convert raw goal to SMART format",
+          "POST /api/v1/goals/clarify": "Process clarification answers (general)",
+          "POST /api/v1/goals": "Create new goal",
+          "GET /api/v1/goals": "List user goals",
+          "GET /api/v1/goals/:id": "Get specific goal",
+          "PUT /api/v1/goals/:id": "Update goal",
+          "DELETE /api/v1/goals/:id": "Delete goal",
+          "GET /api/v1/goals/:id/smart-analysis": "Get SMART criteria analysis",
+          "POST /api/v1/goals/:id/metrics": "Add success metric",
+          "GET /api/v1/goals/:id/metrics/tracking": "Get metric tracking status"
+        }
+      },
+      "missing_endpoints": {
+        "POST /api/v1/goals/:id/clarify": {
+          "purpose": "Get clarification questions for a specific goal",
+          "expected_behavior": "Returns clarification questions based on goal's current state",
+          "mock_reference": "lines 202-233 in mock-server.js"
+        },
+        "POST /api/v1/goals/contextual-help": {
+          "purpose": "Get contextual help for goal components",
+          "expected_behavior": "Returns help message based on component and conversation",
+          "mock_reference": "lines 236-249 in mock-server.js"
+        },
+        "POST /api/v1/goals/component-question": {
+          "purpose": "Get component-specific questions",
+          "expected_behavior": "Returns targeted questions for SMART criteria components",
+          "mock_reference": "lines 252-273 in mock-server.js"
+        }
+      },
+      "architecture": {
+        "routes_location": "/services/goal-strategy/src/routes/goals.ts",
+        "mounting_point": "/api/v1/goals",
+        "middleware": ["authenticateJWT", "requireScopes"],
+        "database": "PostgreSQL with Prisma ORM"
+      }
+    }
+  },
+  "implementation_plan": {
+    "steps": [
+      "1. Add POST /api/v1/goals/:id/clarify endpoint",
+      "2. Add POST /api/v1/goals/contextual-help endpoint",
+      "3. Add POST /api/v1/goals/component-question endpoint",
+      "4. Ensure proper error handling and validation",
+      "5. Follow existing patterns for response formatting"
+    ]
+  }
+}

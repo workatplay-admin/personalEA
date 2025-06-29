@@ -1,0 +1,102 @@
+{
+  "endpoint_exists": true,
+  "endpoint_path": "/api/v1/goals/:id/clarify",
+  "implementation_details": {
+    "file": "/services/goal-strategy/src/routes/goals.ts",
+    "line_number": 163,
+    "http_method": "POST",
+    "required_scopes": ["goals:read"],
+    "authentication": "JWT required",
+    "handler_logic": {
+      "accepts_clarifications": true,
+      "accepts_goal_context": true,
+      "processes_clarification_answers": true,
+      "updates_goal_smart_criteria": true,
+      "saves_clarifications_to_database": true
+    }
+  },
+  "openai_integration": {
+    "primary_processor": "smartGoalProcessor.processClarifications",
+    "api_key_sources": [
+      "x-openai-api-key header (user provided)",
+      "env.OPENAI_API_KEY (environment fallback)"
+    ],
+    "openai_endpoint": "https://api.openai.com/v1/chat/completions",
+    "model": "gpt-4 (default) or env.OPENAI_MODEL",
+    "error_handling": {
+      "no_api_key": "Throws 'OpenAI API key not configured'",
+      "api_failure": "Throws 'OpenAI API call failed: {status} {errorData}'"
+    }
+  },
+  "error_mapping": {
+    "OpenAI_errors": {
+      "error_handler_line": 138,
+      "mapped_to": {
+        "status": 503,
+        "code": "AI_SERVICE_ERROR",
+        "message": "AI service temporarily unavailable"
+      }
+    },
+    "validation_errors": {
+      "handled_by": "Zod schema validation",
+      "returns": "400 Bad Request with VALIDATION_ERROR"
+    },
+    "goal_not_found": {
+      "returns": "404 with GOAL_NOT_FOUND code"
+    }
+  },
+  "request_body_schema": {
+    "clarifications": {
+      "type": "array",
+      "items": {
+        "question": "string",
+        "answer": "string",
+        "smartCriterion": "string"
+      }
+    },
+    "goalContext": {
+      "type": "object",
+      "optional": true
+    }
+  },
+  "response_format": {
+    "success": true,
+    "data": {
+      "goal_object": "Updated goal with new SMART criteria",
+      "confidence": "number",
+      "remaining_questions": "array of clarification questions",
+      "updatedAt": "ISO timestamp"
+    },
+    "correlation_id": "string"
+  },
+  "root_cause_analysis": {
+    "error_message": "System error. The AI service is currently unavailable",
+    "likely_cause": "OpenAI API call failing",
+    "potential_reasons": [
+      "Invalid API key format or expired key",
+      "OpenAI service outage or rate limiting",
+      "Network connectivity issues",
+      "Incorrect model specified in environment",
+      "Request payload too large or malformed"
+    ],
+    "error_flow": [
+      "1. User sends POST to /goals/{id}/clarify with valid JWT",
+      "2. Endpoint retrieves goal from database successfully",
+      "3. smartGoalProcessor.processClarifications is called",
+      "4. callOpenAI method attempts API call with user's key",
+      "5. OpenAI API returns non-200 status or network fails",
+      "6. Error is thrown with 'OpenAI API call failed'",
+      "7. Global error handler catches error containing 'OpenAI'",
+      "8. Returns 503 with 'AI service temporarily unavailable'"
+    ]
+  },
+  "test_recommendations": [
+    "1. Verify OpenAI API key format (should start with 'sk-')",
+    "2. Test OpenAI API key directly with curl",
+    "3. Check for rate limiting on the API key",
+    "4. Verify network connectivity to api.openai.com",
+    "5. Check logs for specific OpenAI error responses",
+    "6. Test with a known working API key",
+    "7. Monitor correlation IDs in logs for detailed error traces"
+  ]
+}

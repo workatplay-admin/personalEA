@@ -1,0 +1,325 @@
+name: Secure Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      skip_tests:
+        description: 'Skip automated tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  pre-deployment-checks:
+    name: Pre-deployment Security Validation
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_environment: ${{ steps.determine-env.outputs.environment }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Determine deployment environment
+        id: determine-env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" =~ ^refs/tags/v ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Generate version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" =~ ^refs/tags/v ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION="$(date +%Y%m%d)-${GITHUB_SHA::8}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Secret scanning
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+      
+      - name: Security scan with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+      
+      - name: Upload security results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Check for exposed secrets
+        run: |
+          # Custom secret detection for environment files
+          if grep -r "sk-[a-zA-Z0-9]\{48\}" . --exclude-dir=node_modules --exclude-dir=.git; then
+            echo "::error::Exposed API keys detected in codebase"
+            exit 1
+          fi
+          
+          # Check for hardcoded passwords
+          if grep -rE "(password|secret|key)\s*=\s*['\"][^'\"]{8,}['\"]" . \
+            --exclude-dir=node_modules \
+            --exclude-dir=.git \
+            --exclude="*.example" \
+            --exclude="*.md"; then
+            echo "::warning::Potential hardcoded secrets detected"
+          fi
+
+  build-secure-images:
+    name: Build Secure Docker Images
+    needs: [pre-deployment-checks]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write # For OIDC
+    
+    strategy:
+      matrix:
+        service:
+          - name: goal-strategy
+            context: ./services/goal-strategy
+            dockerfile: ./services/goal-strategy/Dockerfile.secure
+          - name: email-processing
+            context: ./services/email-processing
+            dockerfile: ./services/email-processing/Dockerfile.secure
+          - name: ui
+            context: ./ui
+            dockerfile: ./ui/Dockerfile.production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service.name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ needs.pre-deployment-checks.outputs.version }}
+            type=raw,value=latest,enable={{is_default_branch}}
+      
+      - name: Build and push Docker image (with BuildKit secrets)
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VERSION=${{ needs.pre-deployment-checks.outputs.version }}
+            BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            VCS_REF=${{ github.sha }}
+          # BuildKit secrets for secure builds
+          secrets: |
+            "npm_token=${{ secrets.NPM_TOKEN }}"
+      
+      - name: Scan built image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service.name }}:${{ needs.pre-deployment-checks.outputs.version }}
+          format: 'sarif'
+          output: 'container-scan-${{ matrix.service.name }}.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Upload container scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'container-scan-${{ matrix.service.name }}.sarif'
+
+  deploy-with-secrets:
+    name: Deploy with Secure Secret Management
+    needs: [pre-deployment-checks, build-secure-images]
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ needs.pre-deployment-checks.outputs.deploy_environment }}
+      url: https://${{ needs.pre-deployment-checks.outputs.deploy_environment }}.personalea.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE_ARN }}
+          role-session-name: GitHubActions-${{ github.run_id }}
+          aws-region: ${{ vars.AWS_REGION }}
+      
+      - name: Retrieve secrets from AWS Secrets Manager
+        id: secrets
+        run: |
+          # Retrieve deployment secrets
+          SECRETS_JSON=$(aws secretsmanager get-secret-value \
+            --secret-id "personalea/${{ needs.pre-deployment-checks.outputs.deploy_environment }}/deployment" \
+            --query SecretString --output text)
+          
+          # Export secrets as masked outputs
+          echo "::add-mask::$(echo $SECRETS_JSON | jq -r '.postgres_password')"
+          echo "::add-mask::$(echo $SECRETS_JSON | jq -r '.redis_password')"
+          echo "::add-mask::$(echo $SECRETS_JSON | jq -r '.jwt_secret')"
+          echo "::add-mask::$(echo $SECRETS_JSON | jq -r '.session_secret')"
+          
+          # Set outputs for deployment
+          echo "deployment_config=$SECRETS_JSON" >> $GITHUB_OUTPUT
+      
+      - name: Deploy with injected secrets
+        env:
+          DEPLOYMENT_ENV: ${{ needs.pre-deployment-checks.outputs.deploy_environment }}
+          VERSION: ${{ needs.pre-deployment-checks.outputs.version }}
+        run: |
+          # Create secure deployment configuration
+          cat > deployment-config.json << 'EOF'
+          ${{ steps.secrets.outputs.deployment_config }}
+          EOF
+          
+          # Deploy using secure script
+          ./deployment/scripts/secure-deploy.sh \
+            --environment "$DEPLOYMENT_ENV" \
+            --version "$VERSION" \
+            --config deployment-config.json
+          
+          # Clean up sensitive files
+          shred -vfz deployment-config.json
+      
+      - name: Verify deployment security
+        run: |
+          # Check that no secrets are exposed in running containers
+          ./deployment/scripts/security-check.sh \
+            --environment ${{ needs.pre-deployment-checks.outputs.deploy_environment }}
+      
+      - name: Rotate deployment credentials
+        if: needs.pre-deployment-checks.outputs.deploy_environment == 'production'
+        run: |
+          # Trigger key rotation for production deployments
+          aws secretsmanager rotate-secret \
+            --secret-id "personalea/production/deployment" \
+            --rotation-lambda-arn ${{ secrets.ROTATION_LAMBDA_ARN }}
+      
+      - name: Security notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment Status: ${{ job.status }}
+            Environment: ${{ needs.pre-deployment-checks.outputs.deploy_environment }}
+            Version: ${{ needs.pre-deployment-checks.outputs.version }}
+            Security Checks: ${{ steps.security-check.outcome || 'Passed' }}
+          webhook_url: ${{ secrets.SECURITY_SLACK_WEBHOOK }}
+
+  post-deployment-security:
+    name: Post-deployment Security Verification
+    needs: [pre-deployment-checks, deploy-with-secrets]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run security tests
+        run: |
+          # OWASP ZAP security scan
+          docker run -t owasp/zap2docker-stable zap-baseline.py \
+            -t https://${{ needs.pre-deployment-checks.outputs.deploy_environment }}.personalea.com \
+            -r security-report.html \
+            -J security-report.json
+      
+      - name: Check SSL configuration
+        run: |
+          # SSL Labs scan
+          ./deployment/scripts/ssl-check.sh \
+            --domain ${{ needs.pre-deployment-checks.outputs.deploy_environment }}.personalea.com
+      
+      - name: Verify secret rotation
+        run: |
+          # Check that old secrets are invalidated
+          ./deployment/scripts/verify-rotation.sh \
+            --environment ${{ needs.pre-deployment-checks.outputs.deploy_environment }}
+      
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports-${{ needs.pre-deployment-checks.outputs.version }}
+          path: |
+            security-report.html
+            security-report.json
+            ssl-report.json
+          retention-days: 90
+
+  cleanup-secrets:
+    name: Clean up temporary secrets
+    needs: [deploy-with-secrets, post-deployment-security]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Revoke temporary credentials
+        run: |
+          echo "Cleaning up deployment secrets and temporary credentials"
+          # Cleanup is handled automatically by AWS STS session expiration
+      
+      - name: Audit log
+        run: |
+          # Log deployment for audit trail
+          echo "Deployment completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_STEP_SUMMARY
+          echo "Environment: ${{ needs.pre-deployment-checks.outputs.deploy_environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "Version: ${{ needs.pre-deployment-checks.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Deployer: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY

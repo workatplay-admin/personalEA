@@ -1,0 +1,90 @@
+{
+  "fix_recommendations": {
+    "immediate_fixes": [
+      {
+        "location": "buildClarificationPrompt method",
+        "current_line": "4. Keep confidence LOW (0.3-0.5) unless the user provided comprehensive details",
+        "recommended_change": "4. Set confidence based on answer quality: 0.2-0.4 for vague, 0.5-0.7 for moderate, 0.8-1.0 for comprehensive details",
+        "reasoning": "Allows dynamic confidence scoring based on actual answer quality"
+      },
+      {
+        "location": "buildClarificationPrompt prompt text",
+        "current_behavior": "Artificially constrains all updates",
+        "recommended_change": "Allow natural evaluation of user input and update all relevant components",
+        "example_prompt_section": "Evaluate the user's input comprehensively:\n- If they mention specific activities, locations, or methods -> Update 'specific' with high confidence\n- If they mention quantities, frequencies, or success criteria -> Update 'measurable'\n- If they mention timeframes, deadlines, or duration -> Update 'timeBound'\n- Set confidence scores that reflect the completeness of their answer"
+      }
+    ],
+    
+    "code_patterns_to_fix": [
+      {
+        "pattern": "confidence: 0.3-0.5",
+        "issue": "Hardcoded low confidence range",
+        "fix": "Dynamic confidence based on parseAIResponse evaluation"
+      },
+      {
+        "pattern": "ONLY update the specific component(s) the user addressed",
+        "issue": "Too restrictive - prevents holistic updates",
+        "fix": "Update all components that the user's answer logically addresses"
+      },
+      {
+        "pattern": "DO NOT add details the user didn't provide",
+        "issue": "Prevents reasonable inference from context",
+        "fix": "Allow reasonable interpretation while avoiding assumptions"
+      }
+    ],
+    
+    "prompt_rewrite_strategy": {
+      "goal": "Create a balanced prompt that properly evaluates user input",
+      "key_principles": [
+        "Objectively assess information completeness",
+        "Update confidence scores proportionally to answer quality",
+        "Recognize when multiple SMART components are addressed in one answer",
+        "Stop asking questions when sufficient information is provided"
+      ],
+      "example_scoring_rubric": {
+        "0.0-0.2": "No relevant information provided",
+        "0.3-0.4": "Vague or minimal information",
+        "0.5-0.6": "Some specific details but gaps remain",
+        "0.7-0.8": "Good detail with minor clarifications needed",
+        "0.9-1.0": "Comprehensive, specific, actionable information"
+      }
+    },
+    
+    "validation_logic_needed": {
+      "description": "Add post-processing to validate AI responses",
+      "checks": [
+        "Ensure confidence scores reflect actual information provided",
+        "Verify that detailed answers result in higher scores",
+        "Check that questions aren't repeated for already-answered criteria",
+        "Validate that the system progresses toward completion"
+      ]
+    }
+  },
+  
+  "testing_strategy": {
+    "unit_tests": [
+      "Test buildClarificationPrompt with various answer qualities",
+      "Test parseAIResponse handles dynamic confidence ranges",
+      "Test that multiple components can be updated simultaneously"
+    ],
+    "integration_tests": [
+      "Full flow test: vague goal -> clarification -> detailed answer -> proper score update",
+      "Test that system completes refinement in reasonable number of iterations",
+      "Test edge cases with partial or confusing answers"
+    ],
+    "example_test_case": {
+      "input": {
+        "original_goal": "Learn to race",
+        "user_answer": "I want to do hobby racing at the local karting track, starting with weekly practice sessions and aiming to compete in amateur league by summer",
+        "addressed_component": "specific"
+      },
+      "expected_output": {
+        "specific": { "confidence": 0.8, "value": "Hobby racing at local karting track" },
+        "measurable": { "confidence": 0.7, "value": "Weekly practice sessions, compete in amateur league" },
+        "timeBound": { "confidence": 0.8, "value": "By summer" },
+        "should_ask_more_questions": true,
+        "questions_should_focus_on": ["achievable", "relevant"]
+      }
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "projectName": "SMART Goal Clarification Flow Improvement",
+  "objective": "Focus clarification on low-confidence aspects until they reach 90%+ confidence",
+  "currentIssues": [
+    "Sequential cycling through all SMART aspects",
+    "No confidence-based prioritization",
+    "Asks questions about high-confidence aspects",
+    "No iterative refinement of low-confidence aspects"
+  ],
+  "requirements": {
+    "confidenceBasedPrioritization": {
+      "description": "Prioritize questions based on component confidence levels",
+      "details": [
+        "Skip components with confidence >= 90%",
+        "Sort components by confidence (lowest first)",
+        "Generate contextual questions based on confidence level"
+      ]
+    },
+    "iterativeRefinement": {
+      "description": "Continue refining single component until high confidence",
+      "details": [
+        "Focus on one component until 90%+ confidence",
+        "Re-evaluate confidence after each response",
+        "Generate follow-up questions for same component if needed"
+      ]
+    },
+    "intelligentSelection": {
+      "description": "Smart component selection based on dependencies",
+      "dependencies": {
+        "specific": ["measurable"],
+        "measurable": ["timeBound"],
+        "all": ["achievable"]
+      }
+    },
+    "apiEnhancements": {
+      "endpoints": [
+        {
+          "path": "/goals/:id/clarify",
+          "changes": [
+            "Support single-component refinement",
+            "Return confidence and reasoning",
+            "Include needsFollowUp flag",
+            "Track refinement history"
+          ]
+        }
+      ],
+      "responseFormat": {
+        "updatedComponent": {
+          "value": "string",
+          "confidence": "number (0-1)",
+          "reasoning": "string"
+        },
+        "needsFollowUp": "boolean",
+        "followUpQuestion": "string (optional)",
+        "componentComplete": "boolean"
+      }
+    },
+    "completionCriteria": {
+      "component": {
+        "confidence": 0.9,
+        "maxIterations": 5,
+        "allowSkip": true
+      },
+      "overall": {
+        "allComponentsMinConfidence": 0.9,
+        "overallMinConfidence": 0.85
+      }
+    }
+  },
+  "implementation": {
+    "frontend": {
+      "files": [
+        "/testing/goal-strategy-test/src/components/ChatClarification.tsx"
+      ],
+      "changes": [
+        "Replace componentIndex with confidence-based selection",
+        "Add iterative questioning logic",
+        "Show confidence levels in UI",
+        "Track refinement attempts per component"
+      ]
+    },
+    "backend": {
+      "files": [
+        "/services/goal-strategy/src/routes/goals.ts",
+        "/services/goal-strategy/src/routes/goals-chat-endpoints.ts",
+        "/services/goal-strategy/src/services/smart-goal-processor.ts"
+      ],
+      "changes": [
+        "Enhance clarification logic",
+        "Add confidence calculation",
+        "Implement follow-up question generation",
+        "Track component refinement history"
+      ]
+    }
+  },
+  "exampleFlow": {
+    "input": "I want to learn guitar",
+    "initialConfidence": {
+      "specific": 0.3,
+      "measurable": 0.2,
+      "achievable": 0.5,
+      "relevant": 0.7,
+      "timeBound": 0.1
+    },
+    "refinementOrder": ["timeBound", "measurable", "specific", "achievable"],
+    "skipComponents": ["relevant"],
+    "expectedIterations": {
+      "timeBound": 3,
+      "measurable": 2,
+      "specific": 2,
+      "achievable": 1
+    }
+  },
+  "successMetrics": [
+    "90%+ confidence achievement rate",
+    "Reduced questions for well-defined goals",
+    "Improved goal quality scores",
+    "Faster completion for clear goals",
+    "User satisfaction improvement"
+  ]
+}

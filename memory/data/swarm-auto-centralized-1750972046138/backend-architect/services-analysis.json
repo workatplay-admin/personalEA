@@ -1,0 +1,91 @@
+{
+  "step": "Backend Service Analysis",
+  "timestamp": "2025-06-26T21:47:23.456Z",
+  "endpoints": [
+    {
+      "path": "/api/v1/goals/contextual-help",
+      "handler": "contextualHelpHandler",
+      "file": "services/goal-strategy/src/routes/goals-chat-endpoints.ts",
+      "issues": [
+        "No retry mechanism for OpenAI API calls",
+        "Returns generic 503 on any OpenAI failure",
+        "No connection recovery logic"
+      ]
+    },
+    {
+      "path": "/api/v1/goals/component-question",
+      "handler": "componentQuestionHandler", 
+      "file": "services/goal-strategy/src/routes/goals-chat-endpoints.ts",
+      "issues": [
+        "Same error handling issues as contextual-help",
+        "No timeout configuration for long requests"
+      ]
+    },
+    {
+      "path": "/api/v1/goals/:id/clarify",
+      "handler": "clarifyGoalHandler",
+      "file": "services/goal-strategy/src/routes/goals.ts",
+      "issues": [
+        "Creates new Prisma client instance",
+        "No connection pooling"
+      ]
+    }
+  ],
+  "middleware": [
+    {
+      "name": "errorHandler",
+      "file": "services/goal-strategy/src/middleware/error-handler.ts",
+      "critical_issue": "Line 139 - Returns 503 for ANY OpenAI/AI error, making service appear unavailable",
+      "recommendation": "Differentiate between transient errors (retry) and service errors (503)"
+    }
+  ],
+  "serviceHealth": {
+    "health_endpoints": [
+      "/health",
+      "/health/detailed",
+      "/health/ready",
+      "/health/live"
+    ],
+    "issues": [
+      "Health checks create new Prisma connections each time",
+      "No connection pool monitoring",
+      "OpenAI health check can fail and mark service unhealthy"
+    ]
+  },
+  "fixes": [
+    {
+      "priority": "CRITICAL",
+      "component": "Error Handler",
+      "fix": "Modify error handler to return 502 (Bad Gateway) for upstream API failures instead of 503",
+      "file": "services/goal-strategy/src/middleware/error-handler.ts",
+      "line": 139
+    },
+    {
+      "priority": "HIGH", 
+      "component": "Prisma Singleton",
+      "fix": "Create singleton Prisma client with connection pooling",
+      "implementation": "Create db.ts file with singleton pattern and pool configuration"
+    },
+    {
+      "priority": "HIGH",
+      "component": "OpenAI Retry Logic",
+      "fix": "Add exponential backoff retry for transient OpenAI failures",
+      "files": [
+        "services/goal-strategy/src/routes/goals-chat-endpoints.ts"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "component": "Circuit Breaker",
+      "fix": "Implement circuit breaker pattern for OpenAI calls",
+      "benefit": "Prevent cascading failures and allow graceful degradation"
+    },
+    {
+      "priority": "MEDIUM",
+      "component": "Connection Pool",
+      "fix": "Configure DATABASE_URL with pool parameters: ?pool_timeout=20&connection_limit=10",
+      "file": ".env files and Prisma configuration"
+    }
+  ],
+  "root_cause": "The service returns 503 (Service Unavailable) for any OpenAI API error, which the frontend interprets as the entire backend being down. This is compounded by database connection exhaustion from multiple Prisma client instances."
+}

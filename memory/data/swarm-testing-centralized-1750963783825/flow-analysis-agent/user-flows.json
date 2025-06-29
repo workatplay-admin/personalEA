@@ -1,0 +1,309 @@
+{
+  "flowAnalysisAgent": {
+    "timestamp": "2025-06-26T18:52:26.935Z",
+    "status": "completed",
+    "applicationStructure": {
+      "services": [
+        {
+          "name": "Goal & Strategy Service",
+          "type": "Full-stack application",
+          "frontend": "React + TypeScript",
+          "backend": "Express API",
+          "port": "Frontend: 5174, Backend: 8085"
+        },
+        {
+          "name": "Email Processing Service",
+          "type": "Backend API service",
+          "backend": "Express + Prisma",
+          "port": 8080
+        }
+      ]
+    },
+    "userFlows": [
+      {
+        "id": "goal-strategy-flow",
+        "name": "Goal to Strategy Transformation Flow",
+        "service": "Goal & Strategy Service",
+        "priority": "critical",
+        "steps": [
+          {
+            "step": 1,
+            "name": "API Configuration",
+            "description": "User provides OpenAI API key for authentication",
+            "component": "ApiConfig",
+            "expectedOutcome": "API credentials stored and JWT token generated",
+            "testData": {
+              "openaiApiKey": "sk-proj-test123...",
+              "expectedJwtFormat": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            }
+          },
+          {
+            "step": 2,
+            "name": "Goal Input",
+            "description": "User enters their goal (vague or specific)",
+            "component": "GoalInput",
+            "expectedOutcome": "Goal text captured and submitted",
+            "testData": {
+              "exampleGoals": [
+                "I want to get promoted to senior developer",
+                "I want to lose weight and get fit",
+                "Launch a successful online course",
+                "Start a tech consulting business while maintaining work-life balance",
+                "Learn machine learning and build an AI project",
+                "Save money for a house down payment"
+              ]
+            }
+          },
+          {
+            "step": 3,
+            "name": "SMART Goal Translation",
+            "description": "AI converts user goal to SMART format with real-time chat refinement",
+            "component": "SmartGoalDisplay",
+            "subComponents": ["ChatClarification", "SmartGoalViewer"],
+            "expectedOutcome": "SMART goal with specific, measurable, achievable, relevant, and time-bound criteria",
+            "testData": {
+              "originalGoal": "I want to get promoted to senior developer",
+              "expectedSMARTFields": ["title", "description", "criteria", "confidence", "clarificationQuestions"]
+            }
+          },
+          {
+            "step": 4,
+            "name": "Milestone Generation",
+            "description": "Break SMART goal into achievable milestones",
+            "component": "MilestonesDisplay",
+            "expectedOutcome": "2-6 milestones with target dates and completion criteria",
+            "testData": {
+              "milestoneCount": "2-6",
+              "requiredFields": ["title", "description", "targetDate", "completionCriteria", "orderIndex"]
+            }
+          },
+          {
+            "step": 5,
+            "name": "Work Breakdown Structure",
+            "description": "Create detailed tasks for each milestone",
+            "component": "WBSDisplay",
+            "expectedOutcome": "Hierarchical task structure with subtasks",
+            "testData": {
+              "taskFields": ["title", "description", "completionCriteria", "milestoneId", "parentTaskId"]
+            }
+          },
+          {
+            "step": 6,
+            "name": "Task Estimation",
+            "description": "Estimate time and effort for each task",
+            "component": "EstimationDisplay",
+            "expectedOutcome": "Hour estimates with confidence intervals",
+            "testData": {
+              "estimationMethods": ["EXPERT_JUDGMENT", "ANALOGY_BASED", "THREE_POINT_PERT", "HISTORICAL_DATA"],
+              "requiredFields": ["estimatedHours", "confidenceScore", "method"]
+            }
+          },
+          {
+            "step": 7,
+            "name": "Feedback Collection",
+            "description": "User provides feedback on the generated plan",
+            "component": "FeedbackForm",
+            "expectedOutcome": "Feedback submitted for continuous improvement",
+            "testData": {
+              "feedbackFields": ["rating", "comments", "suggestions"]
+            }
+          }
+        ]
+      },
+      {
+        "id": "email-sync-flow",
+        "name": "Email Synchronization Flow",
+        "service": "Email Processing Service",
+        "priority": "high",
+        "steps": [
+          {
+            "step": 1,
+            "name": "Authentication",
+            "description": "User provides Gmail access token",
+            "endpoint": "POST /api/v1/emails/sync",
+            "expectedOutcome": "Email provider credentials stored",
+            "testData": {
+              "user_id": "test-user-123",
+              "access_token": "ya29.test-access-token",
+              "sync_options": {
+                "labels": ["INBOX"],
+                "max_results": 100,
+                "since": "2024-01-01T00:00:00Z"
+              }
+            }
+          },
+          {
+            "step": 2,
+            "name": "Email Sync Job Creation",
+            "description": "Create asynchronous job to sync emails",
+            "endpoint": "POST /api/v1/emails/sync",
+            "expectedOutcome": "Job ID returned with 202 status",
+            "testData": {
+              "expectedResponse": {
+                "job_id": "uuid-v4",
+                "state": "pending",
+                "percent_complete": 0
+              }
+            }
+          },
+          {
+            "step": 3,
+            "name": "Job Status Monitoring",
+            "description": "Poll job status for completion",
+            "endpoint": "GET /api/v1/jobs/:job_id",
+            "expectedOutcome": "Job progress updates",
+            "testData": {
+              "states": ["pending", "in_progress", "completed", "failed"]
+            }
+          }
+        ]
+      },
+      {
+        "id": "email-digest-flow",
+        "name": "Email Digest Generation Flow",
+        "service": "Email Processing Service",
+        "priority": "high",
+        "steps": [
+          {
+            "step": 1,
+            "name": "Request Digest",
+            "description": "User requests email digest for time window",
+            "endpoint": "POST /api/v1/emails/digest",
+            "expectedOutcome": "Categorized email digest with summaries",
+            "testData": {
+              "user_id": "test-user-123",
+              "time_window": {
+                "start": "2024-01-01T00:00:00Z",
+                "end": "2024-01-31T23:59:59Z"
+              },
+              "labels": ["INBOX"],
+              "categories": ["URGENT", "ACTIONABLE"]
+            }
+          },
+          {
+            "step": 2,
+            "name": "Digest Generation",
+            "description": "AI processes emails and generates summaries",
+            "expectedOutcome": "Digest with categorized emails and action items",
+            "testData": {
+              "expectedCategories": ["urgent", "actionable", "informational"],
+              "digestFields": ["digest_id", "summary", "emails", "pagination"]
+            }
+          }
+        ]
+      },
+      {
+        "id": "email-summary-flow",
+        "name": "Individual Email Summary Flow",
+        "service": "Email Processing Service",
+        "priority": "medium",
+        "steps": [
+          {
+            "step": 1,
+            "name": "Request Email Summary",
+            "description": "Get AI-generated summary for specific email",
+            "endpoint": "GET /api/v1/emails/:email_id/summary",
+            "expectedOutcome": "Detailed email summary with key points",
+            "testData": {
+              "email_id": "test-email-123",
+              "expectedFields": ["summary", "category", "confidence_score", "key_points"]
+            }
+          }
+        ]
+      },
+      {
+        "id": "action-items-flow",
+        "name": "Action Items Extraction Flow",
+        "service": "Email Processing Service",
+        "priority": "medium",
+        "steps": [
+          {
+            "step": 1,
+            "name": "Request Action Items",
+            "description": "Extract action items from email",
+            "endpoint": "GET /api/v1/emails/:email_id/action-items",
+            "expectedOutcome": "List of prioritized action items",
+            "testData": {
+              "email_id": "test-email-123",
+              "expectedFields": ["text", "confidence_score", "priority", "deadline"]
+            }
+          }
+        ]
+      }
+    ],
+    "testScenarios": [
+      {
+        "id": "complete-goal-strategy-flow",
+        "name": "Complete Goal to Strategy Transformation",
+        "flows": ["goal-strategy-flow"],
+        "description": "Test full journey from goal input to task estimation",
+        "criticalPath": true,
+        "testSteps": [
+          "Configure API with valid OpenAI key",
+          "Input goal: I want to get promoted to senior developer",
+          "Verify SMART goal generation with all criteria",
+          "Use chat interface to refine unclear criteria",
+          "Generate 3-5 milestones",
+          "Create WBS with 15-20 tasks",
+          "Estimate all tasks",
+          "Submit feedback"
+        ]
+      },
+      {
+        "id": "email-processing-workflow",
+        "name": "Email Sync and Digest Workflow",
+        "flows": ["email-sync-flow", "email-digest-flow"],
+        "description": "Test email synchronization and digest generation",
+        "criticalPath": true,
+        "testSteps": [
+          "Authenticate with Gmail access token",
+          "Create sync job for last 30 days",
+          "Monitor job until completion",
+          "Request digest for synced emails",
+          "Verify categorization and summaries"
+        ]
+      },
+      {
+        "id": "api-error-handling",
+        "name": "API Error Handling Scenarios",
+        "flows": ["goal-strategy-flow"],
+        "description": "Test error handling and recovery",
+        "criticalPath": false,
+        "testSteps": [
+          "Test with invalid API key",
+          "Test with malformed goal input",
+          "Test network timeout scenarios",
+          "Test rate limiting",
+          "Verify error messages and recovery options"
+        ]
+      }
+    ],
+    "recommendations": [
+      {
+        "priority": "high",
+        "recommendation": "Implement comprehensive E2E tests for the Goal Strategy flow",
+        "rationale": "This is the primary user journey and involves multiple AI interactions"
+      },
+      {
+        "priority": "high",
+        "recommendation": "Add browser-based testing for chat interface interactions",
+        "rationale": "Real-time chat updates require browser testing to verify WebSocket or polling behavior"
+      },
+      {
+        "priority": "medium",
+        "recommendation": "Create visual regression tests for SMART goal display",
+        "rationale": "The side-by-side layout with real-time updates is complex and prone to UI issues"
+      },
+      {
+        "priority": "medium",
+        "recommendation": "Implement performance testing for AI endpoints",
+        "rationale": "AI calls can be slow and timeout handling is critical"
+      },
+      {
+        "priority": "low",
+        "recommendation": "Add accessibility testing for form inputs",
+        "rationale": "Multiple form interactions require keyboard navigation and screen reader support"
+      }
+    ]
+  }
+}

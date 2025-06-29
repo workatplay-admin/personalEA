@@ -1,0 +1,227 @@
+{
+  "timestamp": "2025-01-26T22:02:00Z",
+  "analyzer": "Service Analyzer Agent",
+  "swarm_id": "swarm-auto-centralized-1750886347267",
+  "current_setup": {
+    "simplified_server": {
+      "location": "/workspaces/personalEA/testing/goal-strategy-test/improved-server.js",
+      "port": 3000,
+      "description": "Simplified server that directly calls OpenAI API",
+      "features": [
+        "Non-blocking OpenAI calls with request queuing",
+        "Circuit breaker pattern for resilience",
+        "Exponential backoff retry logic",
+        "Direct OpenAI API integration",
+        "No database requirements",
+        "No authentication beyond OpenAI API key"
+      ],
+      "api_key_source": "X-OpenAI-API-Key header from frontend"
+    },
+    "actual_service": {
+      "location": "/workspaces/personalEA/services/goal-strategy",
+      "default_port": 8085,
+      "description": "Full Goal Strategy microservice with complete features",
+      "technology_stack": {
+        "framework": "Express.js",
+        "database": "PostgreSQL with Prisma ORM",
+        "cache": "Redis",
+        "authentication": "JWT",
+        "logging": "Winston",
+        "validation": "Zod"
+      }
+    },
+    "frontend_config": {
+      "location": "/workspaces/personalEA/testing/goal-strategy-test/src/services/api.ts",
+      "expected_backend_port": 8085,
+      "proxy_config": {
+        "file": "/workspaces/personalEA/testing/goal-strategy-test/vite.config.ts",
+        "current_proxy_target": "http://localhost:3000",
+        "issue": "Vite proxy points to port 3000 instead of 8085"
+      }
+    }
+  },
+  "required_environment_variables": {
+    "database": {
+      "DATABASE_URL": "postgresql://user:password@localhost:5432/goal_strategy"
+    },
+    "openai": {
+      "OPENAI_API_KEY": "Required - OpenAI API key",
+      "OPENAI_MODEL": "gpt-4-turbo-preview (default)",
+      "OPENAI_MAX_TOKENS": "4000 (default)",
+      "OPENAI_TEMPERATURE": "0.7 (default)"
+    },
+    "authentication": {
+      "JWT_SECRET": "Minimum 32 characters",
+      "JWT_EXPIRES_IN": "24h (default)"
+    },
+    "server": {
+      "PORT": "8085 (default)",
+      "NODE_ENV": "development/production/test",
+      "API_VERSION": "v1 (default)"
+    },
+    "redis": {
+      "REDIS_URL": "redis://localhost:6379",
+      "REDIS_PASSWORD": "Optional",
+      "REDIS_DB": "1 (default)"
+    },
+    "external_services": {
+      "EMAIL_SERVICE_URL": "http://localhost:8084",
+      "CALENDAR_SERVICE_URL": "http://localhost:8086"
+    },
+    "cors": {
+      "CORS_ORIGIN": "http://localhost:3000,http://localhost:8080",
+      "CORS_CREDENTIALS": "true"
+    },
+    "rate_limiting": {
+      "RATE_LIMIT_WINDOW_MS": "900000 (15 minutes default)",
+      "RATE_LIMIT_MAX_REQUESTS": "100 (default)"
+    },
+    "ai_processing": {
+      "AI_CONFIDENCE_THRESHOLD": "0.7 (default)",
+      "AI_MAX_RETRIES": "3 (default)",
+      "AI_TIMEOUT_MS": "30000 (default)"
+    },
+    "estimation_engine": {
+      "ESTIMATION_LEARNING_ENABLED": "true (default)",
+      "ESTIMATION_MIN_SAMPLES": "5 (default)",
+      "ESTIMATION_CONFIDENCE_INTERVAL": "0.95 (default)"
+    },
+    "capacity_management": {
+      "DEFAULT_WORK_HOURS_PER_DAY": "8 (default)",
+      "DEFAULT_WORK_DAYS_PER_WEEK": "5 (default)",
+      "CAPACITY_BUFFER_PERCENTAGE": "20 (default)"
+    },
+    "logging": {
+      "LOG_LEVEL": "info (default)",
+      "LOG_FORMAT": "json (default)",
+      "LOG_FILE_ENABLED": "false (default)",
+      "LOG_FILE_PATH": "./logs/goal-strategy.log (default)"
+    },
+    "feature_flags": {
+      "FEATURE_AI_GOAL_TRANSLATION": "true (default)",
+      "FEATURE_MILESTONE_GENERATION": "true (default)",
+      "FEATURE_WBS_AUTOMATION": "true (default)",
+      "FEATURE_DEPENDENCY_MAPPING": "true (default)",
+      "FEATURE_ESTIMATION_ENGINE": "true (default)",
+      "FEATURE_CALENDAR_INTEGRATION": "true (default)",
+      "FEATURE_CAPACITY_MANAGEMENT": "true (default)"
+    }
+  },
+  "differences": {
+    "simplified_vs_actual": [
+      "Simplified server (port 3000) has no database dependencies",
+      "Actual service (port 8085) requires PostgreSQL and Redis",
+      "Simplified server uses API key from request headers only",
+      "Actual service can use environment-configured API key",
+      "Simplified server has basic mock endpoints",
+      "Actual service has full feature set with all routes",
+      "Simplified server has no authentication beyond API key",
+      "Actual service uses JWT authentication",
+      "Simplified server has no rate limiting",
+      "Actual service has configurable rate limiting",
+      "Simplified server returns hardcoded confidence values",
+      "Actual service has AI-powered confidence scoring",
+      "Simplified server has no persistence",
+      "Actual service stores data in PostgreSQL with Prisma ORM"
+    ]
+  },
+  "docker_compose_findings": {
+    "production": {
+      "file": "docker-compose.production.yml",
+      "service_port_mapping": "PORT=3000 in container (line 82)",
+      "note": "Production config overrides default 8085 to 3000",
+      "encrypted_api_key": "Uses OPENAI_API_KEY_ENCRYPTED with ENCRYPTION_KEY"
+    },
+    "user": {
+      "file": "docker-compose.user.yml",
+      "note": "No separate goal-strategy service defined, runs as part of personalea-web",
+      "api_key_config": "OPENAI_API_KEY=${OPENAI_API_KEY} - centralized configuration"
+    }
+  },
+  "api_integration_points": {
+    "openai": {
+      "purpose": "AI-powered goal translation and processing",
+      "endpoints_using_ai": [
+        "/api/v1/goals/translate",
+        "/api/v1/goals/:goalId/clarify",
+        "/api/v1/goals/contextual-help",
+        "/api/v1/goals/component-question",
+        "/api/v1/milestones/generate",
+        "/api/v1/wbs/generate",
+        "/api/v1/estimations/batch"
+      ]
+    },
+    "external_services": {
+      "email_service": "For email-related goal integrations",
+      "calendar_service": "For scheduling and timeline management"
+    }
+  },
+  "required_infrastructure": {
+    "for_full_service": {
+      "postgresql": {
+        "version": "14-alpine or higher",
+        "database": "goal_strategy",
+        "migrations": "Run with prisma migrate"
+      },
+      "redis": {
+        "version": "7-alpine or higher",
+        "purpose": "Caching and job queues"
+      },
+      "dependencies": [
+        "npm install to install all packages",
+        "npm run prisma:generate to generate Prisma client",
+        "npm run prisma:migrate to run database migrations",
+        "npm run build to compile TypeScript"
+      ]
+    },
+    "for_simplified_server": {
+      "dependencies": [
+        "express",
+        "cors",
+        "axios",
+        "better-queue",
+        "opossum (circuit breaker)"
+      ],
+      "no_database_required": true,
+      "no_build_step": true
+    }
+  },
+  "recommendations": {
+    "to_run_on_port_8085": {
+      "option_1": {
+        "name": "Run Full Service",
+        "steps": [
+          "1. Set up PostgreSQL database",
+          "2. Set up Redis cache",
+          "3. Create .env file with all required variables",
+          "4. Run database migrations: npm run prisma:migrate",
+          "5. Build the service: npm run build",
+          "6. Start the service: npm start"
+        ],
+        "pros": "Full feature set, production-ready",
+        "cons": "Complex setup, requires infrastructure"
+      },
+      "option_2": {
+        "name": "Run Mock Server on 8085",
+        "steps": [
+          "1. Edit services/goal-strategy/mock-server.js line 6",
+          "2. Change PORT = 8085",
+          "3. Run: node services/goal-strategy/mock-server.js"
+        ],
+        "pros": "Simple, no dependencies",
+        "cons": "Limited functionality, mock responses only"
+      },
+      "option_3": {
+        "name": "Update Simplified Server Port",
+        "steps": [
+          "1. Edit testing/goal-strategy-test/improved-server.js line 8",
+          "2. Change PORT = 8085",
+          "3. Update vite.config.ts proxy target to 8085",
+          "4. Run: node testing/goal-strategy-test/improved-server.js"
+        ],
+        "pros": "Real OpenAI integration, good for testing",
+        "cons": "Not production-ready, no persistence"
+      }
+    }
+  }
+}

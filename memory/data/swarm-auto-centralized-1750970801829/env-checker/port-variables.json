@@ -1,0 +1,154 @@
+{
+  "analysis_timestamp": "2025-06-26T20:26:41.829Z",
+  "total_files_analyzed": 17,
+  "port_configurations": {
+    "application_ports": {
+      "WEB_PORT": {
+        "value": "3000",
+        "description": "Web Interface Port",
+        "found_in": [
+          ".env.user.example",
+          ".env.user",
+          ".env"
+        ]
+      },
+      "CONFIG_PORT": {
+        "value": "3001",
+        "description": "Configuration UI Port",
+        "found_in": [
+          ".env.user.example",
+          ".env.user",
+          ".env"
+        ]
+      },
+      "PORT": {
+        "values": ["3001", "8085"],
+        "description": "Generic service port",
+        "found_in": [
+          "services/email-processing/.env.example (3001)",
+          "services/email-processing/.env (3001)",
+          "services/goal-strategy/.env.example (8085)",
+          "services/goal-strategy/.env (8085)",
+          "services/goal-strategy/.env.production (8085)"
+        ]
+      },
+      "GOAL_STRATEGY_PORT": {
+        "value": "3000",
+        "description": "Goal Strategy Service",
+        "found_in": [
+          ".env.production.example",
+          ".env.production",
+          ".env.production.example.backup",
+          ".env.production.example.new"
+        ]
+      },
+      "EMAIL_SERVICE_PORT": {
+        "value": "3001",
+        "description": "Email Processing Service",
+        "found_in": [
+          ".env.production.example",
+          ".env.production",
+          ".env.production.example.backup",
+          ".env.production.example.new"
+        ]
+      },
+      "FRONTEND_PORT": {
+        "value": "5173",
+        "description": "Frontend UI",
+        "found_in": [
+          ".env.production.example",
+          ".env.production",
+          ".env.production.example.backup",
+          ".env.production.example.new"
+        ]
+      },
+      "HEALTH_MONITOR_PORT": {
+        "value": "8080",
+        "description": "Health Monitor Dashboard",
+        "found_in": [
+          ".env.production.example",
+          ".env.production",
+          ".env.production.example.backup",
+          ".env.production.example.new"
+        ]
+      },
+      "VITE_GOAL_STRATEGY_PORT": {
+        "value": "443",
+        "description": "Vite production Goal Strategy port",
+        "found_in": [
+          "testing/goal-strategy-test/.env.production"
+        ]
+      },
+      "VITE_EMAIL_PROCESSING_PORT": {
+        "value": "443",
+        "description": "Vite production Email Processing port",
+        "found_in": [
+          "testing/goal-strategy-test/.env.production"
+        ]
+      }
+    },
+    "infrastructure_ports": {
+      "POSTGRES_PORT": {
+        "value": "5432",
+        "description": "PostgreSQL Database",
+        "found_in": [
+          ".env",
+          ".env.staging",
+          ".env.production.example",
+          ".env.production",
+          ".env.staging.example",
+          ".env.production.example.backup",
+          ".env.production.example.new"
+        ]
+      },
+      "REDIS_PORT": {
+        "value": "6379",
+        "description": "Redis Cache and Queue",
+        "found_in": [
+          ".env.staging",
+          ".env.production.example",
+          ".env.production",
+          ".env.staging.example",
+          ".env.production.example.backup",
+          ".env.production.example.new"
+        ]
+      },
+      "HTTP_PORT": {
+        "value": "80",
+        "description": "HTTP port for web traffic",
+        "found_in": [
+          ".env"
+        ]
+      },
+      "HTTPS_PORT": {
+        "value": "443",
+        "description": "HTTPS port for secure web traffic",
+        "found_in": [
+          ".env"
+        ]
+      }
+    }
+  },
+  "summary": {
+    "unique_port_types": 12,
+    "port_ranges": {
+      "application_services": "3000-8085",
+      "infrastructure": "5432-6379",
+      "web_traffic": "80-443"
+    },
+    "conflicts": {
+      "PORT_variable": "Inconsistent values: 3001 (email-processing) vs 8085 (goal-strategy)",
+      "service_port_mismatch": "EMAIL_SERVICE_PORT=3001 but services/email-processing/PORT=3001 match, GOAL_STRATEGY_PORT=3000 but services/goal-strategy/PORT=8085 mismatch"
+    },
+    "recommendations": [
+      "Standardize PORT variable naming across services",
+      "Resolve mismatch between GOAL_STRATEGY_PORT (3000) and actual service PORT (8085)",
+      "Consider using consistent port numbering scheme",
+      "Document port allocation strategy"
+    ]
+  },
+  "files_without_ports": [
+    "testing/goal-strategy-test/.env",
+    ".env.example"
+  ]
+}

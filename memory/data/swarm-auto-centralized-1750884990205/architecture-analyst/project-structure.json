@@ -1,0 +1,244 @@
+{
+  "project_structure": {
+    "root_directories": [
+      "services",
+      "testing",
+      "docs",
+      "scripts",
+      "deployment",
+      "infrastructure",
+      "shared",
+      "automation",
+      "sparc",
+      "mocks"
+    ],
+    "docker_compose_files": [
+      "docker-compose.dev.yml",
+      "docker-compose.production.yml",
+      "docker-compose.staging.yml",
+      "docker-compose.test.yml",
+      "docker-compose.user.yml",
+      "docker-compose.mock.yml"
+    ],
+    "main_package_workspaces": "services/*"
+  },
+  "services": {
+    "goal_strategy": {
+      "location": "services/goal-strategy",
+      "purpose": "8-phase intelligent goal processing, SMART validation, milestone generation, task estimation",
+      "port": 3000,
+      "database": "PostgreSQL with dedicated schema",
+      "api_endpoints": [
+        "goals",
+        "milestones",
+        "wbs",
+        "dependencies",
+        "estimations",
+        "planner"
+      ],
+      "key_features": [
+        "SMART goal translation",
+        "Interactive clarification",
+        "Milestone breakdown",
+        "Work breakdown structure",
+        "Task estimation engine",
+        "Dependency mapping"
+      ],
+      "status": "Currently being tested",
+      "boundaries": {
+        "database": "Separate Prisma schema with 20+ models",
+        "api": "RESTful API on port 3000",
+        "authentication": "JWT-based with scopes",
+        "dependencies": [
+          "OpenAI API",
+          "PostgreSQL",
+          "Redis"
+        ]
+      }
+    },
+    "email_processing": {
+      "location": "services/email-processing",
+      "purpose": "AI-powered email management, summarization, action extraction",
+      "port": 3001,
+      "database": "SQLite with dedicated schema (production uses PostgreSQL)",
+      "api_endpoints": [
+        "emails/sync",
+        "emails/digest",
+        "emails/summary",
+        "emails/action-items"
+      ],
+      "key_features": [
+        "Gmail OAuth integration",
+        "AI summarization",
+        "Action item extraction",
+        "Async job processing"
+      ],
+      "status": "Operational",
+      "boundaries": {
+        "database": "Separate Prisma schema with 7 models",
+        "api": "RESTful API on port 3001",
+        "authentication": "JWT-based",
+        "dependencies": [
+          "Gmail API",
+          "OpenAI API",
+          "Redis for jobs"
+        ]
+      }
+    },
+    "calendar": {
+      "location": "services/calendar",
+      "status": "Planned but not implemented",
+      "purpose": "Intelligent scheduling and time management"
+    },
+    "dialog_gateway": {
+      "location": "services/dialog-gateway",
+      "status": "Placeholder directory",
+      "purpose": "Future service for dialog management"
+    }
+  },
+  "architecture_patterns": {
+    "overall": "Microservices architecture with service isolation",
+    "communication": {
+      "sync": "REST APIs for client-server",
+      "async": "Redis pub/sub for events, Bull queues for jobs"
+    },
+    "data_layer": {
+      "primary": "PostgreSQL (separate schemas per service)",
+      "cache": "Redis for sessions and caching",
+      "memory": "Memory store for AI context"
+    },
+    "ai_integration": {
+      "primary": "OpenAI GPT-4 for NLP tasks",
+      "secondary": "Claude integration for development"
+    },
+    "deployment": {
+      "containerization": "Docker with docker-compose",
+      "orchestration": "Multiple environment configurations",
+      "monitoring": "Prometheus, Grafana, Loki stack"
+    },
+    "security": {
+      "authentication": "JWT tokens with refresh",
+      "authorization": "Scope-based permissions",
+      "encryption": "At rest and in transit"
+    }
+  },
+  "testing_infrastructure": {
+    "goal_strategy_test": {
+      "location": "testing/goal-strategy-test",
+      "type": "React frontend for testing goal strategy",
+      "components": [
+        "GoalInput",
+        "SmartGoalDisplay",
+        "MilestonesDisplay",
+        "WBSDisplay",
+        "EstimationDisplay"
+      ],
+      "test_suites": [
+        "Unit tests with Vitest",
+        "E2E tests with Playwright",
+        "Integration tests",
+        "Performance tests"
+      ]
+    },
+    "main_tests": {
+      "location": "tests/",
+      "types": [
+        "Playwright E2E",
+        "Pact contract testing",
+        "Dredd API testing"
+      ]
+    }
+  },
+  "modules_without_interference": {
+    "email_processing": {
+      "reason": "Completely separate database schema and API",
+      "safe_areas": [
+        "Gmail provider enhancements",
+        "New email categorization features",
+        "Digest generation improvements"
+      ]
+    },
+    "calendar_service": {
+      "reason": "Not yet implemented, greenfield development",
+      "safe_areas": [
+        "Complete service implementation",
+        "API design",
+        "Database schema creation"
+      ]
+    },
+    "infrastructure": {
+      "reason": "Deployment and monitoring configurations",
+      "safe_areas": [
+        "CI/CD pipelines",
+        "Monitoring dashboards",
+        "Security hardening scripts"
+      ]
+    },
+    "documentation": {
+      "reason": "Independent of service code",
+      "safe_areas": [
+        "API documentation updates",
+        "Architecture diagrams",
+        "User guides"
+      ]
+    },
+    "client_sdk": {
+      "location": "client-dev-kit",
+      "reason": "Standalone TypeScript SDK",
+      "safe_areas": [
+        "New client implementations",
+        "SDK enhancements"
+      ]
+    },
+    "frontend_components": {
+      "reason": "UI components separate from backend",
+      "safe_areas": [
+        "New UI features not in goal-strategy-test",
+        "Styling improvements",
+        "Component library"
+      ]
+    }
+  },
+  "goal_strategy_boundaries": {
+    "database_models": [
+      "Goal",
+      "GoalMetric",
+      "GoalClarification",
+      "Milestone",
+      "MilestoneProgress",
+      "Task",
+      "TaskDependency",
+      "TaskEstimate",
+      "TaskSchedule",
+      "TeamCapacity",
+      "CapacityAllocation",
+      "GoalTemplate",
+      "WorkflowPattern"
+    ],
+    "api_routes": [
+      "src/routes/goals.ts",
+      "src/routes/milestones.ts",
+      "src/routes/wbs.ts",
+      "src/routes/dependencies.ts",
+      "src/routes/estimations.ts",
+      "src/routes/planner.ts",
+      "src/routes/auth.ts",
+      "src/routes/feedback.ts"
+    ],
+    "services": [
+      "smart-goal-processor.ts",
+      "milestone-generator.ts",
+      "wbs-engine.ts",
+      "dependency-mapper.ts",
+      "task-estimation-engine.ts",
+      "planner-service.ts"
+    ],
+    "external_dependencies": [
+      "OpenAI API for AI processing",
+      "PostgreSQL for data storage",
+      "Redis for caching",
+      "JWT for authentication"
+    ],
+    "testing_boundary": "testing/goal-strategy-test directory"
+  }
+}

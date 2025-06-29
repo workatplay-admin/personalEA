@@ -28,6 +28,12 @@ export default defineConfig({
         target: 'http://localhost:8085',
         changeOrigin: true,
         secure: false
+      },
+      '/email-api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/email-api/, '/api')
       }
     }
   },

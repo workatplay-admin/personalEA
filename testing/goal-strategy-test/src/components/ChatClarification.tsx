@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Send, Bot, User } from 'lucide-react'
+import { Send, Bot, User, Target, BarChart, CheckCircle, Compass, Clock, HelpCircle, AlertCircle } from 'lucide-react'
 import { Goal } from '../types'
 import goalAPI from '../services/api'
 
@@ -9,6 +9,8 @@ interface ChatMessage {
   content: string
   timestamp: Date
   smartComponent?: 'specific' | 'measurable' | 'achievable' | 'relevant' | 'timeBound'
+  isExample?: boolean
+  messageType?: 'intro' | 'question' | 'example' | 'feedback' | 'tip'
 }
 
 interface ChatClarificationProps {
@@ -19,11 +21,71 @@ interface ChatClarificationProps {
 }
 
 const SMART_COMPONENTS = [
-  { key: 'specific', label: 'Specific', color: 'blue' },
-  { key: 'measurable', label: 'Measurable', color: 'green' },
-  { key: 'achievable', label: 'Achievable', color: 'yellow' },
-  { key: 'relevant', label: 'Relevant', color: 'purple' },
-  { key: 'timeBound', label: 'Time-bound', color: 'red' }
+  { 
+    key: 'specific', 
+    label: 'Specific', 
+    color: 'blue',
+    icon: Target,
+    description: 'Clear, well-defined, and unambiguous',
+    tips: [
+      'What exactly do you want to accomplish?',
+      'Who is involved?',
+      'Where will it happen?',
+      'Which resources are needed?'
+    ]
+  },
+  { 
+    key: 'measurable', 
+    label: 'Measurable', 
+    color: 'green',
+    icon: BarChart,
+    description: 'Quantifiable to track progress',
+    tips: [
+      'How much? How many?',
+      'How will you know when it\'s accomplished?',
+      'What metrics will you use?',
+      'What are the milestones?'
+    ]
+  },
+  { 
+    key: 'achievable', 
+    label: 'Achievable', 
+    color: 'yellow',
+    icon: CheckCircle,
+    description: 'Realistic and attainable',
+    tips: [
+      'Is this goal realistic?',
+      'Do you have the necessary resources?',
+      'What obstacles might you face?',
+      'Have others done this successfully?'
+    ]
+  },
+  { 
+    key: 'relevant', 
+    label: 'Relevant', 
+    color: 'purple',
+    icon: Compass,
+    description: 'Aligned with broader objectives',
+    tips: [
+      'Why is this goal important?',
+      'How does it align with other goals?',
+      'Is this the right time?',
+      'Does it match your needs?'
+    ]
+  },
+  { 
+    key: 'timeBound', 
+    label: 'Time-bound', 
+    color: 'red',
+    icon: Clock,
+    description: 'Has a deadline or timeframe',
+    tips: [
+      'When will you achieve this?',
+      'What are the key milestones?',
+      'What can you do today?',
+      'What\'s your deadline?'
+    ]
+  }
 ] as const
 
 export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVisible }: ChatClarificationProps) {
@@ -33,6 +95,9 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
   const [isProcessing, setIsProcessing] = useState(false)
   const [componentIndex, setComponentIndex] = useState(0)
   const [collectedClarifications, setCollectedClarifications] = useState<Record<string, string>>({})
+  const [showTips, setShowTips] = useState(false)
+  const [isLearningMode, setIsLearningMode] = useState(true)
+  const [completedComponents, setCompletedComponents] = useState<Set<string>>(new Set())
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -43,6 +108,36 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
     scrollToBottom()
   }, [messages])
 
+  // Find the next component to work on based on lowest confidence score
+  const findNextComponent = (): typeof SMART_COMPONENTS[number] | null => {
+    let lowestScore = 100
+    let lowestComponent: typeof SMART_COMPONENTS[number] | null = null
+
+    for (const component of SMART_COMPONENTS) {
+      const criterion = goal.criteria[component.key as keyof typeof goal.criteria]
+      const confidence = criterion.confidence
+
+      // Skip components that are already above 90% or completed
+      if (confidence >= 90 || completedComponents.has(component.key)) {
+        continue
+      }
+
+      // Find the lowest scoring component
+      if (confidence < lowestScore) {
+        lowestScore = confidence
+        lowestComponent = component
+      }
+    }
+
+    return lowestComponent
+  }
+
+  // Check if the current component has reached 90%+ confidence
+  const isComponentComplete = (componentKey: string): boolean => {
+    const criterion = goal.criteria[componentKey as keyof typeof goal.criteria]
+    return criterion.confidence >= 90
+  }
+
   useEffect(() => {
     if (isVisible && messages.length === 0) {
       initializeChat()
@@ -50,94 +145,189 @@ export default function ChatClarification({ goal, onGoalUpdate, onComplete, isVi
   }, [isVisible])
 
   const initializeChat = () => {
-    const confidenceScore = Math.round(goal.confidence * 100)
-    const needsWork = goal.confidence < 0.7 || Object.values(goal.criteria).some(c => c.confidence < 0.7)
-    
-    const welcomeMessage: ChatMessage = {
-      id: 'welcome',
-      type: 'bot',
-      content: `Hello! I'm your SMART Goal Refinement Assistant. 🎯
+    // Check if all components are already above 90%
+    const allComponentsComplete = SMART_COMPONENTS.every(component => 
+      goal.criteria[component.key as keyof typeof goal.criteria].confidence >= 90
+    )
 
-I've analyzed your goal "${goal.title}" and it currently has a ${confidenceScore}% confidence score. ${needsWork ? 'There are several areas where we can make it more specific, measurable, and actionable.' : 'It looks pretty good, but we can still polish it further!'}
-
-I'll guide you through each SMART component systematically:
-• **Specific** - Making it clear and focused
-• **Measurable** - Adding concrete metrics  
-• **Achievable** - Ensuring it's realistic
-• **Relevant** - Confirming it aligns with your priorities
-• **Time-bound** - Setting clear deadlines
-
-As we chat, your goal will update in real-time on the left. Ready to begin? Let's start with the first component!`,
-      timestamp: new Date()
-    }
-    
-    setMessages([welcomeMessage])
-    
-    // Automatically start with the first component after a brief delay
-    setTimeout(() => {
-      startNextComponent()
-    }, 2000)
-  }
-
-  const startNextComponent = async () => {
-    await startNextComponentWithIndex(componentIndex)
-  }
-
-  const startNextComponentWithIndex = async (index: number) => {
-    // Include ALL components, not just those needing work
-    const allComponents = SMART_COMPONENTS
-
-    if (index >= allComponents.length) {
-      // All components are done
+    if (allComponentsComplete) {
+      // All components are already high confidence, show completion message
       completeChat()
       return
     }
 
-    const component = allComponents[index]
+    const welcomeMessage: ChatMessage = {
+      id: 'welcome',
+      type: 'bot',
+      content: `👋 Welcome to the SMART Goal Builder! 
+
+I'm here to help you transform "${goal.title}" into a powerful SMART goal that will set you up for success.
+
+I've analyzed your goal and identified areas where we can make it stronger. Let's focus on the aspects that need the most improvement to get your goal to 90%+ confidence.
+
+SMART goals are:
+• **S**pecific - Clear and well-defined (${goal.criteria.specific.confidence}% confident)
+• **M**easurable - With concrete criteria for tracking progress (${goal.criteria.measurable.confidence}% confident)  
+• **A**chievable - Realistic and attainable (${goal.criteria.achievable.confidence}% confident)
+• **R**elevant - Meaningful and aligned with your values (${goal.criteria.relevant.confidence}% confident)
+• **T**ime-bound - With a clear deadline (${goal.criteria.timeBound.confidence}% confident)
+
+Let's work together to strengthen the areas that need improvement. Ready to start?`,
+      timestamp: new Date(),
+      messageType: 'intro'
+    }
+    
+    setMessages([welcomeMessage])
+    
+    // Start with the lowest scoring component after a brief delay
+    setTimeout(() => {
+      startNextComponent()
+    }, 3000)
+  }
+
+  const startNextComponent = async () => {
+    const nextComponent = findNextComponent()
+    
+    if (!nextComponent) {
+      // No more components to work on
+      completeChat()
+      return
+    }
+
+    await startComponentWork(nextComponent)
+  }
+
+  const startComponentWork = async (component: typeof SMART_COMPONENTS[number]) => {
     setCurrentComponent(component)
+    setShowTips(false)
 
-    // Use the original goal criteria to determine initial confidence, not the updated goal
-    const criterion = goal.criteria[component.key as keyof typeof goal.criteria]
-    const confidence = Math.round(criterion.confidence * 100)
-    const hasBeenClarified = collectedClarifications[component.key]
-    const isHighConfidence = hasBeenClarified ? false : criterion.confidence >= 0.7
+    // Introduction to the component
+    const currentConfidence = goal.criteria[component.key as keyof typeof goal.criteria].confidence
+    const introMessage: ChatMessage = {
+      id: `intro-${component.key}`,
+      type: 'bot',
+      content: `## ${component.label} Goals
 
-    try {
-      console.log('ChatClarification: Component question generation disabled - endpoint not implemented')
-      
-      // TODO: Re-enable when /goals/component-question endpoint is implemented
-      // For now, use a default question based on the component
-      const defaultQuestions: Record<string, string> = {
-        specific: `Let's make your goal more specific. ${criterion.value} - What specific aspects would you like to clarify?`,
-        measurable: `How would you measure progress? ${criterion.value} - What metrics would work best for you?`,
-        achievable: `Let's ensure this is achievable. ${criterion.value} - What resources or support do you have?`,
-        relevant: `Why is this goal important to you? ${criterion.value} - How does it align with your priorities?`,
-        timeBound: `Let's refine the timeline. ${criterion.value} - What milestones would help track progress?`
+${component.description}
+
+Your current ${component.label.toLowerCase()} score is ${currentConfidence}%. Let's work on improving it to 90% or higher.
+
+${isLearningMode && currentConfidence < 50 ? `Let me show you an example first, then we'll work on yours.` : `Let's refine the ${component.label.toLowerCase()} aspect of your goal.`}`,
+      timestamp: new Date(),
+      smartComponent: component.key as any,
+      messageType: 'intro'
+    }
+
+    setMessages(prev => [...prev, introMessage])
+
+    // Show example if in learning mode and confidence is low
+    if (isLearningMode && currentConfidence < 50) {
+      setTimeout(() => {
+        showComponentExample(component)
+      }, 2000)
+    } else {
+      setTimeout(() => {
+        askComponentQuestion(component)
+      }, 1500)
+    }
+  }
+
+  const showComponentExample = (component: typeof SMART_COMPONENTS[number]) => {
+    const examples = {
+      specific: {
+        poor: "I want to get better at coding",
+        good: "I want to learn React.js by building a personal portfolio website with at least 3 interactive features"
+      },
+      measurable: {
+        poor: "I want to lose weight",
+        good: "I want to lose 15 pounds by tracking my weight weekly and maintaining a 500-calorie daily deficit"
+      },
+      achievable: {
+        poor: "I want to become a millionaire next month",
+        good: "I want to increase my income by 20% through freelance projects, dedicating 10 hours per week"
+      },
+      relevant: {
+        poor: "I should learn quantum physics (but I'm a web developer)",
+        good: "I want to learn TypeScript because it will improve my code quality and job prospects as a frontend developer"
+      },
+      timeBound: {
+        poor: "I'll do it someday",
+        good: "I will complete this by March 31st, with weekly milestones every Friday"
       }
+    }
+
+    const example = examples[component.key as keyof typeof examples]
+    
+    const exampleMessage: ChatMessage = {
+      id: `example-${component.key}`,
+      type: 'bot',
+      content: `### Example: ${component.label}
+
+❌ **Not ${component.label}:** "${example.poor}"
+
+✅ **${component.label}:** "${example.good}"
+
+See the difference? Now let's make your goal ${component.label.toLowerCase()}!`,
+      timestamp: new Date(),
+      isExample: true,
+      messageType: 'example'
+    }
+
+    setMessages(prev => [...prev, exampleMessage])
+
+    setTimeout(() => {
+      askComponentQuestion(component)
+    }, 2000)
+  }
+
+  const askComponentQuestion = async (component: typeof SMART_COMPONENTS[number]) => {
+    try {
+      console.log('ChatClarification: Asking question for component:', component.key)
+      
+      // Generate a personalized question based on the current goal state
+      const criterion = goal.criteria[component.key as keyof typeof goal.criteria]
+      
+      const questionResponse = await goalAPI.generateComponentQuestion(
+        goal.title,
+        component.key,
+        criterion.value,
+        criterion.confidence,
+        false, // Not high confidence since we're building from scratch
+        goal
+      )
 
       const message: ChatMessage = {
-        id: `component-${component.key}`,
+        id: `question-${component.key}`,
         type: 'bot',
-        content: defaultQuestions[component.key] || `How can we improve the ${component.name} aspect of your goal?`,
+        content: questionResponse.question,
         timestamp: new Date(),
-        smartComponent: component.key
+        smartComponent: component.key as any,
+        messageType: 'question'
       }
 
       setMessages(prev => [...prev, message])
     } catch (error: any) {
-      console.error('Error in chat component:', error)
-      console.error('Error details:', error.message)
+      console.error('Error generating component question:', error)
       
-      // System should fail cleanly - no fake responses
-      const errorMessage: ChatMessage = {
-        id: `component-error-${component.key}`,
+      // Fallback to a generic question
+      const fallbackQuestions = {
+        specific: `Let's make your goal more specific. Currently you have: "${goal.title}"\n\nWhat exactly do you want to accomplish? Be as detailed as possible.`,
+        measurable: `How will you measure success? What specific numbers, metrics, or milestones will tell you that you've achieved your goal?`,
+        achievable: `Is this goal realistic given your current resources, skills, and constraints? What makes you confident you can achieve it?`,
+        relevant: `Why is this goal important to you? How does it align with your larger objectives or values?`,
+        timeBound: `When do you want to achieve this goal? What's your deadline, and what are the key milestones along the way?`
+      }
+      
+      const message: ChatMessage = {
+        id: `question-${component.key}`,
         type: 'bot',
-        content: "🚫 System not responsive. The AI service is currently unavailable. Please check your API configuration and try again.",
+        content: fallbackQuestions[component.key as keyof typeof fallbackQuestions],
         timestamp: new Date(),
-        smartComponent: component.key
+        smartComponent: component.key as any,
+        messageType: 'question'
       }
 
-      setMessages(prev => [...prev, errorMessage])
+      setMessages(prev => [...prev, message])
     }
   }
 
@@ -156,79 +346,25 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
     setCurrentInput('')
     setIsProcessing(true)
 
-    // Check if user is starting the conversation (auto-start is now handled in initializeChat)
-    if (!currentComponent && (userInput.toLowerCase().includes('start') || userInput.toLowerCase().includes('begin') || userInput.toLowerCase().includes('ready'))) {
+    // Check for help requests
+    if (userInput.toLowerCase().includes('help') || 
+        userInput.toLowerCase().includes('tips') ||
+        userInput.toLowerCase().includes('example') ||
+        userInput === '?') {
+      await showHelp()
+      setIsProcessing(false)
+      return
+    }
+
+    // Check for navigation commands
+    if (userInput.toLowerCase() === 'skip') {
+      // Mark current component as completed (skipped) and move to next
+      if (currentComponent) {
+        setCompletedComponents(prev => new Set([...prev, currentComponent.key]))
+      }
       await startNextComponent()
       setIsProcessing(false)
       return
-    }
-
-    // Handle navigation commands (next/done) - only when we have a current component
-    if (currentComponent && (userInput.toLowerCase().includes('next') || userInput.toLowerCase().includes('done'))) {
-      if (userInput.toLowerCase().includes('next')) {
-        const nextIndex = componentIndex + 1
-        setComponentIndex(nextIndex)
-        await startNextComponentWithIndex(nextIndex)
-      } else if (userInput.toLowerCase().includes('done')) {
-        completeChat()
-      }
-      setIsProcessing(false)
-      return
-    }
-
-    // Check if user needs help or says "I don't know" - use OpenAI instead of fallbacks
-    if (userInput.toLowerCase().includes("don't know") ||
-        userInput.toLowerCase().includes("not sure") ||
-        userInput.toLowerCase().includes("help")) {
-      
-      try {
-        // Build conversation history for context
-        const conversationHistory = messages.map(msg => ({
-          role: msg.type === 'user' ? 'user' : 'assistant',
-          content: msg.content
-        }))
-        
-        // Add current user message
-        conversationHistory.push({
-          role: 'user',
-          content: userInput
-        })
-
-        console.log('ChatClarification: Requesting OpenAI help with conversation history:', conversationHistory)
-        
-        // Use OpenAI to provide contextual help based on conversation history
-        const response = await goalAPI.generateContextualHelp(
-          goal.title,
-          currentComponent?.key || '',
-          conversationHistory,
-          goal
-        )
-
-        const helpMessage: ChatMessage = {
-          id: `help-${Date.now()}`,
-          type: 'bot',
-          content: response.helpMessage,
-          timestamp: new Date()
-        }
-
-        setMessages(prev => [...prev, helpMessage])
-        setIsProcessing(false)
-        return
-        
-      } catch (error) {
-        console.error('Error getting contextual help:', error)
-        
-        const errorMessage: ChatMessage = {
-          id: `help-error-${Date.now()}`,
-          type: 'bot',
-          content: "🚫 System not responsive. Unable to provide assistance at this time.",
-          timestamp: new Date()
-        }
-
-        setMessages(prev => [...prev, errorMessage])
-        setIsProcessing(false)
-        return
-      }
     }
 
     if (!currentComponent) {
@@ -236,7 +372,7 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
       return
     }
 
-    // Store the clarification for this component
+    // Store the clarification
     const newClarifications = {
       ...collectedClarifications,
       [currentComponent.key]: userInput
@@ -244,160 +380,172 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
     setCollectedClarifications(newClarifications)
 
     try {
-      console.log('ChatClarification: Starting API call for component:', currentComponent.key, 'with input:', userInput)
-      console.log('ChatClarification: Goal ID:', goal.id)
-      console.log('ChatClarification: Goal context:', goal)
-      console.log('ChatClarification: New clarifications:', newClarifications)
+      console.log('ChatClarification: Processing user input for component:', currentComponent.key)
       
-      // Ensure we have a valid goal ID
-      if (!goal.id) {
-        console.error('ChatClarification: No goal ID available')
-        throw new Error('No goal ID available for clarification')
-      }
-      
-      // Build conversation history for context
+      // Build conversation history
       const conversationHistory = messages.map(msg => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
         content: msg.content
       }))
+      
+      conversationHistory.push({
+        role: 'user',
+        content: userInput
+      })
 
-      // Call the API to clarify the goal with all collected clarifications and goal context
+      // Call the API to process the clarification
       const goalContext = {
         title: goal.title,
-        description: goal.title, // Use title as description for now
+        description: goal.title,
         originalGoal: goal.title
       }
       
-      // Backend now has proper timeout handling, so we don't need frontend timeout
       const response = await goalAPI.clarifyGoal(
         goal.id, 
         newClarifications, 
         goalContext,
         conversationHistory
-      ) as Goal | any
+      )
       
-      console.log('ChatClarification: Received API response:', response)
+      console.log('ChatClarification: Received response:', response)
       
-      // Check if the AI needs follow-up before proceeding
+      // Check if AI needs more clarification
       const needsFollowUp = (response as any).data?.needsFollowUp
       
       if (needsFollowUp) {
-        console.log('ChatClarification: AI detected need for follow-up')
-        // AI detected vague response and wants more clarification
         const botResponse: ChatMessage = {
           id: `bot-followup-${Date.now()}`,
           type: 'bot',
-          content: (response as any).message || (response as any).data?.feedback,
-          timestamp: new Date()
+          content: (response as any).message || (response as any).data?.feedback || 
+                   "I need a bit more detail. Could you be more specific? For example, include numbers, deadlines, or concrete actions.",
+          timestamp: new Date(),
+          messageType: 'feedback'
         }
 
         setMessages(prev => [...prev, botResponse])
         setIsProcessing(false)
-
-        // Don't update the goal or advance - wait for better clarification
-        // Don't add the clarification to collected clarifications yet
-        setCollectedClarifications(collectedClarifications) // Keep previous state
+        setCollectedClarifications(collectedClarifications) // Revert
         return
       }
 
-      console.log('ChatClarification: Processing successful response')
-      
-      // No fallback responses anymore - API returns errors properly
-      // Success response should have proper goal structure
-      if (!response || !(response as Goal).criteria) {
-        console.log('ChatClarification: Invalid response structure')
-        const errorResponse: ChatMessage = {
-          id: `bot-error-${Date.now()}`,
-          type: 'bot',
-          content: "🚫 System error. The AI service is currently unavailable. Please check your connection and try again.",
-          timestamp: new Date()
-        }
-        setMessages(prev => [...prev, errorResponse])
-        setIsProcessing(false)
-        return
-      }
-
-      // Normal flow - good clarification received  
+      // Update the goal
       onGoalUpdate(response as Goal)
 
-      // All responses must come from OpenAI - no more fallbacks
-      let botResponseContent = (response as any).aiFeedback || (response as any).message
-      
-      // If no AI response, generate one using OpenAI with conversation context
-      if (!botResponseContent) {
-        try {
-          const conversationHistory = messages.map(msg => ({
-            role: msg.type === 'user' ? 'user' : 'assistant',
-            content: msg.content
-          }))
-          
-          conversationHistory.push({
-            role: 'user', 
-            content: userInput
-          })
-          
-          const contextualResponse = await goalAPI.generateContextualHelp(
-            goal.title,
-            currentComponent?.key || '',
-            conversationHistory,
-            goal
-          )
-          
-          botResponseContent = contextualResponse.helpMessage
-        } catch (error) {
-          console.error('Failed to generate AI response:', error)
-          botResponseContent = "🚫 System not responsive. Unable to process your response at this time."
+      // Check if the component has reached 90%+ confidence
+      const updatedGoal = response as Goal
+      const updatedConfidence = updatedGoal.criteria[currentComponent.key as keyof typeof updatedGoal.criteria].confidence
+
+      if (updatedConfidence >= 90) {
+        // Component is complete!
+        const feedbackMessage: ChatMessage = {
+          id: `feedback-${Date.now()}`,
+          type: 'bot',
+          content: `Excellent! You've successfully improved the ${currentComponent.label.toLowerCase()} aspect of your goal to ${updatedConfidence}% confidence! 🎉\n\n${(response as any).aiFeedback || ''}`,
+          timestamp: new Date(),
+          messageType: 'feedback'
         }
+
+        setMessages(prev => [...prev, feedbackMessage])
+        
+        // Mark component as completed and move to next
+        setCompletedComponents(prev => new Set([...prev, currentComponent.key]))
+        
+        setTimeout(() => {
+          startNextComponent()
+        }, 2000)
+      } else {
+        // Component still needs work
+        const feedbackMessage: ChatMessage = {
+          id: `feedback-${Date.now()}`,
+          type: 'bot',
+          content: `Good progress! Your ${currentComponent.label.toLowerCase()} score improved to ${updatedConfidence}%. Let's keep refining it to reach 90% or higher.\n\n${(response as any).aiFeedback || ''}`,
+          timestamp: new Date(),
+          messageType: 'feedback'
+        }
+
+        setMessages(prev => [...prev, feedbackMessage])
+        
+        // Continue working on the same component
+        setTimeout(() => {
+          askComponentQuestion(currentComponent)
+        }, 2000)
       }
-
-      const botResponse: ChatMessage = {
-        id: `bot-${Date.now()}`,
-        type: 'bot',
-        content: botResponseContent,
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, botResponse])
-      setIsProcessing(false)
-
+      
     } catch (error) {
       console.error('ChatClarification: Error during API call:', error)
       
-      let errorMessage = "🚫 System error. The AI service is currently unavailable."
-      
-      if (error instanceof Error) {
-        console.error('Error details:', error.message)
-        if (error.message.includes('timeout')) {
-          errorMessage = "🚫 Request timed out. The AI service is taking too long to respond."
-        } else if (error.message.includes('API key')) {
-          errorMessage = "🚫 API configuration error. Please check your OpenAI API key."
-        }
-      }
-      
-      const errorResponse: ChatMessage = {
+      const errorMessage: ChatMessage = {
         id: `bot-error-${Date.now()}`,
         type: 'bot',
-        content: errorMessage + " You can also type 'help' for suggestions.",
-        timestamp: new Date()
+        content: "I'm having trouble processing that. Could you try rephrasing? Type 'help' for tips.",
+        timestamp: new Date(),
+        messageType: 'feedback'
       }
 
-      setMessages(prev => [...prev, errorResponse])
+      setMessages(prev => [...prev, errorMessage])
+      setCollectedClarifications(collectedClarifications) // Revert
+    } finally {
       setIsProcessing(false)
-      
-      // Don't add the failed clarification to collected clarifications
-      setCollectedClarifications(collectedClarifications) // Keep previous state
     }
   }
 
+  const showHelp = async () => {
+    if (!currentComponent) return
 
+    const helpMessage: ChatMessage = {
+      id: `help-${Date.now()}`,
+      type: 'bot',
+      content: `### Tips for ${currentComponent.label} Goals:
 
+${currentComponent.tips.map(tip => `• ${tip}`).join('\n')}
+
+Need an example? Here's how to make a goal ${currentComponent.label.toLowerCase()}:
+
+**Original:** "${goal.title}"
+**${currentComponent.label}:** [Your improved version here]
+
+Type your answer when ready, or say 'skip' to move to the next component.`,
+      timestamp: new Date(),
+      messageType: 'tip'
+    }
+
+    setMessages(prev => [...prev, helpMessage])
+    setShowTips(true)
+  }
 
   const completeChat = () => {
+    // Calculate which components were improved
+    const componentScores = SMART_COMPONENTS.map(component => ({
+      key: component.key,
+      label: component.label,
+      confidence: goal.criteria[component.key as keyof typeof goal.criteria].confidence
+    }))
+
+    const highConfidenceComponents = componentScores.filter(c => c.confidence >= 90)
+    const improvedComponents = componentScores.filter(c => completedComponents.has(c.key))
+
     const finalMessage: ChatMessage = {
       id: 'complete',
       type: 'bot',
-      content: `🎉 Excellent work! We've improved all the key components of your SMART goal. Your goal is now much more specific, measurable, and actionable. The confidence score has increased significantly. Click the "Complete Chat" button below when you're ready to finish.`,
-      timestamp: new Date()
+      content: `🎉 **Congratulations!** You've successfully refined your SMART goal!
+
+**Final Confidence Scores:**
+${componentScores.map(c => 
+  `${c.confidence >= 90 ? '✅' : '⚡'} **${c.label}** - ${c.confidence}% confidence`
+).join('\n')}
+
+${highConfidenceComponents.length === 5 
+  ? 'All components are now at 90%+ confidence! Your goal is crystal clear and ready for action.' 
+  : `${highConfidenceComponents.length} out of 5 components are at 90%+ confidence.`}
+
+Your enhanced goal is ready to guide you toward success. Remember:
+• Break it down into smaller milestones
+• Track your progress regularly
+• Adjust as needed while staying focused on the outcome
+
+Click "Complete" below to finalize your SMART goal!`,
+      timestamp: new Date(),
+      messageType: 'intro'
     }
 
     setMessages(prev => [...prev, finalMessage])
@@ -413,18 +561,42 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
   if (!isVisible) return null
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-96 flex flex-col">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-[500px] flex flex-col">
       {/* Chat Header */}
       <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-t-lg">
-        <div className="flex items-center space-x-3">
-          <Bot className="w-6 h-6" />
-          <div>
-            <h3 className="font-semibold">SMART Goal Assistant</h3>
-            {currentComponent && (
-              <p className="text-sm opacity-90">
-                Working on: <span className="font-medium">{currentComponent.label}</span>
-              </p>
-            )}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Bot className="w-6 h-6" />
+            <div>
+              <h3 className="font-semibold">SMART Goal Builder</h3>
+              {currentComponent && (
+                <p className="text-sm opacity-90 flex items-center gap-2">
+                  <currentComponent.icon className="w-4 h-4" />
+                  Building: <span className="font-medium">{currentComponent.label}</span>
+                </p>
+              )}
+            </div>
+          </div>
+          
+          {/* Progress Indicator */}
+          <div className="flex space-x-1">
+            {SMART_COMPONENTS.map((comp) => {
+              const confidence = goal.criteria[comp.key as keyof typeof goal.criteria].confidence
+              const isComplete = confidence >= 90
+              const isCurrent = currentComponent?.key === comp.key
+              
+              return (
+                <div
+                  key={comp.key}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    isComplete ? 'bg-white' :
+                    isCurrent ? 'bg-white animate-pulse' :
+                    'bg-white/30'
+                  }`}
+                  title={`${comp.label} - ${confidence}%`}
+                />
+              )
+            })}
           </div>
         </div>
       </div>
@@ -437,9 +609,13 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+              className={`max-w-md px-4 py-3 rounded-lg ${
                 message.type === 'user'
                   ? 'bg-indigo-600 text-white'
+                  : message.isExample
+                  ? 'bg-amber-50 border border-amber-200 text-gray-800'
+                  : message.messageType === 'tip'
+                  ? 'bg-blue-50 border border-blue-200 text-gray-800'
                   : message.smartComponent
                   ? `bg-${SMART_COMPONENTS.find(c => c.key === message.smartComponent)?.color}-50 border border-${SMART_COMPONENTS.find(c => c.key === message.smartComponent)?.color}-200 text-gray-800`
                   : 'bg-gray-100 text-gray-800'
@@ -447,14 +623,18 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
             >
               <div className="flex items-start space-x-2">
                 {message.type === 'bot' ? (
-                  <Bot className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  message.messageType === 'tip' ? (
+                    <HelpCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                  ) : message.isExample ? (
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" />
+                  ) : (
+                    <Bot className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  )
                 ) : (
                   <User className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 )}
-                <div className="text-sm">
-                  {message.content.split('**').map((part, index) => 
-                    index % 2 === 1 ? <strong key={index}>{part}</strong> : part
-                  )}
+                <div className="text-sm whitespace-pre-wrap">
+                  {formatMessage(message.content)}
                 </div>
               </div>
             </div>
@@ -489,8 +669,8 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
             onKeyPress={handleKeyPress}
             placeholder={
               !currentComponent
-                ? "The conversation will begin automatically..."
-                : `Tell me about ${currentComponent.label.toLowerCase()}... (or say "I don't know" for suggestions)`
+                ? "Getting ready..."
+                : `Describe the ${currentComponent.label.toLowerCase()} aspect... (type 'help' for tips)`
             }
             className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             disabled={isProcessing}
@@ -504,18 +684,58 @@ As we chat, your goal will update in real-time on the left. Ready to begin? Let'
           </button>
         </div>
         
-        {/* Show complete button when chat is done */}
+        {/* Quick Actions */}
+        {currentComponent && !messages.some(m => m.id === 'complete') && (
+          <div className="mt-2 flex gap-2 text-xs">
+            <button
+              onClick={() => setCurrentInput('help')}
+              className="text-indigo-600 hover:text-indigo-800"
+            >
+              Need help?
+            </button>
+            <span className="text-gray-400">•</span>
+            <button
+              onClick={() => setCurrentInput('skip')}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              Skip this step
+            </button>
+          </div>
+        )}
+        
+        {/* Complete button */}
         {messages.some(m => m.id === 'complete') && (
-          <div className="mt-2 flex justify-center">
+          <div className="mt-3 flex justify-center">
             <button
               onClick={onComplete}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              Complete Chat
+              Complete SMART Goal
             </button>
           </div>
         )}
       </div>
     </div>
   )
+}
+
+// Helper function to format messages with markdown-like syntax
+function formatMessage(content: string): React.ReactNode {
+  const parts = content.split(/(\*\*[^*]+\*\*|##\s[^\n]+|###\s[^\n]+|•\s[^\n]+|\n)/g)
+  
+  return parts.map((part, index) => {
+    if (part.startsWith('## ')) {
+      return <h2 key={index} className="text-lg font-bold mb-2">{part.slice(3)}</h2>
+    } else if (part.startsWith('### ')) {
+      return <h3 key={index} className="text-base font-semibold mb-1">{part.slice(4)}</h3>
+    } else if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>
+    } else if (part.startsWith('• ')) {
+      return <div key={index} className="ml-4">{part}</div>
+    } else if (part === '\n') {
+      return <br key={index} />
+    } else {
+      return part
+    }
+  })
 }
