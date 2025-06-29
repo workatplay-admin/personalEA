@@ -56,13 +56,14 @@ export default function GoalInput({ onSubmit, isLoading }: GoalInputProps) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form data-testid="goal-input-form" onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="goal" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             What would you like to achieve?
           </label>
           <textarea
             id="goal"
+            data-testid="goal-input-textarea"
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
             placeholder="Start simple! For example: 'I want to get better at programming' or 'I want to be healthier'..."
@@ -70,19 +71,37 @@ export default function GoalInput({ onSubmit, isLoading }: GoalInputProps) {
             rows={4}
             disabled={isLoading}
           />
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Don't worry about making it perfect - that's what the interactive process is for!
-          </p>
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Don't worry about making it perfect - that's what the interactive process is for!
+            </p>
+            <span data-testid="character-count" className="text-sm text-gray-500 dark:text-gray-400">
+              {goal.length} characters
+            </span>
+          </div>
         </div>
+        
+        {goal.trim() && (
+          <button
+            type="button"
+            data-testid="clear-goal-button"
+            onClick={() => setGoal('')}
+            className="mt-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline"
+            disabled={isLoading}
+          >
+            Clear goal
+          </button>
+        )}
 
         <button
           type="submit"
+          data-testid="submit-goal-button"
           disabled={!goal.trim() || isLoading}
           className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02]"
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              <div data-testid="loading-spinner" className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
               Starting Interactive Session...
             </>
           ) : (
@@ -96,7 +115,7 @@ export default function GoalInput({ onSubmit, isLoading }: GoalInputProps) {
       </form>
 
       {/* Example Goals */}
-      <div className="mt-8">
+      <div data-testid="example-goals" className="mt-8">
         <div className="flex items-center mb-4">
           <Lightbulb className="w-5 h-5 text-yellow-500 mr-2" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -107,6 +126,7 @@ export default function GoalInput({ onSubmit, isLoading }: GoalInputProps) {
           {exampleGoals.map((exampleGoal, index) => (
             <button
               key={index}
+              data-testid={`example-goal-${index}`}
               onClick={() => handleExampleClick(exampleGoal)}
               className="text-left p-3 border border-gray-200 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-all hover:border-indigo-400 dark:hover:border-indigo-600 group"
               disabled={isLoading}

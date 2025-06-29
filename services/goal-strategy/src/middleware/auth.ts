@@ -1,3 +1,14 @@
+/**
+ * Authentication Middleware
+ * 
+ * Implements JWT-based authentication and authorization middleware including
+ * token validation, user authentication, and scope-based access control.
+ * 
+ * @see {@link file://../../../../docs/security/api-key-handling-procedures.md API Key Handling Procedures}
+ * @see {@link file://../../../../docs/guides/developer-onboarding.md Developer Onboarding Guide}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#authentication-issues Authentication Troubleshooting}
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '@/config/environment';

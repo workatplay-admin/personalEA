@@ -110,6 +110,7 @@ function App() {
                 {steps.map((step) => (
                   <li key={step.id} className="flex items-center">
                     <div
+                      data-testid={`step-${step.id + 1}`}
                       className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                         currentStep >= step.id
                           ? 'bg-indigo-600 border-indigo-600 text-white'

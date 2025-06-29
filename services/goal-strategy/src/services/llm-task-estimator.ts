@@ -1,3 +1,14 @@
+/**
+ * LLM Task Estimator Service
+ * 
+ * Implements AI-powered task estimation using language models for intelligent
+ * effort prediction, complexity analysis, and historical data integration.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-5-task-estimation Task Estimation Specification}
+ * @see {@link file://../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ * @see {@link file://../../../../docs/SECURE_LLM_TESTING_STRATEGY.md Secure LLM Testing Strategy}
+ */
+
 import OpenAI from 'openai';
 import { z } from 'zod';
 

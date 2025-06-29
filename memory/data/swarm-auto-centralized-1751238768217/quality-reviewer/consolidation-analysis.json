@@ -1,0 +1,91 @@
+{
+  "consolidation_opportunities": {
+    "status_reports": {
+      "redundant_files": [
+        "APP_READINESS_STATUS_REPORT.md",
+        "DEPLOYMENT_STATUS_REPORT.md",
+        "FINAL_WORKING_STATUS.md",
+        "STAGING_ENVIRONMENT_STATUS.md",
+        "STAGING_VERIFICATION_COMPLETE.md",
+        "USER_TESTING_READY.md",
+        "QUALITY_VALIDATION_REPORT.md"
+      ],
+      "recommendation": "Consolidate into a single PROJECT_STATUS.md with sections for deployment, staging, testing, and validation",
+      "impact": "Reduces 7 files to 1, easier to maintain current status"
+    },
+    "fix_completion_reports": {
+      "redundant_files": [
+        "NETWORK-ERROR-FIX-COMPLETE.md",
+        "USER-FLOW-FIX-COMPLETE.md",
+        "SOLUTION_IMPLEMENTATION_COMPLETE.md",
+        "TIMEOUT_FIX_COMPLETE.md",
+        "IMPLEMENTATION_COMPLETE.md"
+      ],
+      "recommendation": "Create a CHANGELOG.md or consolidate into release notes",
+      "impact": "Better historical tracking, reduces clutter"
+    },
+    "typescript_documentation": {
+      "redundant_files": [
+        "TYPESCRIPT_AND_E2E_FIXES_SUMMARY.md",
+        "TYPESCRIPT_ERROR_RESOLUTION_GUIDE.md",
+        "TYPESCRIPT_FIX_PLAN.md"
+      ],
+      "recommendation": "Merge into docs/guides/typescript-guide.md",
+      "impact": "Centralized TypeScript reference"
+    },
+    "testing_documentation": {
+      "scattered_files": [
+        "AUTOMATED_USER_TESTING_REPORT.md",
+        "BROWSER_VERIFICATION_PROTOCOL.md",
+        "COMPREHENSIVE_TESTING_PROTOCOL.md",
+        "RELIABLE_TESTING_SETUP.md",
+        "TESTING-INFRASTRUCTURE.md",
+        "testing/goal-strategy-test/AUTOMATED_TESTING_GUIDE.md",
+        "testing/goal-strategy-test/TESTING_ENVIRONMENT_GUIDE.md",
+        "testing/goal-strategy-test/TESTING_STATUS_REPORT.md"
+      ],
+      "recommendation": "Consolidate into docs/guides/testing-strategy.md and archive historical reports",
+      "impact": "Single source of truth for testing documentation"
+    },
+    "api_documentation": {
+      "duplicates": [
+        "services/goal-strategy/API_DOCUMENTATION.md",
+        "services/goal-strategy/API_QUICK_REFERENCE.md",
+        "docs/api-spec.md",
+        "docs/reference/api-endpoints/goal-strategy-api.md"
+      ],
+      "recommendation": "Maintain single API documentation in docs/reference/api-endpoints/",
+      "impact": "Avoid conflicting API documentation versions"
+    },
+    "readme_files": {
+      "variants": [
+        "README.md",
+        "README-PRODUCTION.md",
+        "README_STAGING.md"
+      ],
+      "recommendation": "Keep main README.md, move environment-specific content to docs/deployment/",
+      "impact": "Clearer entry point for new users"
+    }
+  },
+  "new_structure_proposal": {
+    "docs/": {
+      "guides/": "User and developer guides",
+      "reference/": "API and architecture references",
+      "deployment/": "Environment-specific deployment guides",
+      "security/": "Security and privacy documentation",
+      "changelog/": "Historical fixes and updates"
+    },
+    "remove_from_root": [
+      "All status reports",
+      "All fix completion files",
+      "Environment-specific guides"
+    ]
+  },
+  "benefits": [
+    "Reduce documentation files from 178 to approximately 80",
+    "Clear hierarchy and navigation",
+    "Eliminate redundancy and conflicts",
+    "Easier maintenance and updates",
+    "Better discoverability"
+  ]
+}

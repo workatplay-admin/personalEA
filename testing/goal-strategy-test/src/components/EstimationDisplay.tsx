@@ -1,3 +1,14 @@
+/**
+ * Task Estimation Display Component
+ * 
+ * React component for displaying task estimation results with multiple estimation methods,
+ * confidence indicators, and user feedback collection for estimation accuracy.
+ * 
+ * @see {@link file://../../../../docs/USER_TESTING_GUIDE.md User Testing Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-5-task-estimation Task Estimation Specification}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#estimation-issues Estimation Troubleshooting}
+ */
+
 import { useState, useEffect } from 'react'
 import { CheckCircle, AlertCircle, Star, BarChart3 } from 'lucide-react'
 import { WBSTask, TaskEstimation } from '../types'

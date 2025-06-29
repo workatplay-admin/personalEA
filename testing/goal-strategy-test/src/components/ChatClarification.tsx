@@ -1,3 +1,14 @@
+/**
+ * Chat Clarification Component
+ * 
+ * Interactive chat interface for conversational goal refinement and clarification,
+ * supporting real-time SMART criteria improvement through AI-powered dialogue.
+ * 
+ * @see {@link file://../../../../docs/USER_TESTING_GUIDE.md User Testing Guide}
+ * @see {@link file://../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#interactive-refinement Interactive Refinement Specification}
+ */
+
 import { useState, useEffect, useRef } from 'react'
 import { Send, Bot, User, Target, BarChart, CheckCircle, Compass, Clock, HelpCircle, AlertCircle } from 'lucide-react'
 import { Goal } from '../types'
@@ -569,7 +580,7 @@ Click "Complete" below to finalize your SMART goal!`,
   if (!isVisible) return null
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-[500px] flex flex-col">
+    <div data-testid="chat-interface" className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-[500px] flex flex-col">
       {/* Chat Header */}
       <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-t-lg">
         <div className="flex items-center justify-between">
@@ -610,13 +621,14 @@ Click "Complete" below to finalize your SMART goal!`,
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div data-testid="chat-messages" className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
+              data-testid={message.type === 'user' ? 'user-message' : 'ai-message'}
               className={`max-w-md px-4 py-3 rounded-lg ${
                 message.type === 'user'
                   ? 'bg-indigo-600 text-white'
@@ -651,7 +663,7 @@ Click "Complete" below to finalize your SMART goal!`,
         
         {isProcessing && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
+            <div data-testid="chat-loading" className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
               <div className="flex items-center space-x-2">
                 <Bot className="w-4 h-4" />
                 <div className="flex space-x-1">
@@ -671,6 +683,7 @@ Click "Complete" below to finalize your SMART goal!`,
       <div className="border-t border-gray-200 dark:border-gray-600 p-4">
         <div className="flex space-x-2">
           <input
+            data-testid="chat-input"
             type="text"
             value={currentInput}
             onChange={(e) => setCurrentInput(e.target.value)}
@@ -684,6 +697,7 @@ Click "Complete" below to finalize your SMART goal!`,
             disabled={isProcessing}
           />
           <button
+            data-testid="chat-send-button"
             onClick={handleSendMessage}
             disabled={!currentInput.trim() || isProcessing}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

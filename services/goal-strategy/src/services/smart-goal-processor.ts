@@ -1,6 +1,20 @@
+/**
+ * Smart Goal Processor Service
+ * 
+ * Implements the SMART goal processing workflow for transforming raw user goals
+ * into Specific, Measurable, Achievable, Relevant, and Time-bound objectives.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../API_DOCUMENTATION.md API Documentation}
+ */
+
 import { logger } from '@/utils/logger';
 import { env } from '@/config/environment';
 
+/**
+ * Raw goal input from the user
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-1-goal-input Goal Input Specification}
+ */
 export interface RawGoalInput {
   goal: string;
   context?: {
@@ -12,6 +26,10 @@ export interface RawGoalInput {
   mode?: 'automatic' | 'interactive'; // New field to control processing mode
 }
 
+/**
+ * SMART criteria evaluation result
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-2-smart-goal-translation SMART Goal Translation}
+ */
 export interface SMARTCriteria {
   specific: {
     value: string;
@@ -906,6 +924,203 @@ Respond in JSON format:
   }
 
   /**
+   * Process conversation using LLM-first architecture
+   */
+  async processConversation(
+    userMessage: string,
+    conversationHistory: Array<{ role: string; content: string; timestamp?: Date }>,
+    currentState: any,
+    userApiKey?: string
+  ): Promise<ConversationResponse> {
+    const correlationId = Math.random().toString(36).substring(7);
+    
+    logger.info('Processing conversation', {
+      correlationId,
+      hasUserMessage: !!userMessage,
+      historyLength: conversationHistory.length,
+      hasCurrentState: !!currentState,
+      hasUserApiKey: !!userApiKey
+    });
+
+    try {
+      const prompt = this.buildConversationPrompt(userMessage, conversationHistory, currentState);
+      const aiResponse = await this.callOpenAI(prompt, correlationId, userApiKey);
+      const result = this.parseConversationResponse(aiResponse);
+
+      logger.info('Conversation processing completed', {
+        correlationId,
+        actionType: result.action_type,
+        phase: result.conversation_state.conversation_phase,
+        overallConfidence: result.conversation_state.overall_confidence
+      });
+
+      return result;
+    } catch (error) {
+      logger.error('Conversation processing failed', {
+        correlationId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Build comprehensive conversation prompt for LLM
+   */
+  private buildConversationPrompt(
+    userMessage: string,
+    conversationHistory: Array<{ role: string; content: string; timestamp?: Date }>,
+    currentState: any
+  ): string {
+    return `You are an AI assistant helping users create SMART goals. You manage the entire conversation flow and state.
+
+CURRENT CONVERSATION STATE:
+${JSON.stringify(currentState || {}, null, 2)}
+
+CONVERSATION HISTORY:
+${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+USER INPUT: ${userMessage}
+
+YOUR RESPONSIBILITIES:
+1. Analyze the user's goal and identify SMART criteria
+2. Track confidence for each criterion (0-1 scale)
+3. Decide what action to take next
+4. Generate appropriate UI elements
+5. Manage the conversation flow naturally
+
+SMART CRITERIA EVALUATION:
+- Specific: Clear, well-defined, and unambiguous (who, what, where, when, why)
+- Measurable: Quantifiable with concrete criteria (how much, how many, metrics)
+- Achievable: Realistic and attainable (resources, skills, constraints)
+- Relevant: Aligned with broader objectives (importance, timing, values)
+- Time-bound: Has a deadline or timeframe (when, milestones, duration)
+
+CONFIDENCE SCORING RULES:
+- 0.0-0.3: Very vague or missing
+- 0.3-0.5: Some information but needs clarification
+- 0.5-0.7: Good progress but missing key details
+- 0.7-0.9: Nearly complete, minor refinements needed
+- 0.9-1.0: Fully defined and clear
+
+ACTION DECISION LOGIC:
+- If this is the first message, start with a welcoming introduction
+- If any criterion is below 0.9, focus on the lowest scoring one
+- Ask targeted questions to improve low-confidence criteria
+- Show examples when users seem confused or ask for help
+- Complete when all criteria are above 0.9 or user is satisfied
+
+CONVERSATION STYLE:
+- Be encouraging and supportive
+- Use clear, simple language
+- Provide specific examples when helpful
+- Celebrate progress and improvements
+- Guide users step by step
+
+RESPONSE FORMAT:
+{
+  "action_type": "ask_question|show_example|update_progress|complete|show_tips",
+  "conversation_state": {
+    "current_goal": "refined goal text based on all information gathered",
+    "smart_criteria": {
+      "specific": {
+        "value": "what exactly will be accomplished",
+        "confidence": 0.0-1.0,
+        "missing": ["what's still needed"]
+      },
+      "measurable": {
+        "value": "how progress will be measured",
+        "metrics": ["specific metrics"],
+        "confidence": 0.0-1.0,
+        "missing": ["what's still needed"]
+      },
+      "achievable": {
+        "value": "why this is realistic",
+        "confidence": 0.0-1.0,
+        "missing": ["what's still needed"]
+      },
+      "relevant": {
+        "value": "why this matters",
+        "confidence": 0.0-1.0,
+        "missing": ["what's still needed"]
+      },
+      "timeBound": {
+        "value": "when it will be completed",
+        "deadline": "specific date if provided",
+        "confidence": 0.0-1.0,
+        "missing": ["what's still needed"]
+      }
+    },
+    "overall_confidence": 0.0-1.0,
+    "current_focus": "specific|measurable|achievable|relevant|timeBound",
+    "completed_components": ["components with confidence >= 0.9"],
+    "conversation_phase": "initial|clarifying|refining|complete"
+  },
+  "display_elements": [
+    {
+      "type": "message|question|example|tip|progress",
+      "content": "Your response to the user",
+      "metadata": {
+        "sender": "bot",
+        "smart_component": "current component being discussed",
+        "visual_style": "primary|info|success|warning"
+      }
+    }
+  ],
+  "ui_instructions": {
+    "show_tips": boolean,
+    "show_progress": true,
+    "enable_input": true,
+    "show_examples": boolean,
+    "completion_ready": boolean
+  }
+}
+
+IMPORTANT:
+- Extract ALL relevant information from the user's input for ALL components
+- Update multiple criteria if the user provides information about them
+- Don't ask for information the user already provided
+- Be adaptive to the user's communication style
+- If the user says something like "I already told you" or seems frustrated, acknowledge it and move forward`;
+  }
+
+  /**
+   * Parse conversation response from LLM
+   */
+  private parseConversationResponse(response: string): ConversationResponse {
+    try {
+      const cleanedResponse = this.stripMarkdownCodeBlocks(response);
+      const parsed = JSON.parse(cleanedResponse);
+      
+      // Validate required fields
+      if (!parsed.action_type || !parsed.conversation_state || !parsed.display_elements) {
+        throw new Error('Invalid conversation response format - missing required fields');
+      }
+
+      // Ensure all confidence values are in 0-1 range
+      const criteria = parsed.conversation_state.smart_criteria;
+      for (const key of Object.keys(criteria)) {
+        if (criteria[key].confidence > 1) {
+          criteria[key].confidence = criteria[key].confidence / 100;
+        }
+        criteria[key].confidence = Math.max(0, Math.min(1, criteria[key].confidence));
+      }
+
+      // Calculate overall confidence
+      const confidenceValues = Object.values(criteria).map((c: any) => c.confidence);
+      parsed.conversation_state.overall_confidence = confidenceValues.reduce((a: number, b: number) => a + b, 0) / confidenceValues.length;
+
+      return parsed as ConversationResponse;
+    } catch (error) {
+      logger.error('Failed to parse conversation response', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        response: response.substring(0, 500)
+      });
+      throw new Error('Failed to parse conversation response');
+    }
+  }
+
+  /**
    * Detect relevance indicators in user answer
    */
   private detectRelevanceInAnswer(answer: string): boolean {
@@ -1040,6 +1255,34 @@ export class GoalParsingUtilities {
 
     return { totalTime, milestones };
   }
+}
+
+export interface ConversationResponse {
+  action_type: 'ask_question' | 'show_example' | 'update_progress' | 'complete' | 'show_tips';
+  conversation_state: {
+    current_goal: string;
+    smart_criteria: SMARTCriteria;
+    overall_confidence: number;
+    current_focus: 'specific' | 'measurable' | 'achievable' | 'relevant' | 'timeBound';
+    completed_components: string[];
+    conversation_phase: 'initial' | 'clarifying' | 'refining' | 'complete';
+  };
+  display_elements: Array<{
+    type: 'message' | 'question' | 'example' | 'tip' | 'progress';
+    content: string;
+    metadata: {
+      sender: 'bot' | 'user';
+      smart_component?: string;
+      visual_style?: 'primary' | 'info' | 'success' | 'warning';
+    };
+  }>;
+  ui_instructions: {
+    show_tips: boolean;
+    show_progress: boolean;
+    enable_input: boolean;
+    show_examples: boolean;
+    completion_ready: boolean;
+  };
 }
 
 export const smartGoalProcessor = new SMARTGoalProcessor();

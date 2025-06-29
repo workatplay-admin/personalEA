@@ -31,6 +31,7 @@ model Goal {
   metrics           GoalMetric[]
   milestones        Milestone[]
   clarifications    GoalClarification[]
+  conversations     GoalConversation[]
 
   @@map("goals")
 }
@@ -69,6 +70,21 @@ model GoalClarification {
   goal              Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
 
   @@map("goal_clarifications")
+}
+
+// Goal Conversation Management
+model GoalConversation {
+  id              String   @id @default(cuid())
+  conversationId  String   @unique
+  goalId          String?
+  messages        Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  goal            Goal?    @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  
+  @@map("goal_conversations")
 }
 
 // Milestone Management

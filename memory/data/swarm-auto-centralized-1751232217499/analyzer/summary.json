@@ -1,0 +1,63 @@
+{
+  "analysis_type": "LLM_heavy_lifting_opportunities",
+  "timestamp": "2025-06-29T20:43:00Z",
+  "codebase": "PersonalEA",
+  "total_files_analyzed": 15,
+  "key_findings": {
+    "manual_parsing_locations": 8,
+    "complex_conditionals": 12,
+    "hardcoded_mappings": 5,
+    "template_based_generation": 14,
+    "algorithm_implementations": 3
+  },
+  "refactoring_opportunities": [
+    {
+      "category": "Text Processing",
+      "priority": "HIGH",
+      "effort_reduction": "70%",
+      "files": [
+        "smart-goal-processor.ts",
+        "ai-processor.ts"
+      ]
+    },
+    {
+      "category": "Decision Logic",
+      "priority": "HIGH",
+      "effort_reduction": "60%",
+      "files": [
+        "ai-processor.ts",
+        "dependency-mapper.ts"
+      ]
+    },
+    {
+      "category": "Validation Rules",
+      "priority": "MEDIUM",
+      "effort_reduction": "50%",
+      "files": [
+        "wbs-engine.ts",
+        "task-estimation-engine.ts"
+      ]
+    },
+    {
+      "category": "Similarity Matching",
+      "priority": "MEDIUM",
+      "effort_reduction": "40%",
+      "files": [
+        "task-estimation-engine.ts"
+      ]
+    }
+  ],
+  "implementation_phases": 3,
+  "estimated_timeline_weeks": 5,
+  "expected_benefits": {
+    "code_reduction_percent": 40,
+    "flexibility_improvement": "HIGH",
+    "accuracy_improvement_percent": 25,
+    "maintenance_reduction_percent": 60
+  },
+  "recommended_patterns": [
+    "UnifiedLLMService",
+    "NaturalLanguageRuleEngine",
+    "SemanticSimilarityService"
+  ]
+}

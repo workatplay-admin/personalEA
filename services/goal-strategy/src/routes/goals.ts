@@ -1,3 +1,14 @@
+/**
+ * Goals API Routes
+ * 
+ * Implements the goals endpoints for SMART goal processing, including
+ * goal translation, clarification, and interactive chat features.
+ * 
+ * @see {@link file://../../API_DOCUMENTATION.md#goals-endpoints Goals API Documentation}
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md Goal Strategy API Reference}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ */
+
 import { Router } from 'express';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
@@ -9,6 +20,10 @@ import { contextualHelpHandler, componentQuestionHandler } from './goals-chat-en
 const router = Router();
 const prisma = new PrismaClient();
 
+/**
+ * Validation schemas for goal endpoints
+ * @see {@link file://../../API_DOCUMENTATION.md#request-validation Request Validation}
+ */
 // Validation schemas
 const translateGoalSchema = z.object({
   raw_goal: z.string().min(1, 'Goal cannot be empty'),
@@ -96,7 +111,7 @@ router.use(authenticateJWT);
  * POST /api/v1/goals/translate
  * Convert raw goal to SMART format using AI
  */
-router.post('/translate', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.post('/translate', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const { raw_goal, context, mode } = translateGoalSchema.parse(req.body);
     const correlationId = req.correlationId || Math.random().toString(36).substring(7);
@@ -178,7 +193,7 @@ router.post('/translate', requireScopes(['goals:write']), async (req, res, next)
  * POST /api/v1/goals/:id/clarify
  * Get clarification questions for a specific goal
  */
-router.post('/:id/clarify', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+router.post('/:id/clarify', requireScopes(['goals:read']), async (req, res, next) => {
   try {
     const goalId = req.params['id']!;
     const { clarifications, goalContext } = req.body;
@@ -313,7 +328,7 @@ router.post('/:id/clarify', requireScopes(['goals:read']), async (req, res, next
  * POST /api/v1/goals/clarify
  * Process clarification answers to improve SMART goal
  */
-router.post('/clarify', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.post('/clarify', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const { goal_id, answers } = clarifyGoalSchema.parse(req.body);
     const correlationId = req.correlationId || Math.random().toString(36).substring(7);
@@ -508,7 +523,7 @@ router.get('/', requireScopes(['goals:read']), async (req, res, next) => {
  * GET /api/v1/goals/:id
  * Get specific goal with full details
  */
-router.get('/:id', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+router.get('/:id', requireScopes(['goals:read']), async (req, res, next) => {
   try {
     const goalId = req.params['id']!;
 
@@ -578,7 +593,7 @@ router.get('/:id', requireScopes(['goals:read']), async (req, res, next): Promis
  * PUT /api/v1/goals/:id
  * Update goal
  */
-router.put('/:id', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.put('/:id', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const goalId = req.params['id']!;
     const updates = updateGoalSchema.parse(req.body);
@@ -647,7 +662,7 @@ router.put('/:id', requireScopes(['goals:write']), async (req, res, next): Promi
  * DELETE /api/v1/goals/:id
  * Delete goal
  */
-router.delete('/:id', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.delete('/:id', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const goalId = req.params['id']!;
 
@@ -693,7 +708,7 @@ router.delete('/:id', requireScopes(['goals:write']), async (req, res, next): Pr
  * GET /api/v1/goals/:id/smart-analysis
  * Get SMART criteria analysis for goal
  */
-router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res, next) => {
   try {
     const goalId = req.params['id']!;
 
@@ -739,7 +754,7 @@ router.get('/:id/smart-analysis', requireScopes(['goals:read']), async (req, res
  * POST /api/v1/goals/:id/metrics
  * Add success metric to goal
  */
-router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const goalId = req.params['id']!;
     const metricData = createMetricSchema.parse(req.body);
@@ -797,7 +812,7 @@ router.post('/:id/metrics', requireScopes(['goals:write']), async (req, res, nex
  * GET /api/v1/goals/:id/metrics/tracking
  * Get metric tracking status
  */
-router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, res, next) => {
   try {
     const goalId = req.params['id']!;
 
@@ -857,7 +872,7 @@ router.get('/:id/metrics/tracking', requireScopes(['goals:read']), async (req, r
  * POST /api/v1/goals/interactive-refine
  * Interactive goal refinement through chat
  */
-router.post('/interactive-refine', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.post('/interactive-refine', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const { goal_id, component, user_response, conversation_history } = req.body;
     const correlationId = req.correlationId || Math.random().toString(36).substring(7);
@@ -961,7 +976,7 @@ Respond in JSON format:
  * POST /api/v1/goals/analyze-without-transform
  * Analyze a goal without automatic transformation
  */
-router.post('/analyze-without-transform', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+router.post('/analyze-without-transform', requireScopes(['goals:read']), async (req, res, next) => {
   try {
     const { raw_goal, context } = req.body;
     const correlationId = req.correlationId || Math.random().toString(36).substring(7);
@@ -1010,5 +1025,91 @@ function calculateOverallProgress(criteria: any): number {
 // Chat endpoints
 router.post('/contextual-help', authenticateJWT, requireScopes(['goals:write']), contextualHelpHandler);
 router.post('/component-question', authenticateJWT, requireScopes(['goals:write']), componentQuestionHandler);
+
+/**
+ * POST /api/v1/goals/conversation
+ * LLM-first conversation endpoint for SMART goal refinement
+ */
+router.post('/conversation', requireScopes(['goals:write']), async (req, res, next) => {
+  try {
+    const { message, conversation_id, context } = req.body;
+    const correlationId = req.correlationId || Math.random().toString(36).substring(7);
+    const userApiKey = req.headers['x-openai-api-key'] as string;
+
+    logger.info('Goal conversation request', {
+      correlationId,
+      userId: req.user?.id,
+      conversationId: conversation_id,
+      hasContext: !!context
+    });
+
+    // Get or create conversation in database
+    let conversation = await prisma.goalConversation.findUnique({
+      where: { id: conversation_id }
+    });
+
+    if (!conversation) {
+      conversation = await prisma.goalConversation.create({
+        data: {
+          id: conversation_id,
+          conversationId: conversation_id,
+          messages: []
+        }
+      });
+    }
+
+    // Process message through LLM-first architecture
+    const result = await smartGoalProcessor.processConversation(
+      message,
+      conversation.messages as any[],
+      {} as any,
+      userApiKey
+    );
+
+    // Update conversation in database
+    await prisma.goalConversation.update({
+      where: { id: conversation_id },
+      data: {
+        messages: {
+          push: [
+            { role: 'user', content: message, timestamp: new Date() },
+            { role: 'assistant', content: JSON.stringify(result), timestamp: new Date() }
+          ]
+        },
+        updatedAt: new Date()
+      }
+    });
+
+    // If conversation is complete, create/update the goal
+    if (result.action_type === 'complete' && result.conversation_state.current_goal) {
+      const smartCriteria = result.conversation_state.smart_criteria;
+      
+      await prisma.goal.upsert({
+        where: { id: conversation_id },
+        create: {
+          userId: req.user!.id,
+          title: result.conversation_state.current_goal,
+          rawGoal: result.conversation_state.current_goal,
+          smartCriteria: smartCriteria as any,
+          status: 'ACTIVE'
+        },
+        update: {
+          title: result.conversation_state.current_goal,
+          smartCriteria: smartCriteria as any,
+          updatedAt: new Date()
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result,
+      correlation_id: correlationId
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router;

@@ -1,3 +1,14 @@
+/**
+ * Work Breakdown Structure (WBS) API Routes
+ * 
+ * Implements WBS generation and management endpoints for hierarchical task decomposition,
+ * automated task breakdown, and project structure optimization.
+ * 
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md#wbs-endpoints WBS API Documentation}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { Router } from 'express';
 import { z } from 'zod';
 import { wbsEngine } from '../services/wbs-engine';

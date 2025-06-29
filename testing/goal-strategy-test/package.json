@@ -61,6 +61,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "lucide-react": "^0.294.0",
+    "node-fetch": "^3.3.2",
     "openai": "^5.5.1",
     "opossum": "^9.0.0",
     "react": "^18.2.0",

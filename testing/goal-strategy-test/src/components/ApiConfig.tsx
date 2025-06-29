@@ -239,7 +239,7 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
   }
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+    <div data-testid="api-config-form" className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
       <h2 className="text-lg font-semibold text-blue-900 mb-4">
         OpenAI API Key Required
       </h2>
@@ -260,6 +260,7 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
             placeholder="Enter your OpenAI API key (sk-...)..."
             className="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             style={{ fontFamily: 'monospace', fontSize: '12px' }}
+            required
           />
         </div>
 
@@ -285,7 +286,7 @@ const ApiConfig: React.FC<ApiConfigProps> = ({ onConfigured }) => {
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{errorMessage}</p>
+                <p data-testid="validation-error" className="text-sm text-red-700">{errorMessage}</p>
               </div>
             </div>
           </div>

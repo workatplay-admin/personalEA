@@ -1,3 +1,14 @@
+/**
+ * Schedule Planning Service
+ * 
+ * Implements intelligent schedule generation, working hours management, capacity planning,
+ * and timeline optimization with calendar integration support.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-7-schedule-planning Schedule Planning Specification}
+ * @see {@link file://../../../../docs/calendar-implementation-checklist.md Calendar Implementation Guide}
+ * @see {@link file://../../../../docs/reference/architecture/system-overview.md#scheduling-engine System Architecture - Scheduling Engine}
+ */
+
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
 import { logger } from '@/utils/logger';

@@ -1,3 +1,14 @@
+/**
+ * Health Check API Routes
+ * 
+ * Implements service health monitoring endpoints including basic health checks,
+ * detailed system diagnostics, readiness probes, liveness probes, and metrics collection.
+ * 
+ * @see {@link file://../../../../docs/guides/deployment-operations.md Deployment Operations Guide}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md Troubleshooting Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ */
+
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { env } from '@/config/environment';

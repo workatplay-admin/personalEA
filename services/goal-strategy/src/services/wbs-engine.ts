@@ -1,3 +1,13 @@
+/**
+ * Work Breakdown Structure (WBS) Engine
+ * 
+ * Implements the WBS generation workflow for breaking down SMART goals
+ * into actionable tasks and subtasks with hierarchical structure.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-4-work-breakdown-structure WBS Specification}
+ * @see {@link file://../../API_DOCUMENTATION.md#wbs-endpoints WBS API Documentation}
+ */
+
 import { PrismaClient } from '@prisma/client';
 import { OpenAI } from 'openai';
 import { logger } from '../utils/logger';
@@ -326,7 +336,7 @@ Return a JSON object with this structure:
         estimatedHours: task.estimatedHours,
         priority: task.priority,
         complexity: task.complexity,
-        skills: task.skills || [],
+        skills: Array.isArray(task.skills) ? task.skills.join(', ') : task.skills || '',
         dependencies: task.dependencies || [],
         completionCriteria: task.completionCriteria,
         templateCategory: task.templateCategory,
@@ -479,16 +489,13 @@ Return a JSON object with this structure:
         data: {
           milestoneId,
           title: task.title,
-          description: task.description,
+          description: task.description || '',
+          completionCriteria: Array.isArray(task.completionCriteria) ? task.completionCriteria.join('; ') : task.completionCriteria?.[0] || 'Task completion criteria to be defined',
           estimatedHours: task.estimatedHours,
           priority: task.priority,
-          complexity: task.complexity,
-          skills: task.skills || [],
-          completionCriteria: task.completionCriteria,
-          templateCategory: task.templateCategory,
-          status: 'NOT_STARTED',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          // Note: skills, complexity, and templateCategory are not in the Task schema
+          // They can be stored in tags or handled separately if needed
+          tags: task.skills || [],
         },
       });
     }
@@ -516,7 +523,7 @@ Return a JSON object with this structure:
       estimatedHours: task.estimatedHours,
       priority: task.priority as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
       complexity: task.complexity as 'SIMPLE' | 'MODERATE' | 'COMPLEX',
-      skills: task.skills || [],
+      skills: Array.isArray(task.skills) ? task.skills : (task.skills ? [task.skills] : []),
       dependencies: [], // Would need to be reconstructed from dependencies table
       completionCriteria: task.completionCriteria,
       templateCategory: task.templateCategory || undefined,

@@ -1,5 +1,12 @@
 /**
- * Type definitions for LLM-driven services
+ * LLM-Driven Services Type Definitions
+ * 
+ * Type definitions and schemas for LLM-powered goal processing services,
+ * including conversation schemas, validation types, and response formats.
+ * 
+ * @see {@link file://../../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ * @see {@link file://../../../../../docs/SECURE_LLM_TESTING_STRATEGY.md Secure LLM Testing Strategy}
+ * @see {@link file://../../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
  */
 
 import { z } from 'zod';
@@ -58,7 +65,7 @@ export const ComprehensiveGoalResponseSchema = z.object({
     userCommunicationStyle: z.string()
   }),
   clarifications: z.array(z.object({
-    category: z.nativeEnum(ClarificationCategory),
+    category: z.enum(['PENDING', 'ANSWERED', 'SKIPPED']),
     question: z.string(),
     priority: z.enum(['high', 'medium', 'low']),
     reason: z.string()

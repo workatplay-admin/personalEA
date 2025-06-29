@@ -1,0 +1,38 @@
+{
+  "consolidation_plan": {
+    "phase_1": {
+      "description": "Critical service documentation links",
+      "items": [
+        "Link goal-strategy service implementations to API documentation",
+        "Link smart goal processor to service specification",
+        "Link email service to documentation"
+      ]
+    },
+    "phase_2": {
+      "description": "API and route documentation links",
+      "items": [
+        "Link all route files to API documentation",
+        "Add implementation references in API docs",
+        "Cross-reference type definitions"
+      ]
+    },
+    "phase_3": {
+      "description": "Architecture and system links",
+      "items": [
+        "Link dependency mapper to architecture docs",
+        "Link WBS engine to workflow documentation",
+        "Update main README with service links"
+      ]
+    }
+  },
+  "guidelines": {
+    "code_comments": {
+      "format": "JSDoc with @see tags",
+      "example": "/**\n * Smart goal processor implementation\n * @see {@link file://./docs/goal-strategy-service-specification.md}\n */"
+    },
+    "doc_references": {
+      "format": "Markdown links with line numbers",
+      "example": "[Implementation](../services/goal-strategy/src/services/smart-goal-processor.ts#L45)"
+    }
+  }
+}

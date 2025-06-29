@@ -34,7 +34,7 @@ export class GoalInputPage extends BasePage {
   }
 
   async selectExampleGoal(index: number = 0) {
-    const exampleGoal = this.exampleGoals.nth(index);
+    const exampleGoal = this.page.locator(`[data-testid="example-goal-${index}"]`);
     await exampleGoal.click();
   }
 

@@ -1,3 +1,14 @@
+/**
+ * Work Breakdown Structure (WBS) Display Component
+ * 
+ * React component for displaying hierarchical task breakdown structures,
+ * including expandable task trees, complexity indicators, and task management.
+ * 
+ * @see {@link file://../../../../docs/USER_TESTING_GUIDE.md User Testing Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-4-work-breakdown-structure WBS Specification}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#wbs-issues WBS Troubleshooting}
+ */
+
 import { useState, useEffect } from 'react'
 import { CheckCircle, AlertCircle, List, Star, ChevronRight, ChevronDown } from 'lucide-react'
 import { Milestone, WBSTask } from '../types'

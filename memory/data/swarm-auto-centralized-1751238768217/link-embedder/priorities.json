@@ -1,0 +1,41 @@
+{
+  "priorities": [
+    {
+      "priority": 1,
+      "type": "code-to-doc",
+      "file": "/workspaces/personalEA/services/goal-strategy/src/services/smart-goal-processor.ts",
+      "reason": "Core service implementation needs documentation reference"
+    },
+    {
+      "priority": 2,
+      "type": "code-to-doc",
+      "file": "/workspaces/personalEA/services/goal-strategy/src/routes/goals.ts",
+      "reason": "Main API endpoint needs link to API documentation"
+    },
+    {
+      "priority": 3,
+      "type": "doc-to-code",
+      "file": "/workspaces/personalEA/services/goal-strategy/API_DOCUMENTATION.md",
+      "reason": "API documentation needs implementation references"
+    },
+    {
+      "priority": 4,
+      "type": "doc-to-code",
+      "file": "/workspaces/personalEA/docs/goal-strategy-service-specification.md",
+      "reason": "Service specification needs implementation links"
+    },
+    {
+      "priority": 5,
+      "type": "code-to-doc",
+      "file": "/workspaces/personalEA/services/email-processing/src/services/email-sync.ts",
+      "reason": "Email service needs documentation reference"
+    }
+  ],
+  "implementation_order": [
+    "smart-goal-processor.ts",
+    "goals.ts",
+    "API_DOCUMENTATION.md",
+    "goal-strategy-service-specification.md",
+    "email-sync.ts"
+  ]
+}

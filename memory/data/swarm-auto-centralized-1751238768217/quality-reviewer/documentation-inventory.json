@@ -1,0 +1,81 @@
+{
+  "scan_timestamp": "2025-06-29T00:00:00Z",
+  "total_documentation_files": 178,
+  "categories": {
+    "root_level_reports": {
+      "count": 46,
+      "description": "Status reports, guides, and quick references at project root",
+      "examples": [
+        "README.md",
+        "APP_READINESS_STATUS_REPORT.md",
+        "DEPLOYMENT_STATUS_REPORT.md",
+        "QUICK_SETUP_REFERENCE.md"
+      ],
+      "concerns": [
+        "Many overlapping status reports",
+        "Multiple README variants (README.md, README-PRODUCTION.md, README_STAGING.md)",
+        "Numerous fix-complete reports that could be consolidated"
+      ]
+    },
+    "claude_commands": {
+      "count": 10,
+      "description": "Claude-Flow command documentation",
+      "path": ".claude/commands/",
+      "status": "Well-organized by command type"
+    },
+    "structured_docs": {
+      "count": 28,
+      "description": "Main documentation directory with guides and references",
+      "path": "docs/",
+      "subfolders": [
+        "guides/",
+        "reference/",
+        "security/"
+      ],
+      "status": "Good structure but may have outdated content"
+    },
+    "service_documentation": {
+      "count": 5,
+      "description": "Service-specific documentation",
+      "services": [
+        "goal-strategy",
+        "email-processing"
+      ],
+      "concerns": [
+        "goal-strategy has multiple API docs (API_DOCUMENTATION.md, API_QUICK_REFERENCE.md)",
+        "Some services may lack documentation"
+      ]
+    },
+    "testing_documentation": {
+      "count": 31,
+      "description": "Testing guides, reports, and implementation plans",
+      "path": "testing/",
+      "concerns": [
+        "Many implementation complete/summary files",
+        "Test results documentation scattered"
+      ]
+    },
+    "memory_swarm_docs": {
+      "count": 52,
+      "description": "Documentation from various swarm operations",
+      "path": "memory/data/swarm-*/",
+      "concerns": [
+        "Historical swarm documentation not consolidated",
+        "Valuable insights potentially buried in subdirectories"
+      ]
+    },
+    "sparc_methodology": {
+      "count": 8,
+      "description": "SPARC planning and methodology documentation",
+      "path": "sparc/plans/",
+      "status": "Well-structured but needs review for currency"
+    }
+  },
+  "immediate_concerns": [
+    "High redundancy in status/completion reports",
+    "Multiple README files without clear hierarchy",
+    "Scattered API documentation",
+    "Historical swarm documentation not integrated",
+    "No clear documentation index or navigation"
+  ]
+}

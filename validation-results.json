@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-24T14:44:42.167Z",
+  "timestamp": "2025-06-29T21:48:53.776Z",
   "tests": [
     {
       "name": "Frontend Load",
@@ -19,7 +19,7 @@
     {
       "name": "Goal Translation",
       "status": "PASS",
-      "details": "SMART Goal Generated: I want to lose 10 pounds and exercise 3 times a week to improve my overall health and fitness by the end of the year"
+      "details": "SMART Goal Generated: SMART Goal: I want to get fit and healthy this year"
     },
     {
       "name": "Multiple Goal Types",

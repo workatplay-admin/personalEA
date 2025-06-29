@@ -1,0 +1,159 @@
+{
+  "missing_documentation": [
+    {
+      "category": "API Endpoints",
+      "missing": [
+        {
+          "endpoint": "/api/v1/dependencies/*",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/routes/dependencies.ts"],
+          "description": "Dependency management endpoints not documented in API docs"
+        },
+        {
+          "endpoint": "/api/v1/estimations/*",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/routes/estimations.ts"],
+          "description": "Task estimation endpoints not documented"
+        },
+        {
+          "endpoint": "/api/v1/feedback/*",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/routes/feedback.ts"],
+          "description": "Feedback collection endpoints not documented"
+        },
+        {
+          "endpoint": "/api/v1/planner/*",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/routes/planner.ts"],
+          "description": "Planning service endpoints not documented"
+        },
+        {
+          "endpoint": "/api/v1/goals/chat/*",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/routes/goals-chat-endpoints.ts"],
+          "description": "Chat-based goal refinement endpoints not documented"
+        }
+      ]
+    },
+    {
+      "category": "Services",
+      "missing": [
+        {
+          "service": "conversational-state-manager",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/services/conversational-state-manager.ts"],
+          "description": "Conversational state management service not documented"
+        },
+        {
+          "service": "llm-driven-validator",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/services/llm-driven-validator.ts"],
+          "description": "LLM validation service not documented"
+        },
+        {
+          "service": "unified-goal-processor",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/services/unified-goal-processor.ts"],
+          "description": "Unified goal processing service not documented"
+        },
+        {
+          "service": "smart-goal-processor-v2",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/services/smart-goal-processor-v2.ts"],
+          "description": "Version 2 of SMART goal processor not documented"
+        }
+      ]
+    },
+    {
+      "category": "UI Components",
+      "missing": [
+        {
+          "component": "ChatClarification",
+          "files": ["/workspaces/personalEA/testing/goal-strategy-test/src/components/ChatClarification.tsx"],
+          "description": "Chat-based clarification UI component not documented"
+        },
+        {
+          "component": "InteractiveGoalDisplay",
+          "files": ["/workspaces/personalEA/testing/goal-strategy-test/src/components/InteractiveGoalDisplay.tsx"],
+          "description": "Interactive goal display component not documented"
+        },
+        {
+          "component": "EstimationDisplay",
+          "files": ["/workspaces/personalEA/testing/goal-strategy-test/src/components/EstimationDisplay.tsx"],
+          "description": "Task estimation display component not documented"
+        },
+        {
+          "component": "WBSDisplay",
+          "files": ["/workspaces/personalEA/testing/goal-strategy-test/src/components/WBSDisplay.tsx"],
+          "description": "Work breakdown structure display component not documented"
+        }
+      ]
+    },
+    {
+      "category": "Architecture",
+      "missing": [
+        {
+          "topic": "LLM-Driven Architecture Implementation",
+          "description": "The llm-first-architecture-refactoring.md describes a plan but no implementation guide exists"
+        },
+        {
+          "topic": "Shared Utilities Documentation",
+          "files": ["/workspaces/personalEA/services/shared/utils/"],
+          "description": "Shared utilities for API key validation and LLM connections not documented"
+        },
+        {
+          "topic": "Error Handling Strategy",
+          "files": ["/workspaces/personalEA/services/goal-strategy/src/middleware/error-handler.ts"],
+          "description": "Error handling middleware and patterns not documented"
+        }
+      ]
+    },
+    {
+      "category": "Setup & Configuration",
+      "missing": [
+        {
+          "topic": "Environment Configuration Guide",
+          "description": "Comprehensive guide for all environment variables and configuration options"
+        },
+        {
+          "topic": "Production Deployment Guide",
+          "description": "Step-by-step production deployment with security best practices"
+        },
+        {
+          "topic": "Integration Testing Guide",
+          "description": "How to test integrations with OpenAI, databases, etc."
+        }
+      ]
+    },
+    {
+      "category": "User Guides",
+      "missing": [
+        {
+          "topic": "Goal Creation Walkthrough",
+          "description": "End-user guide for creating and refining goals"
+        },
+        {
+          "topic": "Chat Interface Usage",
+          "description": "How to use the chat-based goal refinement feature"
+        },
+        {
+          "topic": "Progress Tracking Guide",
+          "description": "How to track goal and milestone progress"
+        }
+      ]
+    }
+  ],
+  "undocumented_features": [
+    {
+      "feature": "Chat-based Goal Refinement",
+      "evidence": "goals-chat-endpoints.ts and ChatClarification.tsx exist but not in docs",
+      "priority": "high"
+    },
+    {
+      "feature": "Task Estimation Engine",
+      "evidence": "estimations.ts and EstimationDisplay.tsx exist but not documented",
+      "priority": "medium"
+    },
+    {
+      "feature": "Dependency Management",
+      "evidence": "dependencies.ts and dependency-mapper.ts exist but not in API docs",
+      "priority": "medium"
+    },
+    {
+      "feature": "Feedback Collection",
+      "evidence": "feedback.ts and FeedbackForm.tsx exist but not documented",
+      "priority": "low"
+    }
+  ]
+}

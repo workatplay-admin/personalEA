@@ -1,3 +1,14 @@
+/**
+ * Milestone Generator Service
+ * 
+ * Implements AI-powered milestone generation for SMART goals, creating logical 
+ * milestone breakdowns with intelligent scheduling and dependency analysis.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-3-milestone-generation Milestone Generation Specification}
+ * @see {@link file://../../../../docs/reference/architecture/system-overview.md#milestone-management System Architecture - Milestone Management}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { logger } from '@/utils/logger';
 import { env } from '@/config/environment';
 import { SMARTCriteria } from './smart-goal-processor';

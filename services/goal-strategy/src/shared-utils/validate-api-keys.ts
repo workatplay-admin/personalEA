@@ -1,6 +1,12 @@
 /**
  * API Key Validation Utility
- * Ensures all required API keys are configured before service startup
+ * 
+ * Comprehensive API key validation for external service integrations,
+ * ensuring proper configuration and security compliance before service startup.
+ * 
+ * @see {@link file://../../../../docs/security/api-key-handling-procedures.md API Key Handling Procedures}
+ * @see {@link file://../../../../docs/guides/developer-onboarding.md Developer Onboarding Guide}
+ * @see {@link file://../../../../docs/secret-management-guide.md Secret Management Guide}
  */
 
 interface APIKeyRequirement {

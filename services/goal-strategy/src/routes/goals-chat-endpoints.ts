@@ -1,3 +1,14 @@
+/**
+ * Goals Chat Endpoints
+ * 
+ * Implements conversational AI endpoints for interactive goal refinement and contextual help,
+ * supporting real-time chat-based goal improvement and component-specific assistance.
+ * 
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md#goals-chat-endpoints Goals Chat API Documentation}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { logger } from '@/utils/logger';
@@ -175,10 +186,14 @@ Provide helpful, encouraging guidance based on their question or statement.
 If they say they don't know or need help, provide specific examples and suggestions relevant to their goal.
 Keep responses concise and actionable.`;
 
-    // Build messages array for OpenAI
+    // Build messages array for OpenAI with type safety
+    const validMessages = conversationHistory
+      .filter(msg => msg && msg.role && msg.content)
+      .map(msg => ({ role: msg.role!, content: msg.content! }));
+    
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...conversationHistory
+      ...validMessages
     ];
 
     const helpMessage = await callOpenAI(messages, apiKey, 0.7, 300);
@@ -488,9 +503,13 @@ Respond in JSON:
   "suggestMoveToNext": boolean
 }`;
 
+        const validMessages = conversationHistory
+          .filter(msg => msg && msg.role && msg.content)
+          .map(msg => ({ role: msg.role!, content: msg.content! }));
+        
         const messages = [
           { role: 'system', content: continuePrompt },
-          ...conversationHistory
+          ...validMessages
         ];
 
         const aiResponse = await callOpenAI(messages, userApiKey, 0.7, 400);

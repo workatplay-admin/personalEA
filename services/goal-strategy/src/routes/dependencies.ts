@@ -1,3 +1,14 @@
+/**
+ * Dependencies API Routes
+ * 
+ * Implements dependency analysis and management endpoints for task relationships,
+ * critical path analysis, parallel execution optimization, and resource conflict detection.
+ * 
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md#dependencies-endpoints Dependencies API Documentation}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { Router } from 'express';
 import { z } from 'zod';
 import { dependencyMapper } from '../services/dependency-mapper';
@@ -132,8 +143,8 @@ router.delete(
         userId: req.user?.id 
       });
 
-      const { predecessorId, successorId } = req.body;
-      await dependencyMapper.removeTaskDependency(predecessorId, successorId);
+      const { predecessorTaskId, successorTaskId } = req.body;
+      await dependencyMapper.removeTaskDependency(predecessorTaskId, successorTaskId);
 
       logger.info('Dependency removed successfully', { correlationId });
 
@@ -161,7 +172,7 @@ router.delete(
 router.get(
   '/:milestoneId/critical-path',
   authenticateJWT,
-  async (req, res): Promise<void> => {
+  async (req, res) => {
     const correlationId = `critical-path-${Date.now()}`;
     const { milestoneId } = req.params;
     
@@ -222,7 +233,7 @@ router.get(
 router.get(
   '/:milestoneId/parallel-tracks',
   authenticateJWT,
-  async (req, res): Promise<void> => {
+  async (req, res) => {
     const correlationId = `parallel-tracks-${Date.now()}`;
     const { milestoneId } = req.params;
     
@@ -282,7 +293,7 @@ router.get(
 router.get(
   '/:milestoneId/resource-conflicts',
   authenticateJWT,
-  async (req, res): Promise<void> => {
+  async (req, res) => {
     const correlationId = `resource-conflicts-${Date.now()}`;
     const { milestoneId } = req.params;
     
@@ -343,7 +354,7 @@ router.get(
 router.get(
   '/:milestoneId/optimization',
   authenticateJWT,
-  async (req, res): Promise<void> => {
+  async (req, res) => {
     const correlationId = `optimization-${Date.now()}`;
     const { milestoneId } = req.params;
     

@@ -1,0 +1,128 @@
+{
+  "linkOpportunities": {
+    "codeToDocumentation": [
+      {
+        "file": "/services/goal-strategy/src/routes/goals.ts",
+        "line": 95,
+        "type": "endpoint",
+        "currentState": "/**\n * POST /api/v1/goals/translate\n * Convert raw goal to SMART format using AI\n */",
+        "recommendation": "Add @see link to API documentation",
+        "suggestedComment": "/**\n * POST /api/v1/goals/translate\n * Convert raw goal to SMART format using AI\n * @see {@link file://./../../API_DOCUMENTATION.md#translate-raw-goal-to-smart-format}\n * @see {@link file://./../../../../docs/api-spec.md}\n */",
+        "priority": "high"
+      },
+      {
+        "file": "/services/goal-strategy/src/services/smart-goal-processor.ts",
+        "type": "class",
+        "currentState": "No documentation",
+        "recommendation": "Add comprehensive JSDoc with links to usage examples",
+        "suggestedComment": "/**\n * SmartGoalProcessor - AI-powered service for transforming raw goals into SMART criteria\n * @see {@link file://./../../API_DOCUMENTATION.md#goals-endpoints} for API usage\n * @see {@link file://./../../../../docs/llm-first-architecture-refactoring.md} for architecture details\n * @example\n * const processor = new SmartGoalProcessor();\n * const result = await processor.translateGoal(rawGoal);\n */",
+        "priority": "high"
+      },
+      {
+        "file": "/services/goal-strategy/src/middleware/auth.ts",
+        "type": "function",
+        "currentState": "Basic comments",
+        "recommendation": "Add reference to authentication documentation",
+        "suggestedComment": "/**\n * JWT Authentication Middleware\n * @see {@link file://./../../API_DOCUMENTATION.md#authentication} for JWT structure and scopes\n * @see {@link file://./../../../../docs/security/api-key-handling-procedures.md} for security guidelines\n */",
+        "priority": "medium"
+      },
+      {
+        "file": "/services/goal-strategy/src/services/wbs-engine.ts",
+        "type": "class",
+        "currentState": "No documentation",
+        "recommendation": "Add documentation with WBS methodology references",
+        "suggestedComment": "/**\n * WBSEngine - Work Breakdown Structure generation and management\n * @see {@link file://./../../API_DOCUMENTATION.md#wbs-endpoints} for API endpoints\n * @see {@link https://www.pmi.org/learning/library/work-breakdown-structure-project-management-8857} for WBS methodology\n */",
+        "priority": "medium"
+      },
+      {
+        "file": "/services/goal-strategy/src/types/smart-goals.ts",
+        "type": "interface",
+        "currentState": "No documentation",
+        "recommendation": "Add type documentation with SMART criteria explanation",
+        "suggestedComment": "/**\n * SMART Goal Type Definitions\n * @see {@link file://./../../API_DOCUMENTATION.md#smart-criteria-format} for detailed field descriptions\n * @see {@link https://www.mindtools.com/pages/article/smart-goals.htm} for SMART criteria methodology\n */",
+        "priority": "medium"
+      }
+    ],
+    "documentationToCode": [
+      {
+        "file": "/services/goal-strategy/API_DOCUMENTATION.md",
+        "section": "Goals Endpoints",
+        "currentState": "Lists endpoints without code references",
+        "recommendation": "Add links to implementation files",
+        "suggestedAddition": "### Implementation References\n- Route handlers: [`/src/routes/goals.ts`](../src/routes/goals.ts)\n- Core logic: [`/src/services/smart-goal-processor.ts`](../src/services/smart-goal-processor.ts)\n- Type definitions: [`/src/types/smart-goals.ts`](../src/types/smart-goals.ts)",
+        "priority": "high"
+      },
+      {
+        "file": "/docs/api-spec.md",
+        "section": "Microservices Architecture",
+        "currentState": "Shows architecture diagram",
+        "recommendation": "Add links to service implementations",
+        "suggestedAddition": "### Service Implementations\n- Goal Strategy: [`/services/goal-strategy`](../services/goal-strategy)\n- Email Processing: [`/services/email-processing`](../services/email-processing)\n- Dialog Gateway: [`/services/dialog-gateway`](../services/dialog-gateway) (planned)",
+        "priority": "medium"
+      },
+      {
+        "file": "/docs/guides/api-integration.md",
+        "currentState": "Missing",
+        "recommendation": "Create guide with code examples",
+        "suggestedContent": "# API Integration Guide\n\n## Goal Strategy Service\n\n### Example: Creating a SMART Goal\n\n```typescript\n// See implementation: /services/goal-strategy/src/routes/goals.ts:99-175\nimport { translateGoal } from '@personalea/goal-strategy';\n\nconst result = await translateGoal({\n  raw_goal: 'I want to learn Spanish',\n  context: { timeframe: '6 months' }\n});\n```",
+        "priority": "high"
+      }
+    ],
+    "crossReferences": [
+      {
+        "from": "/services/goal-strategy/src/services/smart-goal-processor.ts",
+        "to": "/services/goal-strategy/src/types/smart-goals.ts",
+        "type": "type-usage",
+        "recommendation": "Add @see tags for type definitions"
+      },
+      {
+        "from": "/services/goal-strategy/src/routes/goals.ts",
+        "to": "/services/goal-strategy/src/services/smart-goal-processor.ts",
+        "type": "service-usage",
+        "recommendation": "Add @uses tags for service dependencies"
+      },
+      {
+        "from": "/testing/goal-strategy-test/tests/e2e",
+        "to": "/services/goal-strategy/src/routes",
+        "type": "test-coverage",
+        "recommendation": "Add @tested-by tags in route files"
+      }
+    ],
+    "configurationLinks": [
+      {
+        "file": "/services/goal-strategy/src/config/environment.ts",
+        "recommendation": "Add links to environment setup documentation",
+        "suggestedComment": "/**\n * Environment Configuration\n * @see {@link file://./../../../../docs/configuration-management-plan.md}\n * @see {@link file://./../../../../.env.example} for required variables\n */"
+      }
+    ]
+  },
+  "proposedLinkingConventions": {
+    "inlineCodeComments": {
+      "format": "@see {@link file://relative/path/to/doc.md#section}",
+      "example": "@see {@link file://./../../API_DOCUMENTATION.md#goals-endpoints}"
+    },
+    "markdownLinks": {
+      "format": "[Description](../relative/path/to/code.ts#L123)",
+      "example": "[Goal Translation Implementation](../services/goal-strategy/src/routes/goals.ts#L99)"
+    },
+    "jsdocTags": {
+      "recommended": [
+        "@see - Reference to documentation",
+        "@example - Code usage examples",
+        "@implements - Interface implementations",
+        "@uses - Service dependencies",
+        "@tested-by - Test file references"
+      ]
+    }
+  },
+  "statistics": {
+    "totalLinkOpportunities": 18,
+    "codeToDocLinks": 5,
+    "docToCodeLinks": 3,
+    "crossReferenceLinks": 3,
+    "configurationLinks": 1,
+    "highPriority": 5,
+    "mediumPriority": 7,
+    "lowPriority": 0
+  }
+}

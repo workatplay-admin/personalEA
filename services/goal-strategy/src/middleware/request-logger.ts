@@ -1,10 +1,16 @@
-import { Request, Response, NextFunction } from 'express';
-import { createCorrelationId, createContextLogger } from '@/utils/logger';
-
 /**
  * Request Logger Middleware
- * Adds correlation ID and logs all requests
+ * 
+ * Implements request logging and correlation ID management for distributed tracing,
+ * performance monitoring, and request/response lifecycle tracking.
+ * 
+ * @see {@link file://../../../../docs/guides/deployment-operations.md Deployment Operations Guide}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#logging-issues Logging Troubleshooting}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#logging-specification Logging Specification}
  */
+
+import { Request, Response, NextFunction } from 'express';
+import { createCorrelationId, createContextLogger } from '@/utils/logger';
 export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
   const startTime = Date.now();
   

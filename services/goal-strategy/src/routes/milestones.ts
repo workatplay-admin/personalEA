@@ -1,3 +1,14 @@
+/**
+ * Milestones API Routes
+ * 
+ * Implements milestone management endpoints for AI-powered milestone generation,
+ * milestone CRUD operations, progress tracking, and timeline management.
+ * 
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md#milestones-endpoints Milestones API Documentation}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { Router } from 'express';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
@@ -50,7 +61,7 @@ router.use(authenticateJWT);
  * POST /api/v1/goals/:goalId/milestones/generate
  * Generate milestone breakdown for a goal using AI
  */
-router.post('/:goalId/milestones/generate', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.post('/:goalId/milestones/generate', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const goalId = req.params['goalId']!;
     const { preferences } = generateMilestonesSchema.parse(req.body);
@@ -131,7 +142,7 @@ router.post('/:goalId/milestones/generate', requireScopes(['goals:write']), asyn
  * POST /api/v1/goals/:goalId/milestones
  * Create a new milestone for a goal
  */
-router.post('/:goalId/milestones', requireScopes(['goals:write']), async (req, res, next): Promise<void> => {
+router.post('/:goalId/milestones', requireScopes(['goals:write']), async (req, res, next) => {
   try {
     const goalId = req.params['goalId']!;
     const milestoneData = createMilestoneSchema.parse(req.body);
@@ -197,7 +208,7 @@ router.post('/:goalId/milestones', requireScopes(['goals:write']), async (req, r
  * GET /api/v1/goals/:goalId/milestones
  * Get all milestones for a goal
  */
-router.get('/:goalId/milestones', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+router.get('/:goalId/milestones', requireScopes(['goals:read']), async (req, res, next) => {
   try {
     const goalId = req.params['goalId']!;
 
@@ -267,16 +278,14 @@ router.get('/:goalId/milestones', requireScopes(['goals:read']), async (req, res
  * GET /api/v1/milestones/:id
  * Get specific milestone with full details
  */
-router.get('/:id', requireScopes(['goals:read']), async (req, res, next): Promise<void> => {
+router.get('/:id', requireScopes(['goals:read']), async (req, res, next) => {
   try {
     const milestoneId = req.params['id']!;
 
     const milestone = await prisma.milestone.findFirst({
       where: { id: milestoneId },
       include: {
-        goal: {
-          where: { userId: req.user!.id }
-        },
+        goal: true,
         tasks: {
           include: {
             estimates: true,
@@ -347,13 +356,11 @@ router.put('/:id', requireScopes(['goals:write']), async (req, res, next) => {
     const existingMilestone = await prisma.milestone.findFirst({
       where: { id: milestoneId },
       include: {
-        goal: {
-          where: { userId: req.user!.id }
-        }
+        goal: true
       }
     });
 
-    if (!existingMilestone || !existingMilestone.goal) {
+    if (!existingMilestone || existingMilestone.goal?.userId !== req.user!.id) {
       return res.status(404).json({
         error: {
           code: 'MILESTONE_NOT_FOUND',
@@ -408,13 +415,11 @@ router.delete('/:id', requireScopes(['goals:write']), async (req, res, next) => 
     const existingMilestone = await prisma.milestone.findFirst({
       where: { id: milestoneId },
       include: {
-        goal: {
-          where: { userId: req.user!.id }
-        }
+        goal: true
       }
     });
 
-    if (!existingMilestone || !existingMilestone.goal) {
+    if (!existingMilestone || existingMilestone.goal?.userId !== req.user!.id) {
       return res.status(404).json({
         error: {
           code: 'MILESTONE_NOT_FOUND',
@@ -455,9 +460,7 @@ router.get('/:id/progress', requireScopes(['goals:read']), async (req, res, next
     const milestone = await prisma.milestone.findFirst({
       where: { id: milestoneId },
       include: {
-        goal: {
-          where: { userId: req.user!.id }
-        },
+        goal: true,
         tasks: true,
         progress: {
           orderBy: { recordedAt: 'desc' }
@@ -465,7 +468,7 @@ router.get('/:id/progress', requireScopes(['goals:read']), async (req, res, next
       }
     });
 
-    if (!milestone || !milestone.goal) {
+    if (!milestone || milestone.goal?.userId !== req.user!.id) {
       return res.status(404).json({
         error: {
           code: 'MILESTONE_NOT_FOUND',
@@ -524,13 +527,11 @@ router.post('/:id/progress', requireScopes(['goals:write']), async (req, res, ne
     const milestone = await prisma.milestone.findFirst({
       where: { id: milestoneId },
       include: {
-        goal: {
-          where: { userId: req.user!.id }
-        }
+        goal: true
       }
     });
 
-    if (!milestone || !milestone.goal) {
+    if (!milestone || milestone.goal?.userId !== req.user!.id) {
       return res.status(404).json({
         error: {
           code: 'MILESTONE_NOT_FOUND',

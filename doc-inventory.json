@@ -1,0 +1,62 @@
+{
+  "documentation_files": {
+    "root_level_docs": [
+      "README.md",
+      "CLAUDE.md",
+      "CONTRIBUTING.md",
+      "README-PRODUCTION.md",
+      "README_STAGING.md"
+    ],
+    "main_docs_directory": "/workspaces/personalEA/docs",
+    "service_specific_docs": {
+      "goal-strategy": [
+        "/workspaces/personalEA/services/goal-strategy/README.md",
+        "/workspaces/personalEA/services/goal-strategy/API_DOCUMENTATION.md",
+        "/workspaces/personalEA/services/goal-strategy/API_QUICK_REFERENCE.md"
+      ],
+      "email-processing": [
+        "/workspaces/personalEA/services/email-processing/README.md"
+      ]
+    },
+    "testing_docs": [
+      "/workspaces/personalEA/testing/goal-strategy-test/AUTOMATED_TESTING_GUIDE.md",
+      "/workspaces/personalEA/testing/goal-strategy-test/USER_TESTING_SCENARIOS.md",
+      "/workspaces/personalEA/testing/goal-strategy-test/USER_VALIDATION_GUIDE.md",
+      "/workspaces/personalEA/testing/conversation-quality/README.md"
+    ],
+    "guides": [
+      "/workspaces/personalEA/docs/guides/api-integration.md",
+      "/workspaces/personalEA/docs/guides/claude-flow-usage.md",
+      "/workspaces/personalEA/docs/guides/deployment-operations.md",
+      "/workspaces/personalEA/docs/guides/developer-onboarding.md",
+      "/workspaces/personalEA/docs/guides/testing-strategy.md"
+    ],
+    "reference_docs": [
+      "/workspaces/personalEA/docs/reference/api-endpoints/goal-strategy-api.md",
+      "/workspaces/personalEA/docs/reference/architecture/system-overview.md",
+      "/workspaces/personalEA/docs/reference/troubleshooting/common-issues.md"
+    ],
+    "security_docs": [
+      "/workspaces/personalEA/docs/security/api-key-handling-procedures.md",
+      "/workspaces/personalEA/docs/security/deployment-security-checklist.md",
+      "/workspaces/personalEA/docs/SECURITY_DEPLOYMENT_GUIDE.md"
+    ],
+    "sparc_docs": [
+      "/workspaces/personalEA/sparc/README.md",
+      "/workspaces/personalEA/sparc/plans/methodology/README.md",
+      "/workspaces/personalEA/sparc/plans/SPARC_IMPLEMENTATION_SUMMARY.md"
+    ],
+    "claude_flow_docs": [
+      "/workspaces/personalEA/.claude/commands/sparc/coder.md",
+      "/workspaces/personalEA/.claude/commands/sparc/orchestrator.md",
+      "/workspaces/personalEA/.claude/commands/sparc/researcher.md",
+      "/workspaces/personalEA/.claude/commands/swarm/*.md"
+    ],
+    "total_documentation_files": 200,
+    "documentation_directories": [
+      "/workspaces/personalEA/docs",
+      "/workspaces/personalEA/deployment/docs",
+      "/workspaces/personalEA/automation/docs-tooling"
+    ]
+  }
+}

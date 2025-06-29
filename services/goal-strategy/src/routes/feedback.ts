@@ -1,3 +1,14 @@
+/**
+ * User Feedback API Routes
+ * 
+ * Implements user feedback collection endpoints for gathering user experience data,
+ * satisfaction ratings, and improvement suggestions for goal processing features.
+ * 
+ * @see {@link file://../../../../docs/USER_TESTING_GUIDE.md User Testing Guide}
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md#feedback-endpoints Feedback API Documentation}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ */
+
 import { Router, Request, Response } from 'express'
 import { logger } from '../utils/logger'
 

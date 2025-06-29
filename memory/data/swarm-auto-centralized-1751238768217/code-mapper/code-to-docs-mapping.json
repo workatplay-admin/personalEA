@@ -1,0 +1,330 @@
+{
+  "mapping": {
+    "services": {
+      "goal-strategy": {
+        "routes": {
+          "/api/v1/goals/translate": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:99-175",
+            "method": "POST",
+            "description": "Convert raw goal to SMART format using AI",
+            "documentation": [
+              "/services/goal-strategy/API_DOCUMENTATION.md:245-308",
+              "/docs/api-spec.md"
+            ],
+            "requiredScopes": ["goals:write"],
+            "exportedFunctions": ["translateGoalSchema"],
+            "status": "documented"
+          },
+          "/api/v1/goals/:id/clarify": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:181-310",
+            "method": "POST",
+            "description": "Get clarification questions for a specific goal",
+            "documentation": [
+              "/services/goal-strategy/API_DOCUMENTATION.md"
+            ],
+            "requiredScopes": ["goals:read"],
+            "status": "partially-documented"
+          },
+          "/api/v1/goals/clarify": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:316-402",
+            "method": "POST",
+            "description": "Process clarification answers to improve SMART goal",
+            "documentation": [
+              "/services/goal-strategy/API_DOCUMENTATION.md"
+            ],
+            "requiredScopes": ["goals:write"],
+            "exportedFunctions": ["clarifyGoalSchema"],
+            "status": "documented"
+          },
+          "/api/v1/goals": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:408-505",
+            "methods": ["POST", "GET"],
+            "description": "Create new goal or list user's goals",
+            "documentation": [
+              "/services/goal-strategy/API_DOCUMENTATION.md"
+            ],
+            "requiredScopes": ["goals:write", "goals:read"],
+            "exportedFunctions": ["createGoalSchema"],
+            "status": "documented"
+          },
+          "/api/v1/goals/:id": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:511-690",
+            "methods": ["GET", "PUT", "DELETE"],
+            "description": "Get, update, or delete specific goal",
+            "documentation": [
+              "/services/goal-strategy/API_DOCUMENTATION.md"
+            ],
+            "requiredScopes": ["goals:read", "goals:write"],
+            "exportedFunctions": ["updateGoalSchema"],
+            "status": "documented"
+          },
+          "/api/v1/goals/:id/smart-analysis": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:696-736",
+            "method": "GET",
+            "description": "Get SMART criteria analysis for goal",
+            "documentation": [],
+            "requiredScopes": ["goals:read"],
+            "status": "undocumented"
+          },
+          "/api/v1/goals/:id/metrics": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:742-794",
+            "method": "POST",
+            "description": "Add success metric to goal",
+            "documentation": [],
+            "requiredScopes": ["goals:write"],
+            "exportedFunctions": ["createMetricSchema"],
+            "status": "undocumented"
+          },
+          "/api/v1/goals/:id/metrics/tracking": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:800-852",
+            "method": "GET",
+            "description": "Get metric tracking status",
+            "documentation": [],
+            "requiredScopes": ["goals:read"],
+            "status": "undocumented"
+          },
+          "/api/v1/goals/interactive-refine": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:859-958",
+            "method": "POST",
+            "description": "Interactive goal refinement through chat",
+            "documentation": [],
+            "requiredScopes": ["goals:write"],
+            "status": "undocumented"
+          },
+          "/api/v1/goals/analyze-without-transform": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:964-999",
+            "method": "POST",
+            "description": "Analyze a goal without automatic transformation",
+            "documentation": [],
+            "requiredScopes": ["goals:read"],
+            "status": "undocumented"
+          },
+          "/api/v1/goals/conversation": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:1018-1098",
+            "method": "POST",
+            "description": "LLM-first conversation endpoint for SMART goal refinement",
+            "documentation": [
+              "/docs/llm-first-architecture-refactoring.md"
+            ],
+            "requiredScopes": ["goals:write"],
+            "status": "partially-documented"
+          },
+          "/api/v1/goals/contextual-help": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:1011",
+            "method": "POST",
+            "description": "Get contextual help for goal creation",
+            "documentation": [],
+            "requiredScopes": ["goals:write"],
+            "importedFrom": "./goals-chat-endpoints",
+            "status": "undocumented"
+          },
+          "/api/v1/goals/component-question": {
+            "codeLocation": "/services/goal-strategy/src/routes/goals.ts:1012",
+            "method": "POST",
+            "description": "Ask questions about specific SMART components",
+            "documentation": [],
+            "requiredScopes": ["goals:write"],
+            "importedFrom": "./goals-chat-endpoints",
+            "status": "undocumented"
+          }
+        },
+        "services": {
+          "smartGoalProcessor": {
+            "codeLocation": "/services/goal-strategy/src/services/smart-goal-processor.ts",
+            "exportedClass": "SmartGoalProcessor",
+            "exportedFunctions": [
+              "translateGoal",
+              "processClarifications",
+              "analyzeGoalCompleteness",
+              "analyzeGoalInteractive",
+              "processConversation"
+            ],
+            "documentation": [],
+            "usedInRoutes": [
+              "/api/v1/goals/translate",
+              "/api/v1/goals/clarify",
+              "/api/v1/goals/:id/smart-analysis",
+              "/api/v1/goals/conversation"
+            ],
+            "status": "undocumented"
+          },
+          "wbsEngine": {
+            "codeLocation": "/services/goal-strategy/src/services/wbs-engine.ts",
+            "exportedClass": "WBSEngine",
+            "exportedFunctions": [
+              "generateWBS",
+              "validateWBS",
+              "optimizeWBS"
+            ],
+            "documentation": [],
+            "usedInRoutes": ["/api/v1/wbs"],
+            "status": "undocumented"
+          },
+          "dependencyMapper": {
+            "codeLocation": "/services/goal-strategy/src/services/dependency-mapper.ts",
+            "exportedClass": "DependencyMapper",
+            "exportedFunctions": [
+              "mapDependencies",
+              "validateDependencies",
+              "optimizeDependencyChain"
+            ],
+            "documentation": [],
+            "usedInRoutes": ["/api/v1/dependencies"],
+            "status": "undocumented"
+          },
+          "milestoneGenerator": {
+            "codeLocation": "/services/goal-strategy/src/services/milestone-generator.ts",
+            "exportedClass": "MilestoneGenerator",
+            "exportedFunctions": [
+              "generateMilestones",
+              "validateMilestone"
+            ],
+            "documentation": [],
+            "usedInRoutes": ["/api/v1/milestones"],
+            "status": "undocumented"
+          },
+          "taskEstimationEngine": {
+            "codeLocation": "/services/goal-strategy/src/services/task-estimation-engine.ts",
+            "exportedClass": "TaskEstimationEngine",
+            "exportedFunctions": [
+              "estimateTask",
+              "batchEstimate",
+              "getHistoricalAccuracy"
+            ],
+            "documentation": [],
+            "usedInRoutes": ["/api/v1/estimations"],
+            "status": "undocumented"
+          }
+        },
+        "middleware": {
+          "authenticateJWT": {
+            "codeLocation": "/services/goal-strategy/src/middleware/auth.ts",
+            "exportedFunctions": ["authenticateJWT", "requireScopes"],
+            "documentation": [
+              "/services/goal-strategy/API_DOCUMENTATION.md:24-55"
+            ],
+            "status": "documented"
+          },
+          "errorHandler": {
+            "codeLocation": "/services/goal-strategy/src/middleware/error-handler.ts",
+            "exportedFunctions": ["errorHandler"],
+            "documentation": [
+              "/services/goal-strategy/API_DOCUMENTATION.md:89-139"
+            ],
+            "status": "documented"
+          }
+        },
+        "types": {
+          "smartGoals": {
+            "codeLocation": "/services/goal-strategy/src/types/smart-goals.ts",
+            "exportedTypes": [
+              "SmartCriteria",
+              "SmartGoal",
+              "ClarificationQuestion",
+              "GoalContext"
+            ],
+            "documentation": [],
+            "status": "undocumented"
+          },
+          "goal": {
+            "codeLocation": "/services/goal-strategy/src/types/goal.ts",
+            "exportedTypes": [
+              "Goal",
+              "GoalStatus",
+              "Priority",
+              "GoalMetric"
+            ],
+            "documentation": [],
+            "status": "undocumented"
+          }
+        }
+      },
+      "email-processing": {
+        "routes": {
+          "/api/v1/email": {
+            "codeLocation": "/services/email-processing/src/routes/email.ts",
+            "methods": ["GET", "POST"],
+            "description": "Email management endpoints",
+            "documentation": [
+              "/docs/email-service-api-v1.yaml"
+            ],
+            "status": "documented"
+          },
+          "/api/v1/health": {
+            "codeLocation": "/services/email-processing/src/routes/health.ts",
+            "method": "GET",
+            "description": "Health check endpoint",
+            "documentation": [],
+            "status": "undocumented"
+          }
+        },
+        "services": {
+          "emailSync": {
+            "codeLocation": "/services/email-processing/src/services/email-sync.ts",
+            "exportedClass": "EmailSyncService",
+            "documentation": [],
+            "status": "undocumented"
+          },
+          "aiProcessor": {
+            "codeLocation": "/services/email-processing/src/services/ai-processor.ts",
+            "exportedClass": "AIEmailProcessor",
+            "documentation": [],
+            "status": "undocumented"
+          }
+        },
+        "providers": {
+          "gmailProvider": {
+            "codeLocation": "/services/email-processing/src/providers/gmail-provider.ts",
+            "exportedClass": "GmailProvider",
+            "documentation": [],
+            "status": "undocumented"
+          }
+        }
+      },
+      "dialog-gateway": {
+        "documentation": [
+          "/docs/api-spec.md"
+        ],
+        "status": "documented"
+      },
+      "calendar": {
+        "documentation": [
+          "/docs/calendar-service-api-v1.yaml",
+          "/docs/calendar-functionality-architecture-plan.md",
+          "/docs/calendar-implementation-checklist.md"
+        ],
+        "status": "planned"
+      }
+    },
+    "shared": {
+      "utils": {
+        "validateApiKeys": {
+          "codeLocation": "/services/shared/utils/validate-api-keys.ts",
+          "exportedFunctions": ["validateApiKeys"],
+          "documentation": [],
+          "usedIn": ["goal-strategy", "email-processing"],
+          "status": "undocumented"
+        },
+        "validateLLMConnections": {
+          "codeLocation": "/services/shared/utils/validate-llm-connections.ts",
+          "exportedFunctions": ["validateLLMConnections"],
+          "documentation": [],
+          "usedIn": ["goal-strategy", "email-processing"],
+          "status": "undocumented"
+        }
+      }
+    }
+  },
+  "statistics": {
+    "totalEndpoints": 20,
+    "documentedEndpoints": 7,
+    "partiallyDocumentedEndpoints": 2,
+    "undocumentedEndpoints": 11,
+    "totalServices": 10,
+    "documentedServices": 0,
+    "undocumentedServices": 10,
+    "totalTypes": 8,
+    "documentedTypes": 0,
+    "undocumentedTypes": 8
+  }
+}

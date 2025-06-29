@@ -1,3 +1,14 @@
+/**
+ * Task Estimation Engine Service
+ * 
+ * Implements comprehensive task estimation using multiple methodologies including
+ * expert judgment, analogy-based estimation, three-point PERT, parametric, and bottom-up approaches.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-5-task-estimation Task Estimation Specification}
+ * @see {@link file://../../../../docs/reference/architecture/system-overview.md#estimation-engine System Architecture - Estimation Engine}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { PrismaClient } from '@prisma/client';
 import { OpenAI } from 'openai';
 import { logger } from '../utils/logger';

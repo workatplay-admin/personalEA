@@ -1,3 +1,14 @@
+/**
+ * Schedule Planning API Routes
+ * 
+ * Implements comprehensive schedule planning endpoints including intelligent schedule generation,
+ * working hours management, capacity planning, and timeline optimization.
+ * 
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md#planner-endpoints Planner API Documentation}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { Router } from 'express';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';

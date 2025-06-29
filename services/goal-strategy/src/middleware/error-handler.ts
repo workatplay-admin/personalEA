@@ -1,3 +1,14 @@
+/**
+ * Error Handler Middleware
+ * 
+ * Implements comprehensive error handling middleware for the goal strategy service,
+ * including error logging, response formatting, and graceful error recovery.
+ * 
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md Troubleshooting Guide}
+ * @see {@link file://../../../../docs/guides/developer-onboarding.md Developer Onboarding Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#error-handling Error Handling Specification}
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { createContextLogger } from '@/utils/logger';

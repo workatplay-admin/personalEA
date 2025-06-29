@@ -1,3 +1,14 @@
+/**
+ * Logging Utility
+ * 
+ * Centralized logging configuration using Winston with correlation ID support,
+ * structured logging formats, and environment-aware log levels.
+ * 
+ * @see {@link file://../../../../docs/guides/deployment-operations.md Deployment Operations Guide}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#logging-issues Logging Troubleshooting}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#logging-specification Logging Specification}
+ */
+
 import winston from 'winston';
 import { env } from '@/config/environment';
 

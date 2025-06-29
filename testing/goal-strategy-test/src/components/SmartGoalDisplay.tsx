@@ -1,3 +1,14 @@
+/**
+ * Smart Goal Display Component
+ * 
+ * Interactive React component for displaying and managing SMART goal transformation results,
+ * including confidence scoring, clarification workflows, and goal refinement interfaces.
+ * 
+ * @see {@link file://../../../../docs/USER_TESTING_GUIDE.md User Testing Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#smart-goals SMART Goals Specification}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#frontend-issues Frontend Troubleshooting}
+ */
+
 import { useState, useEffect } from 'react'
 import { CheckCircle, AlertCircle, Edit3, Star, MessageSquare, Target, Sparkles } from 'lucide-react'
 import { Goal } from '../types'
@@ -210,7 +221,7 @@ export default function SmartGoalDisplay({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <div data-testid="loading-spinner" className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             Transforming Your Goal...
           </h2>
@@ -230,7 +241,7 @@ export default function SmartGoalDisplay({
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             Translation Failed
           </h2>
-          <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+          <p data-testid="error-message" className="text-red-600 dark:text-red-400 mb-4">{error}</p>
           <button
             onClick={translateGoal}
             className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -252,7 +263,7 @@ export default function SmartGoalDisplay({
 
   if (useSideBySideLayout) {
     return (
-      <div className="space-y-6">
+      <div data-testid="smart-goal-display" className="space-y-6">
         {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
@@ -279,7 +290,7 @@ export default function SmartGoalDisplay({
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Target className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h3 data-testid="smart-goal-title" className="text-xl font-semibold text-gray-900 dark:text-white">
                 Your SMART Goal
               </h3>
               {shouldAutoAdvanceToMilestones() && (
@@ -412,6 +423,7 @@ export default function SmartGoalDisplay({
             
             {!shouldAutoAdvanceToMilestones() && !showChat && shouldShowChatOption() && (
               <button
+                data-testid="refine-button"
                 onClick={handleStartChat}
                 className="flex items-center px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-300 rounded-md hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
@@ -439,6 +451,7 @@ export default function SmartGoalDisplay({
           </div>
 
           <button
+            data-testid="continue-button"
             onClick={handleContinue}
             className={`flex items-center px-6 py-2 text-base font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
               shouldAutoAdvanceToMilestones() 

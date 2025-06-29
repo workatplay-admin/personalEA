@@ -1,3 +1,13 @@
+/**
+ * Email Synchronization Service
+ * 
+ * Handles email synchronization with Gmail provider, AI processing,
+ * and database persistence for the PersonalEA email processing system.
+ * 
+ * @see {@link file://../../README.md Email Processing Service Documentation}
+ * @see {@link file://../../../../docs/personal-ea-prd.md#email-processing Email Processing PRD}
+ */
+
 import { PrismaClient } from '@prisma/client';
 import { logger } from '@/utils/logger';
 import { GmailProvider } from '@/providers/gmail-provider';
@@ -20,6 +30,10 @@ export interface EmailSyncConfig {
   };
 }
 
+/**
+ * Main service class for email synchronization
+ * @see {@link file://../../README.md#email-sync-service Service Documentation}
+ */
 export class EmailSyncService {
   private prisma: PrismaClient;
   private gmailProvider: GmailProvider;

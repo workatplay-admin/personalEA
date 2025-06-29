@@ -1,3 +1,14 @@
+/**
+ * Unified Goal Processor Service
+ * 
+ * Implements a comprehensive goal processing pipeline that unifies SMART goal transformation,
+ * milestone generation, task breakdown, and conversational refinement in a single service.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ * @see {@link file://../../../../docs/reference/architecture/system-overview.md System Architecture Overview}
+ */
+
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { 
@@ -62,7 +73,7 @@ const ComprehensiveGoalResponseSchema = z.object({
     userCommunicationStyle: z.string()
   }),
   clarifications: z.array(z.object({
-    category: z.nativeEnum(ClarificationCategory),
+    category: z.enum(['PENDING', 'ANSWERED', 'SKIPPED']),
     question: z.string(),
     priority: z.enum(['high', 'medium', 'low']),
     reason: z.string()

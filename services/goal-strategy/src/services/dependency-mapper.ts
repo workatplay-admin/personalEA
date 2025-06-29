@@ -1,3 +1,13 @@
+/**
+ * Task Dependency Mapper Service
+ * 
+ * Analyzes and maps task dependencies for milestone planning,
+ * including critical path analysis and optimization strategies.
+ * 
+ * @see {@link file://../../../../docs/reference/architecture/system-overview.md#dependency-management System Architecture - Dependency Management}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-6-dependency-mapping Dependency Mapping Specification}
+ */
+
 import { PrismaClient } from '@prisma/client';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
@@ -13,8 +23,8 @@ const DependencyMappingSchema = z.object({
 }).partial().required({ milestoneId: true });
 
 const TaskDependencySchema = z.object({
-  predecessorId: z.string().uuid(),
-  successorId: z.string().uuid(),
+  predecessorTaskId: z.string().uuid(),
+  successorTaskId: z.string().uuid(),
   dependencyType: z.enum(['FINISH_TO_START', 'START_TO_START', 'FINISH_TO_FINISH', 'START_TO_FINISH']).default('FINISH_TO_START'),
   lag: z.number().default(0), // Hours of lag/lead time
   isHard: z.boolean().default(true), // Hard vs soft dependency
@@ -39,8 +49,8 @@ export interface TaskNode {
 
 export interface TaskDependency {
   id: string;
-  predecessorId: string;
-  successorId: string;
+  predecessorTaskId: string;
+  successorTaskId: string;
   dependencyType: 'FINISH_TO_START' | 'START_TO_START' | 'FINISH_TO_FINISH' | 'START_TO_FINISH';
   lag: number;
   isHard: boolean;
@@ -182,13 +192,10 @@ export class DependencyMapper {
       // Save dependency
       await prisma.taskDependency.create({
         data: {
-          predecessorId: validatedDependency.predecessorId,
-          successorId: validatedDependency.successorId,
+          predecessorTaskId: validatedDependency.predecessorTaskId,
+          successorTaskId: validatedDependency.successorTaskId,
           dependencyType: validatedDependency.dependencyType,
-          lag: validatedDependency.lag,
-          isHard: validatedDependency.isHard,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          lagTime: validatedDependency.lag || 0
         },
       });
 
@@ -202,15 +209,15 @@ export class DependencyMapper {
   /**
    * Remove task dependency
    */
-  async removeTaskDependency(predecessorId: string, successorId: string): Promise<void> {
+  async removeTaskDependency(predecessorTaskId: string, successorTaskId: string): Promise<void> {
     const correlationId = `remove-dep-${Date.now()}`;
-    logger.info('Removing task dependency', { correlationId, predecessorId, successorId });
+    logger.info('Removing task dependency', { correlationId, predecessorTaskId, successorTaskId });
 
     try {
       await prisma.taskDependency.deleteMany({
         where: {
-          predecessorId,
-          successorId,
+          predecessorTaskId,
+          successorTaskId,
         },
       });
 
@@ -228,14 +235,14 @@ export class DependencyMapper {
     return await prisma.task.findMany({
       where: { milestoneId },
       include: {
-        dependencies: {
+        predecessors: {
           include: {
-            predecessor: true,
+            predecessorTask: true,
           },
         },
-        dependents: {
+        successors: {
           include: {
-            successor: true,
+            successorTask: true,
           },
         },
       },
@@ -257,18 +264,18 @@ export class DependencyMapper {
         priority: task.priority,
         complexity: task.complexity,
         skills: task.skills || [],
-        dependencies: task.dependencies.map((dep: any) => ({
+        dependencies: task.predecessors.map((dep: any) => ({
           id: dep.id,
-          predecessorId: dep.predecessorId,
-          successorId: dep.successorId,
+          predecessorTaskId: dep.predecessorTaskId,
+          successorTaskId: dep.successorTaskId,
           dependencyType: dep.dependencyType,
           lag: dep.lag,
           isHard: dep.isHard,
         })),
-        dependents: task.dependents.map((dep: any) => ({
+        dependents: task.successors.map((dep: any) => ({
           id: dep.id,
-          predecessorId: dep.predecessorId,
-          successorId: dep.successorId,
+          predecessorTaskId: dep.predecessorTaskId,
+          successorTaskId: dep.successorTaskId,
           dependencyType: dep.dependencyType,
           lag: dep.lag,
           isHard: dep.isHard,
@@ -308,7 +315,7 @@ export class DependencyMapper {
       const node = taskGraph.get(nodeId);
       if (node) {
         for (const dependent of node.dependents) {
-          if (hasCycle(dependent.successorId)) {
+          if (hasCycle(dependent.successorTaskId)) {
             return true;
           }
         }
@@ -379,7 +386,7 @@ export class DependencyMapper {
       // Calculate earliest start based on dependencies
       let earliestStart = 0;
       for (const dependency of task.dependencies) {
-        const predecessor = taskGraph.get(dependency.predecessorId);
+        const predecessor = taskGraph.get(dependency.predecessorTaskId);
         if (predecessor) {
           processTask(predecessor.id); // Ensure predecessor is processed first
           
@@ -444,7 +451,7 @@ export class DependencyMapper {
       let latestFinish = task.latestFinish || projectEndTime;
       
       for (const dependent of task.dependents) {
-        const successor = taskGraph.get(dependent.successorId);
+        const successor = taskGraph.get(dependent.successorTaskId);
         if (successor) {
           processTask(successor.id); // Ensure successor is processed first
           
@@ -492,7 +499,7 @@ export class DependencyMapper {
     const startTasks = criticalTasks.filter(taskId => {
       const task = taskGraph.get(taskId);
       return task && !task.dependencies.some(dep => 
-        criticalTasks.includes(dep.predecessorId)
+        criticalTasks.includes(dep.predecessorTaskId)
       );
     });
 
@@ -506,11 +513,11 @@ export class DependencyMapper {
       if (task) {
         // Find next critical task in sequence
         const nextCriticalTask = task.dependents.find(dep => 
-          criticalTasks.includes(dep.successorId) && !visited.has(dep.successorId)
+          criticalTasks.includes(dep.successorTaskId) && !visited.has(dep.successorTaskId)
         );
 
         if (nextCriticalTask) {
-          buildPath(nextCriticalTask.successorId);
+          buildPath(nextCriticalTask.successorTaskId);
         }
       }
     };
@@ -604,8 +611,8 @@ export class DependencyMapper {
     if (!task1 || !task2) return false;
 
     // Check if task1 depends on task2 or vice versa
-    const task1DependsOnTask2 = task1.dependencies.some(dep => dep.predecessorId === task2Id);
-    const task2DependsOnTask1 = task2.dependencies.some(dep => dep.predecessorId === task1Id);
+    const task1DependsOnTask2 = task1.dependencies.some(dep => dep.predecessorTaskId === task2Id);
+    const task2DependsOnTask1 = task2.dependencies.some(dep => dep.predecessorTaskId === task1Id);
 
     return task1DependsOnTask2 || task2DependsOnTask1;
   }
@@ -834,17 +841,17 @@ export class DependencyMapper {
     const graph = new Map<string, string[]>();
     
     for (const dep of existingDependencies) {
-      if (!graph.has(dep.predecessorId)) {
-        graph.set(dep.predecessorId, []);
+      if (!graph.has(dep.predecessorTaskId)) {
+        graph.set(dep.predecessorTaskId, []);
       }
-      graph.get(dep.predecessorId)!.push(dep.successorId);
+      graph.get(dep.predecessorTaskId)!.push(dep.successorTaskId);
     }
 
     // Add the new dependency
-    if (!graph.has(dependency.predecessorId)) {
-      graph.set(dependency.predecessorId, []);
+    if (!graph.has(dependency.predecessorTaskId)) {
+      graph.set(dependency.predecessorTaskId, []);
     }
-    graph.get(dependency.predecessorId)!.push(dependency.successorId);
+    graph.get(dependency.predecessorTaskId)!.push(dependency.successorTaskId);
 
     // Check for cycles using DFS
     const visited = new Set<string>();
@@ -872,7 +879,7 @@ export class DependencyMapper {
       return false;
     };
 
-    if (hasCycle(dependency.predecessorId)) {
+    if (hasCycle(dependency.predecessorTaskId)) {
       throw new Error('Adding this dependency would create a circular dependency');
     }
   }

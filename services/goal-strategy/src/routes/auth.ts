@@ -1,3 +1,14 @@
+/**
+ * Authentication API Routes
+ * 
+ * Implements authentication and authorization endpoints including test token generation
+ * for development and testing purposes.
+ * 
+ * @see {@link file://../../../../docs/security/api-key-handling-procedures.md API Key Handling Procedures}
+ * @see {@link file://../../../../docs/guides/developer-onboarding.md Developer Onboarding Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ */
+
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '@/config/environment';

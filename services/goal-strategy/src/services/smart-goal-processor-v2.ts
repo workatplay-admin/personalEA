@@ -1,3 +1,14 @@
+/**
+ * SMART Goal Processor V2 Service
+ * 
+ * Enhanced SMART goal processor leveraging LLM-driven architecture for improved
+ * goal transformation, conversational refinement, and intelligent processing workflows.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ * @see {@link file://../../../../docs/reference/architecture/system-overview.md System Architecture Overview}
+ */
+
 import { logger } from '@/utils/logger';
 import { env } from '@/config/environment';
 import { UnifiedGoalProcessor } from './unified-goal-processor';
@@ -57,10 +68,17 @@ export class SMARTGoalProcessorV2 {
 
     try {
       // 1. Manage conversation state with LLM
+      const currentMetadata = currentGoalState?.conversationMetadata;
       const conversationState = await this.stateManager.manageConversation(
         conversationHistory,
         userInput,
-        currentGoalState?.conversationMetadata
+        currentMetadata ? {
+          phase: {
+            current: currentMetadata.phase.current as any,
+            confidence: currentMetadata.phase.confidence,
+            transitionReason: undefined
+          }
+        } : undefined
       );
 
       // 2. Process the entire conversation with unified processor
@@ -150,7 +168,7 @@ export class SMARTGoalProcessorV2 {
       smartGoal.description,
       {
         projectType: smartGoal.category,
-        deadline: smartGoal.deadline,
+        deadline: smartGoal.smartCriteria?.timeBound?.deadline,
         constraints: context?.constraints
       }
     );

@@ -1,3 +1,14 @@
+/**
+ * Goal System Type Definitions
+ * 
+ * Comprehensive type definitions for the goal strategy system including enums,
+ * schemas, and interfaces for goals, milestones, tasks, and related entities.
+ * 
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md API Endpoints Documentation}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { z } from 'zod';
 
 // Enums

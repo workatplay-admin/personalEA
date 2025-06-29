@@ -1,3 +1,14 @@
+/**
+ * Smart Goal Viewer Component
+ * 
+ * Pure display component for rendering SMART goal criteria with visual indicators,
+ * confidence scores, and structured goal information presentation.
+ * 
+ * @see {@link file://../../../../docs/USER_TESTING_GUIDE.md User Testing Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#smart-goals SMART Goals Specification}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#frontend-issues Frontend Troubleshooting}
+ */
+
 import { CheckCircle, AlertTriangle, Target } from 'lucide-react'
 import { Goal } from '../types'
 
@@ -63,7 +74,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           </h2>
           <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm border ${getConfidenceColor(safeGoal.confidence)}`}>
             {getConfidenceIcon(safeGoal.confidence)}
-            <span>
+            <span data-testid="confidence-score">
               {Math.round(safeGoal.confidence * 100)}% Confidence
             </span>
           </div>
@@ -72,7 +83,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
 
       {/* SMART Criteria Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+        <div data-testid="specific-criterion" className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-blue-900 dark:text-blue-100">
               Specific
@@ -96,7 +107,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           )}
         </div>
 
-        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+        <div data-testid="measurable-criterion" className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-green-900 dark:text-green-100">
               Measurable
@@ -120,7 +131,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           )}
         </div>
 
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+        <div data-testid="achievable-criterion" className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-yellow-900 dark:text-yellow-100">
               Achievable
@@ -144,7 +155,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           )}
         </div>
 
-        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+        <div data-testid="relevant-criterion" className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-purple-900 dark:text-purple-100">
               Relevant
@@ -168,7 +179,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
           )}
         </div>
 
-        <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+        <div data-testid="timebound-criterion" className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-red-900 dark:text-red-100">
               Time-bound
@@ -228,7 +239,7 @@ export default function SmartGoalViewer({ goal }: SmartGoalViewerProps) {
 
       {/* Clarification Questions - only show if not all criteria are at 90%+ */}
       {safeGoal.clarificationQuestions.length > 0 && !Object.values(safeCriteria).every(criterion => criterion.confidence >= 0.9) && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+        <div data-testid="clarification-questions" className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
           <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2 flex items-center">
             <AlertTriangle className="w-4 h-4 mr-2" />
             Clarification Needed

@@ -1,3 +1,14 @@
+/**
+ * Task Estimation API Routes
+ * 
+ * Implements comprehensive task estimation endpoints using multiple estimation methods
+ * including expert judgment, analogy-based, three-point PERT, parametric, and bottom-up approaches.
+ * 
+ * @see {@link file://../../../../docs/reference/api-endpoints/goal-strategy-api.md#estimations-endpoints Estimations API Documentation}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md Goal Strategy Service Specification}
+ * @see {@link file://../../../../docs/development-plan.md Development Plan}
+ */
+
 import { Router } from 'express';
 import { z } from 'zod';
 import { taskEstimationEngine } from '../services/task-estimation-engine';
@@ -82,7 +93,7 @@ router.post(
 router.put(
   '/:taskId/actual',
   authenticateJWT,
-  async (req, res): Promise<void> => {
+  async (req, res) => {
     const correlationId = `update-actual-${Date.now()}`;
     const { taskId } = req.params;
     
@@ -133,7 +144,7 @@ router.put(
 router.post(
   '/batch',
   authenticateJWT,
-  async (req, res): Promise<void> => {
+  async (req, res) => {
     const correlationId = `batch-estimation-${Date.now()}`;
     
     try {
@@ -311,7 +322,7 @@ router.get(
 router.get(
   '/:taskId/history',
   authenticateJWT,
-  async (req, res): Promise<void> => {
+  async (req, res) => {
     const correlationId = `estimation-history-${Date.now()}`;
     const { taskId } = req.params;
     

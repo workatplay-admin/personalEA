@@ -1,3 +1,14 @@
+/**
+ * Conversational State Manager Service
+ * 
+ * Manages conversational state and context for interactive goal refinement sessions,
+ * tracking conversation phases, information gathering, and state transitions.
+ * 
+ * @see {@link file://../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#interactive-refinement Interactive Refinement Specification}
+ * @see {@link file://../../../../docs/reference/architecture/system-overview.md#conversation-management System Architecture - Conversation Management}
+ */
+
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { ConversationMessage } from '../types/smart-goals';

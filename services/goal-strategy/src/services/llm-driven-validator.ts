@@ -1,3 +1,14 @@
+/**
+ * LLM-Driven Validator Service
+ * 
+ * Implements AI-powered validation and component extraction for goal processing,
+ * including timeframe parsing, metrics identification, and SMART criteria validation.
+ * 
+ * @see {@link file://../../../../docs/LLM_DRIVEN_REFACTORING.md LLM-Driven Refactoring Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#validation-engine Validation Engine Specification}
+ * @see {@link file://../../../../docs/SECURE_LLM_TESTING_STRATEGY.md Secure LLM Testing Strategy}
+ */
+
 import OpenAI from 'openai';
 import { z } from 'zod';
 

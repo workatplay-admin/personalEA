@@ -1,3 +1,14 @@
+/**
+ * Milestones Display Component
+ * 
+ * React component for displaying and managing milestone generation results,
+ * including timeline visualization, progress tracking, and milestone refinement.
+ * 
+ * @see {@link file://../../../../docs/USER_TESTING_GUIDE.md User Testing Guide}
+ * @see {@link file://../../../../docs/goal-strategy-service-specification.md#step-3-milestone-generation Milestone Generation Specification}
+ * @see {@link file://../../../../docs/reference/troubleshooting/common-issues.md#milestone-issues Milestone Troubleshooting}
+ */
+
 import { useState, useEffect } from 'react'
 import { CheckCircle, AlertCircle, Calendar, Star } from 'lucide-react'
 import { Goal, Milestone } from '../types'
