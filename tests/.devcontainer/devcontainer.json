@@ -1,0 +1,9 @@
+{
+  //  Install Claude-Flow every time the container is (re)built
+  "postCreateCommand": "npm install -g claude-flow@1.0.72",
+
+  //  Auto-open the Web UI when port 3000 is first forwarded
+  "portsAttributes": {
+    "3000": { "label": "Claude-Flow UI", "onAutoForward": "openBrowser" }
+  }
+}
