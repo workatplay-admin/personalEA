@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-29T23:16:38.408Z",
+  "timestamp": "2025-06-30T00:09:25.741Z",
   "version": "1.0",
   "entries": [
     {
@@ -1792,7 +1792,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T17:56:09.424Z",
       "updatedAt": "2025-06-26T17:56:09.424Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 4626,
       "compressed": true,
@@ -1812,7 +1812,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T17:56:54.650Z",
       "updatedAt": "2025-06-26T17:56:54.650Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 5991,
       "compressed": true,
@@ -1851,7 +1851,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T19:06:57.471Z",
       "updatedAt": "2025-06-26T19:06:57.471Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 706,
       "compressed": false,
@@ -1871,7 +1871,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T19:18:39.692Z",
       "updatedAt": "2025-06-26T19:18:39.692Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 1202,
       "compressed": true,
@@ -1891,7 +1891,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T19:18:59.038Z",
       "updatedAt": "2025-06-26T19:18:59.038Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 1250,
       "compressed": true,
@@ -1947,7 +1947,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T19:19:03.625Z",
       "updatedAt": "2025-06-26T19:19:03.625Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 966,
       "compressed": false,
@@ -1967,7 +1967,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T19:59:10.185Z",
       "updatedAt": "2025-06-26T19:59:10.185Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 1574,
       "compressed": true,
@@ -2125,7 +2125,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T20:49:35.467Z",
       "updatedAt": "2025-06-26T20:49:35.467Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 3712,
       "compressed": true,
@@ -2145,7 +2145,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T21:11:22.097Z",
       "updatedAt": "2025-06-26T21:11:22.097Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 1603,
       "compressed": true,
@@ -2165,7 +2165,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T21:12:09.085Z",
       "updatedAt": "2025-06-26T21:12:09.085Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 32,
       "compressed": false,
@@ -2185,7 +2185,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T21:31:27.920Z",
       "updatedAt": "2025-06-26T21:31:27.920Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 9546,
       "compressed": true,
@@ -2205,7 +2205,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-26T22:24:37.175Z",
       "updatedAt": "2025-06-26T22:24:37.175Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 6245,
       "compressed": true,
@@ -2225,7 +2225,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-29T17:11:09.540Z",
       "updatedAt": "2025-06-29T17:11:09.540Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 32,
       "compressed": false,
@@ -2364,7 +2364,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-29T17:11:28.286Z",
       "updatedAt": "2025-06-29T17:11:28.286Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 4096,
       "compressed": true,
@@ -2384,7 +2384,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-29T18:05:44.612Z",
       "updatedAt": "2025-06-29T18:05:44.612Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 5572,
       "compressed": true,
@@ -2404,7 +2404,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-29T20:17:56.545Z",
       "updatedAt": "2025-06-29T20:17:56.545Z",
-      "lastAccessedAt": "2025-06-29T23:14:15.575Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 1934,
       "compressed": true,
@@ -2424,7 +2424,7 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-29T23:15:12.588Z",
       "updatedAt": "2025-06-29T23:15:12.588Z",
-      "lastAccessedAt": "2025-06-29T23:15:12.588Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 2335,
       "compressed": true,
@@ -2444,23 +2444,63 @@
       "accessLevel": "shared",
       "createdAt": "2025-06-29T23:16:38.400Z",
       "updatedAt": "2025-06-29T23:16:38.400Z",
-      "lastAccessedAt": "2025-06-29T23:16:38.400Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
       "version": 1,
       "size": 3146,
       "compressed": true,
       "checksum": "5f1d0267af288b7a50ceb9af083fe6270e3a1ba541ac491b617eba1ab130a7a9",
       "references": [],
       "dependencies": []
+    },
+    {
+      "id": "entry_mciahwau_a14jhwu9c",
+      "key": "swarm-auto-centralized-1751238768217/doc-scanner/inventory",
+      "value": "{\"total_files\":193,\"categories\":{\"root_level\":[\"README.md\",\"SECURITY_ALERT.md\",\"SECURITY_UPDATE.md\",\"CLAUDE.md\",\"TYPESCRIPT_ERROR_RESOLUTION_GUIDE.md\",\"TYPESCRIPT_FIX_PLAN.md\",\"SOLUTION_IMPLEMENTATION_COMPLETE.md\",\"flow-implementation-specs.md\",\"GOAL_STRATEGY_STARTUP_GUIDE.md\",\"QUICK-FIX-GUIDE.md\",\"STAGING_USER_TESTING_GUIDE.md\",\"CICD_SECURITY_ANALYSIS.md\",\"APP_READINESS_STATUS_REPORT.md\",\"TYPESCRIPT_AND_E2E_FIXES_SUMMARY.md\"],\"docs_directory\":{\"main\":[\"docs/README.md\",\"docs/api-spec.md\",\"docs/api-validation-setup.md\",\"docs/LLM_DRIVEN_REFACTORING.md\",\"docs/PRIVACY_IMPLEMENTATION_PLAN.md\",\"docs/SECURE_LLM_TESTING_STRATEGY.md\",\"docs/SECURITY_DEPLOYMENT_GUIDE.md\",\"docs/SMART_GOAL_BUG_FIX_PLAN.md\",\"docs/USER_TESTING_GUIDE.md\",\"docs/calendar-functionality-architecture-plan.md\",\"docs/calendar-implementation-checklist.md\",\"docs/configuration-management-plan.md\",\"docs/contract-testing.md\",\"docs/development-plan.md\",\"docs/faq.md\",\"docs/goal-strategy-service-specification.md\",\"docs/llm-first-architecture-refactoring.md\",\"docs/mock-server-enhancement-summary.md\",\"docs/mock-servers.md\",\"docs/personal-ea-prd.md\",\"docs/phase-2.5-testing-plan.md\",\"docs/schemathesis-v4-migration.md\",\"docs/secret-management-guide.md\",\"docs/user-installation-guide.md\",\"docs/version-alignment.md\"],\"subdirectories\":{\"guides\":[\"docs/guides/api-integration.md\",\"docs/guides/claude-flow-usage.md\",\"docs/guides/deployment-operations.md\",\"docs/guides/developer-onboarding.md\",\"docs/guides/testing-strategy.md\"],\"reference\":[\"docs/reference/architecture/system-overview.md\",\"docs/reference/troubleshooting/common-issues.md\",\"docs/reference/api-endpoints/goal-strategy-api.md\"],\"security\":[\"docs/security/api-key-handling-procedures.md\",\"docs/security/deployment-security-checklist.md\"]}},\"services\":{\"goal-strategy\":[\"services/goal-strategy/README.md\",\"services/goal-strategy/API_DOCUMENTATION.md\",\"services/goal-strategy/API_QUICK_REFERENCE.md\",\"services/goal-strategy/tests/README.md\"],\"email-processing\":[\"services/email-processing/README.md\"]},\"testing\":{\"goal-strategy-test\":[\"testing/goal-strategy-test/AUTOMATED_TESTING_GUIDE.md\",\"testing/goal-strategy-test/TESTING_ENVIRONMENT_GUIDE.md\",\"testing/goal-strategy-test/USER_VALIDATION_GUIDE.md\"]},\"memory_data\":{\"count\":41,\"examples\":[\"memory/data/swarm-*/architecture-analysis.md\",\"memory/data/swarm-*/comprehensive-audit-report.md\",\"memory/data/swarm-*/configuration-report.md\",\"memory/data/swarm-*/bug-fix-summary.md\"]},\"tasks\":[\"tasks/rfc-001-dialog-gateway.md\"],\"sparc_plans\":[\"sparc/plans/contracts/API_FIRST_TDD_GUIDE.md\"],\"claude_commands\":[\".claude/commands/*.md (10 files)\"]}}",
+      "type": "object",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-29T23:17:00.486Z",
+      "updatedAt": "2025-06-29T23:17:00.486Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
+      "version": 1,
+      "size": 2817,
+      "compressed": true,
+      "checksum": "6059362bb3e9b80f7bdd386e1a3401e72bfc479b2c2953c2d1fbd94391fe780d",
+      "references": [],
+      "dependencies": []
+    },
+    {
+      "id": "entry_mciaimzg_yjxiw3z9o",
+      "key": "swarm-auto-centralized-1751238768217/doc-scanner/missing",
+      "value": "{\"missing_documentation\":[{\"category\":\"API Endpoints\",\"missing\":[{\"endpoint\":\"/api/v1/dependencies/*\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/routes/dependencies.ts\"],\"description\":\"Dependency management endpoints not documented in API docs\"},{\"endpoint\":\"/api/v1/estimations/*\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/routes/estimations.ts\"],\"description\":\"Task estimation endpoints not documented\"},{\"endpoint\":\"/api/v1/feedback/*\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/routes/feedback.ts\"],\"description\":\"Feedback collection endpoints not documented\"},{\"endpoint\":\"/api/v1/planner/*\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/routes/planner.ts\"],\"description\":\"Planning service endpoints not documented\"},{\"endpoint\":\"/api/v1/goals/chat/*\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/routes/goals-chat-endpoints.ts\"],\"description\":\"Chat-based goal refinement endpoints not documented\"}]},{\"category\":\"Services\",\"missing\":[{\"service\":\"conversational-state-manager\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/services/conversational-state-manager.ts\"],\"description\":\"Conversational state management service not documented\"},{\"service\":\"llm-driven-validator\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/services/llm-driven-validator.ts\"],\"description\":\"LLM validation service not documented\"},{\"service\":\"unified-goal-processor\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/services/unified-goal-processor.ts\"],\"description\":\"Unified goal processing service not documented\"},{\"service\":\"smart-goal-processor-v2\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/services/smart-goal-processor-v2.ts\"],\"description\":\"Version 2 of SMART goal processor not documented\"}]},{\"category\":\"UI Components\",\"missing\":[{\"component\":\"ChatClarification\",\"files\":[\"/workspaces/personalEA/testing/goal-strategy-test/src/components/ChatClarification.tsx\"],\"description\":\"Chat-based clarification UI component not documented\"},{\"component\":\"InteractiveGoalDisplay\",\"files\":[\"/workspaces/personalEA/testing/goal-strategy-test/src/components/InteractiveGoalDisplay.tsx\"],\"description\":\"Interactive goal display component not documented\"},{\"component\":\"EstimationDisplay\",\"files\":[\"/workspaces/personalEA/testing/goal-strategy-test/src/components/EstimationDisplay.tsx\"],\"description\":\"Task estimation display component not documented\"},{\"component\":\"WBSDisplay\",\"files\":[\"/workspaces/personalEA/testing/goal-strategy-test/src/components/WBSDisplay.tsx\"],\"description\":\"Work breakdown structure display component not documented\"}]},{\"category\":\"Architecture\",\"missing\":[{\"topic\":\"LLM-Driven Architecture Implementation\",\"description\":\"The llm-first-architecture-refactoring.md describes a plan but no implementation guide exists\"},{\"topic\":\"Shared Utilities Documentation\",\"files\":[\"/workspaces/personalEA/services/shared/utils/\"],\"description\":\"Shared utilities for API key validation and LLM connections not documented\"},{\"topic\":\"Error Handling Strategy\",\"files\":[\"/workspaces/personalEA/services/goal-strategy/src/middleware/error-handler.ts\"],\"description\":\"Error handling middleware and patterns not documented\"}]},{\"category\":\"Setup & Configuration\",\"missing\":[{\"topic\":\"Environment Configuration Guide\",\"description\":\"Comprehensive guide for all environment variables and configuration options\"},{\"topic\":\"Production Deployment Guide\",\"description\":\"Step-by-step production deployment with security best practices\"},{\"topic\":\"Integration Testing Guide\",\"description\":\"How to test integrations with OpenAI, databases, etc.\"}]},{\"category\":\"User Guides\",\"missing\":[{\"topic\":\"Goal Creation Walkthrough\",\"description\":\"End-user guide for creating and refining goals\"},{\"topic\":\"Chat Interface Usage\",\"description\":\"How to use the chat-based goal refinement feature\"},{\"topic\":\"Progress Tracking Guide\",\"description\":\"How to track goal and milestone progress\"}]}],\"undocumented_features\":[{\"feature\":\"Chat-based Goal Refinement\",\"evidence\":\"goals-chat-endpoints.ts and ChatClarification.tsx exist but not in docs\",\"priority\":\"high\"},{\"feature\":\"Task Estimation Engine\",\"evidence\":\"estimations.ts and EstimationDisplay.tsx exist but not documented\",\"priority\":\"medium\"},{\"feature\":\"Dependency Management\",\"evidence\":\"dependencies.ts and dependency-mapper.ts exist but not in API docs\",\"priority\":\"medium\"},{\"feature\":\"Feedback Collection\",\"evidence\":\"feedback.ts and FeedbackForm.tsx exist but not documented\",\"priority\":\"low\"}]}",
+      "type": "object",
+      "namespace": "default",
+      "tags": [],
+      "metadata": {},
+      "owner": "system",
+      "accessLevel": "shared",
+      "createdAt": "2025-06-29T23:17:35.068Z",
+      "updatedAt": "2025-06-29T23:17:35.068Z",
+      "lastAccessedAt": "2025-06-30T00:09:24.961Z",
+      "version": 1,
+      "size": 4918,
+      "compressed": true,
+      "checksum": "58c9e14e20b9c5173a8c4771344fdf819738448a49dbdb4e4fa268d0b9e7847d",
+      "references": [],
+      "dependencies": []
     }
   ],
   "statistics": {
     "overview": {
-      "totalEntries": 69,
+      "totalEntries": 71,
       "totalSize": null,
-      "compressedEntries": 46,
+      "compressedEntries": 48,
       "compressionRatio": 0,
-      "indexSize": 100,
-      "memoryUsage": 9927384,
+      "indexSize": 50,
+      "memoryUsage": 9794920,
       "diskUsage": 0
     },
     "distribution": {
@@ -2470,8 +2510,8 @@
           "size": null
         },
         "default": {
-          "count": 66,
-          "size": 263172
+          "count": 68,
+          "size": 270907
         },
         "swarm-testing-centralized-1750818479518": {
           "count": 1,
@@ -2484,8 +2524,8 @@
           "size": null
         },
         "object": {
-          "count": 48,
-          "size": 118542
+          "count": 50,
+          "size": 126277
         },
         "string": {
           "count": 18,
@@ -2506,8 +2546,8 @@
           "size": null
         },
         "system": {
-          "count": 66,
-          "size": 263172
+          "count": 68,
+          "size": 270907
         }
       },
       "byAccessLevel": {
@@ -2516,39 +2556,40 @@
           "size": null
         },
         "shared": {
-          "count": 66,
-          "size": 263172
+          "count": 68,
+          "size": 270907
         }
       }
     },
     "temporal": {
-      "entriesCreatedLast24h": 6,
-      "entriesUpdatedLast24h": 6,
-      "entriesAccessedLast24h": 69,
+      "entriesCreatedLast24h": 8,
+      "entriesUpdatedLast24h": 8,
+      "entriesAccessedLast24h": 71,
       "oldestEntry": "1970-01-01T00:00:00.000Z",
-      "newestEntry": "2025-06-29T23:16:38.400Z"
+      "newestEntry": "2025-06-29T23:17:35.068Z"
     },
     "performance": {
       "averageQueryTime": 0,
-      "averageWriteTime": 1,
+      "averageWriteTime": 0,
       "cacheHitRatio": 0,
       "indexEfficiency": 0.95
     },
     "health": {
       "expiredEntries": 0,
       "orphanedReferences": 0,
-      "duplicateKeys": 0,
+      "duplicateKeys": 1,
       "corruptedEntries": 0,
       "recommendedCleanup": false
     },
     "optimization": {
       "suggestions": [
-        "2 entries could benefit from compression"
+        "2 entries could benefit from compression",
+        "1 duplicate keys found"
       ],
       "potentialSavings": {
         "compression": 1246.1999999999998,
         "cleanup": 0,
-        "deduplication": 0
+        "deduplication": 2817
       },
       "indexOptimization": [
         "Consider periodic index rebuilding for optimal performance"
