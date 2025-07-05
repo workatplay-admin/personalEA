@@ -1,0 +1,156 @@
+name: Rapid OpenAI Integration Deploy
+
+on:
+  push:
+    branches: [main, rapid-deploy]
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Deployment target'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+        - both
+
+env:
+  NODE_VERSION: '18'
+  DEPLOY_TIMEOUT: '10m'
+
+jobs:
+  quick-test:
+    name: Quick Tests (5 min)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: services/goal-strategy/package-lock.json
+      
+      - name: Quick install
+        working-directory: services/goal-strategy
+        run: npm ci --production=false
+      
+      - name: Type check only
+        working-directory: services/goal-strategy
+        run: npx tsc --noEmit
+      
+      - name: Critical tests only
+        working-directory: services/goal-strategy
+        run: |
+          npm test -- --testNamePattern="critical" --maxWorkers=4
+
+  rapid-build:
+    name: Rapid Build (3 min)
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    needs: quick-test
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: services/goal-strategy
+          push: true
+          tags: |
+            personalea/goal-strategy:rapid-${{ github.sha }}
+            personalea/goal-strategy:latest
+          cache-from: type=registry,ref=personalea/goal-strategy:buildcache
+          cache-to: type=registry,ref=personalea/goal-strategy:buildcache,mode=max
+          build-args: |
+            SKIP_TESTS=true
+
+  instant-deploy:
+    name: Instant Deploy (2 min)
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: rapid-build
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: goal-strategy-rapid
+          image: personalea/goal-strategy:rapid-${{ github.sha }}
+          region: us-central1
+          env_vars: |
+            NODE_ENV=production
+            API_VERSION=v1
+          secrets: |
+            OPENAI_API_KEY=openai-api-key:latest
+      
+      - name: Quick smoke test
+        run: |
+          curl -f ${{ steps.deploy.outputs.url }}/health || exit 1
+          echo "✅ Deployment successful!"
+      
+      - name: Output URL
+        run: |
+          echo "🚀 Service deployed to: ${{ steps.deploy.outputs.url }}"
+          echo "📝 Add this to your DNS: ${{ steps.deploy.outputs.url }}"
+
+  parallel-platforms:
+    name: Deploy Everywhere
+    runs-on: ubuntu-latest
+    needs: rapid-build
+    strategy:
+      matrix:
+        platform: [vercel, netlify, railway]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to ${{ matrix.platform }}
+        run: |
+          case "${{ matrix.platform }}" in
+            vercel)
+              npm i -g vercel
+              vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+              ;;
+            netlify)
+              npm i -g netlify-cli
+              netlify deploy --prod --auth=${{ secrets.NETLIFY_TOKEN }}
+              ;;
+            railway)
+              npm i -g @railway/cli
+              railway up --service goal-strategy --token=${{ secrets.RAILWAY_TOKEN }}
+              ;;
+          esac
+
+  notification:
+    name: Notify Completion
+    runs-on: ubuntu-latest
+    needs: [instant-deploy]
+    if: always()
+    steps:
+      - name: Send notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            🚀 Rapid Deployment Complete!
+            Time: ~10 minutes
+            Status: ${{ needs.instant-deploy.result }}
+            URL: Check Cloud Run console
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+# Fastest possible deployment - under 10 minutes!

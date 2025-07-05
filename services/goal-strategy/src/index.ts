@@ -20,6 +20,9 @@ import dependencyRoutes from '@/routes/dependencies';
 import estimationRoutes from '@/routes/estimations';
 import feedbackRoutes from '@/routes/feedback';
 import plannerRoutes from '@/routes/planner';
+import personalizationRoutes from '@/routes/personalization';
+import neuralChatRoutes from '@/routes/neural-chat';
+import enhancedChatRoutes from '@/routes/enhanced-chat';
 // import taskRoutes from '@/routes/tasks';
 // import capacityRoutes from '@/routes/capacity';
 
@@ -143,6 +146,9 @@ apiRouter.use('/dependencies', dependencyRoutes);
 apiRouter.use('/estimations', estimationRoutes);
 apiRouter.use('/feedback', feedbackRoutes);
 apiRouter.use('/planner', plannerRoutes);
+apiRouter.use('/personalization', personalizationRoutes);
+apiRouter.use('/neural-chat', neuralChatRoutes);
+apiRouter.use('/enhanced-chat', enhancedChatRoutes);
 // apiRouter.use('/tasks', taskRoutes);
 // apiRouter.use('/capacity', capacityRoutes);
 

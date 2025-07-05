@@ -1,0 +1,46 @@
+{
+  "requiredApiKeys": {
+    "openai": {
+      "name": "OpenAI API Key",
+      "envVar": "OPENAI_API_KEY",
+      "format": "sk-[alphanumeric string]",
+      "required": true,
+      "usage": "Core AI functionality for goal translation, milestones, WBS generation",
+      "models": ["gpt-4-turbo-preview", "gpt-3.5-turbo"],
+      "endpoints": [
+        "/api/v1/goals/translate",
+        "/api/v1/goals/clarify",
+        "/api/v1/goals/contextual-help",
+        "/api/v1/milestones/generate",
+        "/api/v1/wbs/generate",
+        "/api/v1/estimations/estimate"
+      ]
+    },
+    "claude": {
+      "name": "Claude API Key",
+      "envVar": "CLAUDE_API_KEY",
+      "format": "sk-ant-[alphanumeric string]",
+      "required": false,
+      "usage": "Optional Claude integration"
+    }
+  },
+  "optionalApiKeys": {
+    "gmail": {
+      "name": "Gmail API",
+      "envVars": ["GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REDIRECT_URI"],
+      "required": false,
+      "usage": "Gmail email integration"
+    }
+  },
+  "apiConfiguration": {
+    "baseUrl": "http://localhost:8085/api/v1",
+    "timeout": 30000,
+    "retries": 3,
+    "exponentialBackoff": true,
+    "authentication": "JWT Bearer token",
+    "cors": {
+      "origins": ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "https://*.app.github.dev"],
+      "credentials": true
+    }
+  }
+}

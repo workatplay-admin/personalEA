@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-07-05T01:14:26.283Z",
+  "totalSuites": 4,
+  "passedSuites": 0,
+  "failedSuites": 4,
+  "totalTests": 0,
+  "passedTests": 0,
+  "failedTests": 4,
+  "totalDuration": 3145,
+  "criticalFailures": [
+    "Conversation Flow: 1 failures",
+    "SMART Scoring Accuracy: 1 failures"
+  ],
+  "confidenceScore": 0,
+  "productionReady": false,
+  "results": [
+    {
+      "suite": "Conversation Flow",
+      "passed": false,
+      "totalTests": 0,
+      "passedTests": 0,
+      "failedTests": 1,
+      "duration": 826,
+      "errors": [
+        "Command failed: npx jest /workspaces/personalEA/services/goal-strategy/tests/comprehensive/conversation-flow.test.ts --testTimeout=30000 --forceExit --json\nNo tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspaces/personalEA\n  14 files checked.\n  testMatch: **/__tests__/**/*.+(ts|tsx|js), **/*.(test|spec).+(ts|tsx|js) - 7 matches\n  testPathIgnorePatterns: /node_modules/, /tests/pact/pacts/ - 14 matches\n  testRegex:  - 0 matches\nPattern: /workspaces/personalEA/services/goal-strategy/tests/comprehensive/conversation-flow.test.ts - 0 matches\n"
+      ],
+      "timestamp": "2025-07-05T01:14:23.964Z"
+    },
+    {
+      "suite": "SMART Scoring Accuracy",
+      "passed": false,
+      "totalTests": 0,
+      "passedTests": 0,
+      "failedTests": 1,
+      "duration": 761,
+      "errors": [
+        "Command failed: npx jest /workspaces/personalEA/services/goal-strategy/tests/comprehensive/smart-scoring-accuracy.test.ts --testTimeout=30000 --forceExit --json\nNo tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspaces/personalEA\n  14 files checked.\n  testMatch: **/__tests__/**/*.+(ts|tsx|js), **/*.(test|spec).+(ts|tsx|js) - 7 matches\n  testPathIgnorePatterns: /node_modules/, /tests/pact/pacts/ - 14 matches\n  testRegex:  - 0 matches\nPattern: /workspaces/personalEA/services/goal-strategy/tests/comprehensive/smart-scoring-accuracy.test.ts - 0 matches\n"
+      ],
+      "timestamp": "2025-07-05T01:14:24.726Z"
+    },
+    {
+      "suite": "Edge Cases & Error Handling",
+      "passed": false,
+      "totalTests": 0,
+      "passedTests": 0,
+      "failedTests": 1,
+      "duration": 779,
+      "errors": [
+        "Command failed: npx jest /workspaces/personalEA/services/goal-strategy/tests/comprehensive/edge-cases-error-handling.test.ts --testTimeout=30000 --forceExit --json\nNo tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspaces/personalEA\n  14 files checked.\n  testMatch: **/__tests__/**/*.+(ts|tsx|js), **/*.(test|spec).+(ts|tsx|js) - 7 matches\n  testPathIgnorePatterns: /node_modules/, /tests/pact/pacts/ - 14 matches\n  testRegex:  - 0 matches\nPattern: /workspaces/personalEA/services/goal-strategy/tests/comprehensive/edge-cases-error-handling.test.ts - 0 matches\n"
+      ],
+      "timestamp": "2025-07-05T01:14:25.505Z"
+    },
+    {
+      "suite": "Performance & Reliability",
+      "passed": false,
+      "totalTests": 0,
+      "passedTests": 0,
+      "failedTests": 1,
+      "duration": 776,
+      "errors": [
+        "Command failed: npx jest /workspaces/personalEA/services/goal-strategy/tests/comprehensive/performance-reliability.test.ts --testTimeout=30000 --forceExit --json\nNo tests found, exiting with code 1\nRun with `--passWithNoTests` to exit with code 0\nIn /workspaces/personalEA\n  14 files checked.\n  testMatch: **/__tests__/**/*.+(ts|tsx|js), **/*.(test|spec).+(ts|tsx|js) - 7 matches\n  testPathIgnorePatterns: /node_modules/, /tests/pact/pacts/ - 14 matches\n  testRegex:  - 0 matches\nPattern: /workspaces/personalEA/services/goal-strategy/tests/comprehensive/performance-reliability.test.ts - 0 matches\n"
+      ],
+      "timestamp": "2025-07-05T01:14:26.282Z"
+    }
+  ]
+}

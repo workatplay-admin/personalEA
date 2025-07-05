@@ -1,0 +1,13 @@
+{
+  "objective": "We need to stand up the app and test. You ALWAYS need to use real API keys for user testing you can NEVER use fall back data.",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-07-05T00:18:59.127Z",
+  "id": "swarm-auto-centralized-1751674739127"
+}

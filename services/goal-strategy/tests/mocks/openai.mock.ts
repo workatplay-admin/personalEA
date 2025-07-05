@@ -195,3 +195,30 @@ export const mockGoalTranslationResult: GoalTranslationResult = {
   ],
   confidence: 0.87
 };
+
+export function createMockOpenAIResponse(data: Partial<{
+  smartGoal: string;
+  confidence: number;
+  smartCriteria: Partial<SMARTCriteria>;
+  clarificationQuestions: string[];
+  missingCriteria: string[];
+}>) {
+  const defaultCriteria: SMARTCriteria = {
+    specific: { value: "Test", confidence: 0.5, missing: [] },
+    measurable: { value: "Test", metrics: [], confidence: 0.5, missing: [] },
+    achievable: { value: "Test", confidence: 0.5, missing: [] },
+    relevant: { value: "Test", confidence: 0.5, missing: [] },
+    timeBound: { value: "Test", confidence: 0.5, missing: [] }
+  };
+
+  return {
+    smartGoal: data.smartGoal || "Test goal",
+    confidence: data.confidence || 0.5,
+    smartCriteria: {
+      ...defaultCriteria,
+      ...data.smartCriteria
+    },
+    clarificationQuestions: data.clarificationQuestions || [],
+    missingCriteria: data.missingCriteria || []
+  };
+}

@@ -1,0 +1,27 @@
+{
+  "fallbackDataLocations": {
+    "mockHandlers": "testing/goal-strategy-test/src/tests/mocks/handlers.ts",
+    "testFixtures": "testing/goal-strategy-test/tests/e2e/fixtures/test-data.ts",
+    "mockServers": [
+      "testing/goal-strategy-test/openai-api-server.js",
+      "testing/goal-strategy-test/improved-server.js"
+    ]
+  },
+  "fallbackPatterns": [
+    "Mock API responses in test handlers",
+    "Environment-based configuration fallbacks",
+    "Default values in environment.ts",
+    "Test data fixtures for E2E tests",
+    "Circuit breaker patterns in improved-server.js"
+  ],
+  "avoidanceStrategy": {
+    "useRealApis": true,
+    "requireApiKeys": true,
+    "noMockData": true,
+    "validateResponses": true,
+    "commands": [
+      "USE_REAL_API=true npm run test:comprehensive:real-api",
+      "OPENAI_API_KEY=$OPENAI_API_KEY npm run test:e2e"
+    ]
+  }
+}

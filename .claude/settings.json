@@ -1,69 +1,60 @@
 {
+  "env": {
+    "RUV_SWARM_AUTO_COMMIT": "false",
+    "RUV_SWARM_AUTO_PUSH": "false",
+    "RUV_SWARM_HOOKS_ENABLED": "true",
+    "RUV_SWARM_TELEMETRY_ENABLED": "true",
+    "RUV_SWARM_REMOTE_EXECUTION": "true"
+  },
   "permissions": {
     "allow": [
-      "Bash(*)",
-      "Read(*)",
-      "Write(*)",
-      "Edit(*)",
-      "MultiEdit(*)",
-      "Glob(*)",
-      "Grep(*)",
-      "LS(*)",
-      "NotebookEdit(*)",
-      "NotebookRead(*)",
-      "WebFetch(*)",
-      "WebSearch(*)",
-      "TodoRead",
-      "TodoWrite",
-      "Agent(*)"
+      "Bash(npx ruv-swarm *)",
+      "Bash(npm run lint)",
+      "Bash(npm run test:*)",
+      "Bash(npm test *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push)",
+      "Bash(git config *)",
+      "Bash(node *)",
+      "Bash(which *)",
+      "Bash(pwd)",
+      "Bash(ls *)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(eval *)"
+    ]
   },
-  "env": {
-    "BASH_DEFAULT_TIMEOUT_MS": "300000",
-    "BASH_MAX_TIMEOUT_MS": "600000",
-    "BASH_MAX_OUTPUT_LENGTH": "500000",
-    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "true",
-    "MAX_THINKING_TOKENS": "20000",
-    "MCP_TIMEOUT": "60000",
-    "MCP_TOOL_TIMEOUT": "120000",
-    "DISABLE_COST_WARNINGS": "1",
-    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "0",
-    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "8192"
+  "hooks": {
+    "pre-edit": "npx ruv-swarm hook pre-edit --file $FILE --auto-spawn-agents true --optimize-topology true",
+    "post-edit": "npx ruv-swarm hook post-edit --file $FILE --train-on-success true --auto-format true",
+    "pre-search": "npx ruv-swarm hook pre-search --query $QUERY --cache-results true --optimize-search true",
+    "pre-command": "npx ruv-swarm hook pre-command --command $COMMAND --validate-safety true",
+    "session-end": "npx ruv-swarm hook session-end --export-metrics true --generate-summary true --persist-memory true",
+    "pre-task": "npx ruv-swarm hook pre-task --description $TASK --auto-spawn-agents true --optimize-resources true",
+    "post-task": "npx ruv-swarm hook post-task --task-id $TASK_ID --analyze-performance true --train-patterns true",
+    "notification": "npx ruv-swarm hook notification --message $MESSAGE --telemetry true --analyze-sentiment true"
   },
-  "cleanupPeriodDays": 90,
-  "includeCoAuthoredBy": true,
-  "automation": {
-    "enabled": true,
-    "defaultTimeout": 300000,
-    "maxRetries": 3,
-    "retryBackoff": 2000,
-    "parallelExecution": true,
-    "batchOperations": true,
-    "autoSaveMemory": true,
-    "autoCommit": false
-  },
-  "claudeFlow": {
-    "version": "1.0.72",
-    "swarmDefaults": {
-      "maxAgents": 10,
-      "timeout": 3600000,
-      "parallel": true,
-      "monitor": true,
-      "outputFormat": "json"
-    },
-    "sparcDefaults": {
-      "timeout": 3600000,
-      "parallel": true,
-      "batch": true,
-      "memoryKey": "sparc_session"
-    },
-    "memoryDefaults": {
-      "maxSize": "1GB",
-      "autoCompress": true,
-      "autoCleanup": true,
-      "indexingEnabled": true,
-      "persistenceEnabled": true
+  "mcpServers": {
+    "ruv-swarm": {
+      "command": "npx",
+      "args": [
+        "ruv-swarm",
+        "mcp",
+        "start"
+      ],
+      "env": {
+        "RUV_SWARM_HOOKS_ENABLED": "true",
+        "RUV_SWARM_TELEMETRY_ENABLED": "true",
+        "RUV_SWARM_REMOTE_READY": "true"
+      }
     }
-  }
+  },
+  "includeCoAuthoredBy": true
 }

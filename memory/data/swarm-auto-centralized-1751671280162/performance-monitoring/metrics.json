@@ -1,0 +1,147 @@
+{
+  "performanceReport": {
+    "timestamp": "2025-07-04T23:26:00Z",
+    "agent": "Performance & Monitoring Agent",
+    "swarmId": "swarm-auto-centralized-1751671280162",
+    "status": "CRITICAL",
+    "metrics": {
+      "testExecution": {
+        "testSuiteTimeout": 60000,
+        "parallelWorkers": 1,
+        "browserConfigurations": 7,
+        "observedExecutionTimes": {
+          "jwtTokenGeneration": "immediate",
+          "environmentConfiguration": "immediate",
+          "authenticatedGoalTranslation": 18409,
+          "apiFlowTest": "failed_404"
+        },
+        "playwrightDuration": 1720,
+        "goalStrategyTests": "timeout_30s"
+      },
+      "applicationPerformance": {
+        "apiResponseTimes": {
+          "goalTranslation": {
+            "measured": 18409,
+            "target": 5000,
+            "status": "FAILING",
+            "percentageOverTarget": 267
+          },
+          "frontendAPICalls": {
+            "times": [800, 832, 953],
+            "average": 861.67,
+            "target": 5000,
+            "status": "PASSING"
+          }
+        },
+        "pageLoadTime": {
+          "measured": 7,
+          "target": 3000,
+          "status": "EXCELLENT"
+        },
+        "uiInteractionTarget": 500
+      },
+      "criticalBottlenecks": [
+        {
+          "component": "OpenAI API Integration",
+          "location": "services/goal-strategy/src/services/smart-goal-processor.ts:264-285",
+          "issue": "30-second timeout blocking requests",
+          "severity": "CRITICAL",
+          "impact": "Primary cause of 10+ second response times"
+        },
+        {
+          "component": "Database Queries",
+          "location": "services/goal-strategy/src/routes/goals.ts:362-383",
+          "issue": "Complex nested queries with deep includes",
+          "severity": "HIGH",
+          "problems": [
+            "No indexing on userId fields",
+            "Multiple sequential operations",
+            "N+1 query patterns",
+            "SQLite limitations"
+          ]
+        },
+        {
+          "component": "Synchronous Operations",
+          "issues": [
+            "JSON parsing in AI response handling",
+            "Progress calculations in application layer",
+            "Sequential Promise.all operations"
+          ],
+          "severity": "MEDIUM"
+        }
+      ],
+      "systemHealth": {
+        "nodeProcesses": "multiple_active",
+        "memoryUsage": "acceptable",
+        "cpuUsage": "normal_idle",
+        "serviceAvailability": {
+          "goalStrategyService": {
+            "status": "running",
+            "port": 3000
+          },
+          "frontendInterface": {
+            "status": "running",
+            "port": 5173
+          }
+        },
+        "errorRates": {
+          "404Errors": true,
+          "importErrors": true,
+          "timeoutErrors": true
+        }
+      },
+      "browserPerformance": {
+        "testedBrowsers": 7,
+        "corsIssues": "resolved",
+        "uiRendering": "consistent",
+        "javascriptExecution": "no_issues",
+        "mobileVsDesktop": "no_significant_difference"
+      }
+    },
+    "recommendations": {
+      "immediate": [
+        "Reduce OpenAI API timeout from 30s to 10s",
+        "Add database indexes on userId fields",
+        "Implement request timeout middleware (10s limit)",
+        "Fix test suite configuration to prevent hanging"
+      ],
+      "shortTerm": [
+        "Optimize database queries",
+        "Implement API resilience patterns",
+        "Enhance performance monitoring"
+      ],
+      "longTerm": [
+        "Migrate from SQLite to PostgreSQL",
+        "Implement microservice architecture for AI",
+        "Add comprehensive performance testing"
+      ]
+    },
+    "kpis": {
+      "apiResponseTime": {
+        "current": 18400,
+        "target": 5000,
+        "status": "FAILING"
+      },
+      "pageLoadTime": {
+        "current": 7,
+        "target": 3000,
+        "status": "PASSING"
+      },
+      "testExecutionTime": {
+        "current": "timeout",
+        "target": 300000,
+        "status": "FAILING"
+      },
+      "errorRate": {
+        "current": "multiple_failures",
+        "target": 0,
+        "status": "FAILING"
+      },
+      "availability": {
+        "current": "services_running",
+        "status": "PASSING"
+      }
+    },
+    "overallStatus": "CRITICAL - Immediate action required for API timeout and database performance"
+  }
+}

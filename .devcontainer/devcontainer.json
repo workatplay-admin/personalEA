@@ -1,0 +1,9 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+
+  "postCreateCommand": "npm install -g claude-flow@1.0.72",
+
+  "portsAttributes": {
+    "3000": { "label": "Claude-Flow UI", "onAutoForward": "openBrowser" }
+  }
+}

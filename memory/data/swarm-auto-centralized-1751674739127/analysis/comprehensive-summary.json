@@ -1,0 +1,63 @@
+{
+  "summary": "PersonalEA is a microservices-based AI assistant system for goal setting and strategy planning",
+  "keyFindings": {
+    "appType": "AI-powered personal executive assistant with goal strategy management",
+    "primaryService": "Goal Strategy Service on port 8085 using OpenAI API",
+    "requiredApiKeys": ["OPENAI_API_KEY"],
+    "testingFramework": "Comprehensive with Playwright E2E and Jest unit tests",
+    "realApiSupport": "Full support for testing with real OpenAI API keys"
+  },
+  "standup": {
+    "services": [
+      {
+        "name": "Goal Strategy Service",
+        "command": "cd services/goal-strategy && npm install && npm run dev",
+        "port": 8085,
+        "requiresDatabase": true,
+        "requiresRedis": true
+      },
+      {
+        "name": "Frontend",
+        "command": "cd testing/goal-strategy-test && npm install && npm run dev",
+        "port": 5173,
+        "requiresBackend": true
+      }
+    ],
+    "requiredInfrastructure": [
+      "PostgreSQL database",
+      "Redis cache",
+      "OpenAI API key"
+    ]
+  },
+  "testingStrategy": {
+    "realApiTesting": {
+      "commands": [
+        "export OPENAI_API_KEY=your-real-key",
+        "cd testing/goal-strategy-test",
+        "npm run test:comprehensive:real-api",
+        "npm run test:e2e"
+      ],
+      "avoidFallbacks": [
+        "Use real OpenAI API key in environment",
+        "Run openai-api-server.js as proxy to real API",
+        "Avoid mock-api-server.js which has static responses"
+      ]
+    },
+    "testLocations": {
+      "e2e": "testing/goal-strategy-test/tests/e2e",
+      "unit": "services/goal-strategy/tests",
+      "integration": "services/goal-strategy/tests/integration"
+    }
+  },
+  "apiEndpoints": {
+    "goalTranslation": "/api/v1/goals/translate",
+    "goalClarification": "/api/v1/goals/{goalId}/clarify",
+    "milestoneGeneration": "/api/v1/milestones/generate",
+    "wbsGeneration": "/api/v1/wbs/generate",
+    "taskEstimation": "/api/v1/estimations/estimate"
+  },
+  "foundApiKeys": {
+    "test": "Found in testing/goal-strategy-test/.env",
+    "production": "Found in .env (staging/production configuration)"
+  }
+}

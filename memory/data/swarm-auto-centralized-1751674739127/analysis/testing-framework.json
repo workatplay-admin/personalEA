@@ -1,0 +1,47 @@
+{
+  "testFrameworks": {
+    "unit": {
+      "framework": "Jest with ts-jest",
+      "location": "services/goal-strategy/tests",
+      "coverage": true,
+      "commands": ["npm test", "npm run test:unit", "npm run test:watch"]
+    },
+    "e2e": {
+      "framework": "Playwright",
+      "location": "testing/goal-strategy-test/tests/e2e",
+      "browsers": ["chromium", "firefox", "webkit", "mobile"],
+      "config": "playwright.config.ts",
+      "commands": ["npm run test:e2e", "npm run test:e2e:headed", "npm run test:e2e:debug"]
+    },
+    "integration": {
+      "framework": "Jest + Supertest",
+      "location": "services/goal-strategy/tests/integration",
+      "realApiTests": true
+    },
+    "visual": {
+      "framework": "Playwright visual regression",
+      "location": "tests/e2e/visual-regression.spec.ts"
+    }
+  },
+  "testSuites": [
+    "Unit tests for services (Jest)",
+    "E2E browser automation (Playwright)",
+    "API contract testing (Pact)",
+    "Visual regression testing",
+    "Performance benchmarks",
+    "Accessibility testing",
+    "Cross-browser testing"
+  ],
+  "testEnvironments": {
+    "local": "Mock API servers",
+    "staging": "Real APIs with test keys",
+    "production": "Real APIs with production keys"
+  },
+  "testData": {
+    "mockServers": [
+      "openai-api-server.js - Proxy to real OpenAI API",
+      "improved-server.js - Enhanced mock with queue and circuit breaker",
+      "mock-api-server.js - Static mock responses"
+    ]
+  }
+}

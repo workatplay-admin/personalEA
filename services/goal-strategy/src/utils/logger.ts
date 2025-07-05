@@ -21,20 +21,14 @@ const logFormat = winston.format.combine(
 );
 
 const transports: winston.transport[] = [
-  new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      logFormat
-    )
-  })
+  new winston.transports.Console()
 ];
 
 // Add file transport if enabled
 if (env.LOG_FILE_ENABLED) {
   transports.push(
     new winston.transports.File({
-      filename: env.LOG_FILE_PATH,
-      format: logFormat
+      filename: env.LOG_FILE_PATH
     })
   );
 }

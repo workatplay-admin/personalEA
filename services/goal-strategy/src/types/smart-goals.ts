@@ -18,6 +18,7 @@ export interface ConversationMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp?: string;
+  metadata?: Record<string, any>;
 }
 
 /**

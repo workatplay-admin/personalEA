@@ -42,7 +42,6 @@
     "version:update": "npm run update-versions"
   },
   "devDependencies": {
-    "@pact-foundation/pact": "^12.1.0",
     "@pact-foundation/pact-node": "^10.17.7",
     "@playwright/test": "^1.53.1",
     "@stoplight/prism-cli": "^5.8.0",
@@ -50,13 +49,13 @@
     "@types/jest": "^29.5.8",
     "axios": "^1.10.0",
     "concurrently": "^8.2.2",
-    "dredd": "^14.1.0",
+    "cross-spawn": "^7.0.6",
     "husky": "^8.0.3",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.0",
     "openapi-typescript": "^6.7.1",
     "puppeteer": "^24.10.2",
-    "redoc-cli": "^0.13.21",
+    "semver": "^7.7.2",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1"
   },

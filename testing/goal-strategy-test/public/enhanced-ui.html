@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal & Strategy Service - Enhanced Adaptive UI</title>
+    <style>
+        :root {
+            /* Adaptive color schemes */
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            
+            /* Adaptive spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Adaptive typography */
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            
+            /* Accessibility */
+            --focus-color: #0056b3;
+            --focus-width: 3px;
+        }
+
+        /* High contrast mode */
+        body.high-contrast {
+            --primary-color: #0066cc;
+            --secondary-color: #000000;
+            --success-color: #006600;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        /* Large text mode */
+        body.large-text {
+            --font-size-base: 20px;
+            --font-size-lg: 24px;
+            --font-size-xl: 28px;
+        }
+
+        /* Spacious layout */
+        body.spacious-layout {
+            --spacing-md: 24px;
+            --spacing-lg: 32px;
+            --spacing-xl: 48px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Accessibility: Focus indicators */
+        *:focus {
+            outline: var(--focus-width) solid var(--focus-color);
+            outline-offset: 2px;
+        }
+
+        /* Skip to main content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary-color);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Main container */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        /* Adaptive header */
+        .adaptive-header {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .user-welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .expertise-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+
+        .expertise-beginner { background: #e3f2fd; color: #1976d2; }
+        .expertise-intermediate { background: #f3e5f5; color: #7b1fa2; }
+        .expertise-advanced { background: #e8f5e9; color: #388e3c; }
+        .expertise-expert { background: #fff3e0; color: #f57c00; }
+
+        /* Accessibility controls */
+        .accessibility-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .control-button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            transition: all 0.2s;
+        }
+
+        .control-button:hover {
+            background: #f5f5f5;
+            border-color: var(--primary-color);
+        }
+
+        .control-button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Progress indicator */
+        .progress-container {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .step-indicator.completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-indicator.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(0,123,255,0.2);
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        /* Main goal input area */
+        .goal-input-container {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .input-header {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .adaptive-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: var(--spacing-md);
+            font-size: var(--font-size-base);
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+            transition: border-color 0.2s;
+        }
+
+        .adaptive-textarea:focus {
+            border-color: var(--primary-color);
+        }
+
+        .character-count {
+            text-align: right;
+            font-size: var(--font-size-sm);
+            color: #666;
+            margin-top: 8px;
+        }
+
+        /* Example templates */
+        .example-templates {
+            margin-top: var(--spacing-lg);
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .template-card {
+            background: #f8f9fa;
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .template-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .template-description {
+            font-size: var(--font-size-sm);
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .template-example {
+            font-size: var(--font-size-sm);
+            font-style: italic;
+            color: #444;
+        }
+
+        /* Adaptive buttons */
+        .button-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .adaptive-button {
+            padding: 12px 24px;
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .adaptive-button.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .adaptive-button.primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .adaptive-button.secondary {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .adaptive-button.secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .adaptive-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Help system */
+        .help-panel {
+            background: #f0f8ff;
+            padding: var(--spacing-lg);
+            border-radius: 8px;
+            border-left: 4px solid var(--info-color);
+            margin-top: var(--spacing-lg);
+        }
+
+        .help-title {
+            font-weight: 600;
+            color: var(--info-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-content {
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .help-tips {
+            margin-top: var(--spacing-md);
+            padding-left: var(--spacing-lg);
+        }
+
+        .help-tip {
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .help-tip::before {
+            content: "💡";
+            position: absolute;
+            left: -20px;
+        }
+
+        /* SMART criteria display */
+        .smart-criteria-panel {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: var(--spacing-lg);
+        }
+
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .criteria-item {
+            background: #f8f9fa;
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            border-left: 4px solid #e0e0e0;
+            transition: all 0.2s;
+        }
+
+        .criteria-item.high-confidence {
+            border-left-color: var(--success-color);
+            background: #f1f8f4;
+        }
+
+        .criteria-item.medium-confidence {
+            border-left-color: var(--warning-color);
+            background: #fffbf0;
+        }
+
+        .criteria-item.low-confidence {
+            border-left-color: var(--danger-color);
+            background: #fef5f5;
+        }
+
+        .criteria-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .confidence-badge {
+            font-size: var(--font-size-sm);
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .criteria-value {
+            font-size: var(--font-size-sm);
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .criteria-missing {
+            font-size: var(--font-size-sm);
+            color: var(--danger-color);
+            font-style: italic;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: var(--spacing-sm);
+            }
+
+            .template-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .criteria-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-steps {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .progress-line {
+                display: none;
+            }
+
+            .adaptive-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Loading states */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: var(--font-size-sm);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Animation for smooth transitions */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    
+    <div class="app-container">
+        <!-- Adaptive Header -->
+        <header class="adaptive-header">
+            <div class="user-welcome">
+                <div>
+                    <h1>🎯 Smart Goal Creator</h1>
+                    <p>Welcome back! <span class="expertise-badge expertise-intermediate">Intermediate User</span></p>
+                </div>
+                <div class="accessibility-controls">
+                    <button class="control-button" onclick="toggleHighContrast()" aria-label="Toggle high contrast mode">
+                        🎨 High Contrast
+                    </button>
+                    <button class="control-button" onclick="toggleLargeText()" aria-label="Toggle large text mode">
+                        🔍 Large Text
+                    </button>
+                    <button class="control-button" onclick="toggleSpaciousLayout()" aria-label="Toggle spacious layout">
+                        📏 Spacious Layout
+                    </button>
+                    <button class="control-button" onclick="showHelp()" aria-label="Show help">
+                        ❓ Help
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Indicator -->
+        <div class="progress-container" role="progressbar" aria-label="Goal creation progress">
+            <div class="progress-steps">
+                <div class="progress-line">
+                    <div class="progress-fill" style="width: 20%"></div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-indicator active" aria-current="step">1</div>
+                    <div>Define Goal</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-indicator">2</div>
+                    <div>Make it SMART</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-indicator">3</div>
+                    <div>Set Milestones</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-indicator">4</div>
+                    <div>Plan Tasks</div>
+                </div>
+                <div class="progress-step">
+                    <div class="step-indicator">5</div>
+                    <div>Review & Commit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main id="main">
+            <!-- Goal Input Section -->
+            <div class="goal-input-container">
+                <div class="input-header">
+                    <h2>What would you like to achieve?</h2>
+                    <p>Don't worry about making it perfect - just tell us what you want to accomplish, and we'll help you refine it.</p>
+                </div>
+                
+                <textarea 
+                    id="goalInput" 
+                    class="adaptive-textarea"
+                    placeholder="Example: I want to get better at public speaking..."
+                    aria-label="Enter your goal"
+                    maxlength="500"
+                ></textarea>
+                <div class="character-count">
+                    <span id="charCount">0</span> / 500 characters
+                </div>
+
+                <!-- Example Templates -->
+                <div class="example-templates">
+                    <h3>Need inspiration? Try one of these:</h3>
+                    <div class="template-grid">
+                        <div class="template-card" onclick="useTemplate('fitness')">
+                            <div class="template-title">🏃‍♀️ Fitness Goal</div>
+                            <div class="template-description">Get in shape and improve health</div>
+                            <div class="template-example">"I want to run a 5K race"</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('career')">
+                            <div class="template-title">💼 Career Goal</div>
+                            <div class="template-description">Advance in your profession</div>
+                            <div class="template-example">"I want to get promoted to senior developer"</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('learning')">
+                            <div class="template-title">📚 Learning Goal</div>
+                            <div class="template-description">Acquire new skills or knowledge</div>
+                            <div class="template-example">"I want to learn Spanish"</div>
+                        </div>
+                        <div class="template-card" onclick="useTemplate('financial')">
+                            <div class="template-title">💰 Financial Goal</div>
+                            <div class="template-description">Improve your financial situation</div>
+                            <div class="template-example">"I want to save for a house"</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="adaptive-button primary" onclick="analyzeGoal()" id="analyzeButton">
+                        <span>Analyze My Goal</span>
+                        <span>→</span>
+                    </button>
+                    <button class="adaptive-button secondary" onclick="showMoreExamples()">
+                        Show More Examples
+                    </button>
+                </div>
+            </div>
+
+            <!-- Help Panel (Initially Hidden) -->
+            <div id="helpPanel" class="help-panel" style="display: none;">
+                <div class="help-title">
+                    <span>💡</span>
+                    <span>Tips for Writing Great Goals</span>
+                </div>
+                <div class="help-content">
+                    <p>The best goals are clear about what you want to achieve. Here are some tips:</p>
+                    <ul class="help-tips">
+                        <li class="help-tip">Be specific about what you want to accomplish</li>
+                        <li class="help-tip">Think about why this goal matters to you</li>
+                        <li class="help-tip">Consider what success looks like</li>
+                        <li class="help-tip">Don't worry about timeframes yet - we'll help with that</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SMART Criteria Results (Initially Hidden) -->
+            <div id="smartCriteriaPanel" class="smart-criteria-panel" style="display: none;">
+                <h2>Your Goal Analysis</h2>
+                <p>Here's how your goal measures up to the SMART criteria:</p>
+                
+                <div class="criteria-grid" id="criteriaGrid">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div class="button-group">
+                    <button class="adaptive-button primary" onclick="refineGoal()">
+                        <span>Refine My Goal</span>
+                        <span>→</span>
+                    </button>
+                    <button class="adaptive-button secondary" onclick="startOver()">
+                        Start Over
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // User profile detection (simulated)
+        let userProfile = {
+            expertiseLevel: 'intermediate',
+            primaryDomain: 'general',
+            communicationStyle: 'standard',
+            languageComplexity: 'standard',
+            culturalContext: {
+                timeOrientation: 'flexible'
+            },
+            accessibilityNeeds: {},
+            goalPreferences: {
+                motivationStyle: 'growth',
+                detailLevel: 'moderate'
+            }
+        };
+
+        // UI State
+        let uiState = {
+            currentStep: 1,
+            goalText: '',
+            smartCriteria: null,
+            accessibilitySettings: {
+                highContrast: false,
+                largeText: false,
+                spaciousLayout: false
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUI();
+            detectUserProfile();
+            updateCharacterCount();
+        });
+
+        // Character count
+        document.getElementById('goalInput').addEventListener('input', function() {
+            updateCharacterCount();
+            uiState.goalText = this.value;
+        });
+
+        function updateCharacterCount() {
+            const input = document.getElementById('goalInput');
+            const count = input.value.length;
+            document.getElementById('charCount').textContent = count;
+        }
+
+        // Initialize UI based on user profile
+        function initializeUI() {
+            // Apply saved accessibility settings
+            const savedSettings = localStorage.getItem('accessibilitySettings');
+            if (savedSettings) {
+                uiState.accessibilitySettings = JSON.parse(savedSettings);
+                applyAccessibilitySettings();
+            }
+        }
+
+        // Detect user profile from interaction patterns
+        function detectUserProfile() {
+            // In a real implementation, this would analyze:
+            // - Previous goals
+            // - Interaction patterns
+            // - Language complexity
+            // - Time spent on tasks
+            // For now, we'll use the default profile
+            updateUIForProfile();
+        }
+
+        // Update UI based on user profile
+        function updateUIForProfile() {
+            // Update expertise badge
+            const badges = document.querySelectorAll('.expertise-badge');
+            badges.forEach(badge => {
+                badge.className = `expertise-badge expertise-${userProfile.expertiseLevel}`;
+                badge.textContent = `${userProfile.expertiseLevel.charAt(0).toUpperCase() + userProfile.expertiseLevel.slice(1)} User`;
+            });
+
+            // Adjust placeholder text based on expertise
+            const placeholders = {
+                'beginner': 'Example: I want to learn how to cook healthy meals...',
+                'intermediate': 'Example: I want to improve my project management skills...',
+                'advanced': 'Example: I want to lead a digital transformation initiative...',
+                'expert': 'Example: I want to architect a scalable microservices platform...'
+            };
+            document.getElementById('goalInput').placeholder = placeholders[userProfile.expertiseLevel];
+        }
+
+        // Template usage
+        function useTemplate(type) {
+            const templates = {
+                'fitness': 'I want to run a 5K race and improve my overall fitness',
+                'career': 'I want to get promoted to senior developer at my company',
+                'learning': 'I want to become conversational in Spanish',
+                'financial': 'I want to save $10,000 for a house down payment'
+            };
+            
+            document.getElementById('goalInput').value = templates[type];
+            updateCharacterCount();
+            uiState.goalText = templates[type];
+            
+            // Show help relevant to the template
+            showContextualHelp(type);
+        }
+
+        // Accessibility controls
+        function toggleHighContrast() {
+            uiState.accessibilitySettings.highContrast = !uiState.accessibilitySettings.highContrast;
+            applyAccessibilitySettings();
+            saveAccessibilitySettings();
+        }
+
+        function toggleLargeText() {
+            uiState.accessibilitySettings.largeText = !uiState.accessibilitySettings.largeText;
+            applyAccessibilitySettings();
+            saveAccessibilitySettings();
+        }
+
+        function toggleSpaciousLayout() {
+            uiState.accessibilitySettings.spaciousLayout = !uiState.accessibilitySettings.spaciousLayout;
+            applyAccessibilitySettings();
+            saveAccessibilitySettings();
+        }
+
+        function applyAccessibilitySettings() {
+            const body = document.body;
+            
+            // High contrast
+            if (uiState.accessibilitySettings.highContrast) {
+                body.classList.add('high-contrast');
+                document.querySelector('[onclick="toggleHighContrast()"]').classList.add('active');
+            } else {
+                body.classList.remove('high-contrast');
+                document.querySelector('[onclick="toggleHighContrast()"]').classList.remove('active');
+            }
+            
+            // Large text
+            if (uiState.accessibilitySettings.largeText) {
+                body.classList.add('large-text');
+                document.querySelector('[onclick="toggleLargeText()"]').classList.add('active');
+            } else {
+                body.classList.remove('large-text');
+                document.querySelector('[onclick="toggleLargeText()"]').classList.remove('active');
+            }
+            
+            // Spacious layout
+            if (uiState.accessibilitySettings.spaciousLayout) {
+                body.classList.add('spacious-layout');
+                document.querySelector('[onclick="toggleSpaciousLayout()"]').classList.add('active');
+            } else {
+                body.classList.remove('spacious-layout');
+                document.querySelector('[onclick="toggleSpaciousLayout()"]').classList.remove('active');
+            }
+        }
+
+        function saveAccessibilitySettings() {
+            localStorage.setItem('accessibilitySettings', JSON.stringify(uiState.accessibilitySettings));
+        }
+
+        // Help system
+        function showHelp() {
+            const helpPanel = document.getElementById('helpPanel');
+            helpPanel.style.display = helpPanel.style.display === 'none' ? 'block' : 'none';
+            helpPanel.classList.add('fade-in');
+        }
+
+        function showContextualHelp(context) {
+            const helpContent = {
+                'fitness': 'Great choice! Fitness goals work best when they\'re specific and measurable. Think about what aspect of fitness you want to improve.',
+                'career': 'Career goals are exciting! Consider what specific skills or achievements will help you reach the next level.',
+                'learning': 'Learning goals are wonderful! Think about how you\'ll know when you\'ve succeeded - what will you be able to do?',
+                'financial': 'Financial goals are important! Be specific about the amount and timeline to stay motivated.'
+            };
+            
+            if (helpContent[context]) {
+                const helpPanel = document.getElementById('helpPanel');
+                helpPanel.querySelector('.help-content').innerHTML = `
+                    <p>${helpContent[context]}</p>
+                    <ul class="help-tips">
+                        <li class="help-tip">Be specific about what success looks like</li>
+                        <li class="help-tip">Think about realistic timeframes</li>
+                        <li class="help-tip">Consider what resources you'll need</li>
+                    </ul>
+                `;
+                helpPanel.style.display = 'block';
+                helpPanel.classList.add('fade-in');
+            }
+        }
+
+        // Goal analysis
+        async function analyzeGoal() {
+            const goalText = document.getElementById('goalInput').value.trim();
+            
+            if (!goalText) {
+                alert('Please enter a goal first!');
+                return;
+            }
+            
+            // Show loading state
+            const button = document.getElementById('analyzeButton');
+            button.disabled = true;
+            button.innerHTML = '<span class="loading"></span> Analyzing...';
+            
+            // Simulate API call (in real implementation, this would call the backend)
+            setTimeout(() => {
+                // Generate mock SMART analysis
+                const mockAnalysis = generateMockAnalysis(goalText);
+                displaySMARTAnalysis(mockAnalysis);
+                
+                // Update progress
+                updateProgress(2);
+                
+                // Reset button
+                button.disabled = false;
+                button.innerHTML = '<span>Analyze My Goal</span><span>→</span>';
+            }, 1500);
+        }
+
+        function generateMockAnalysis(goalText) {
+            // In a real implementation, this would come from the API
+            return {
+                smartCriteria: {
+                    specific: {
+                        value: 'The goal mentions what you want to achieve',
+                        confidence: 0.7,
+                        missing: ['Could be more specific about the exact outcome']
+                    },
+                    measurable: {
+                        value: 'Success criteria need to be defined',
+                        confidence: 0.4,
+                        missing: ['No specific metrics or measurements mentioned']
+                    },
+                    achievable: {
+                        value: 'Seems realistic with proper planning',
+                        confidence: 0.8,
+                        missing: []
+                    },
+                    relevant: {
+                        value: 'Aligns with personal growth',
+                        confidence: 0.9,
+                        missing: []
+                    },
+                    timeBound: {
+                        value: 'No specific timeframe mentioned',
+                        confidence: 0.2,
+                        missing: ['Need to set a target deadline']
+                    }
+                },
+                overallConfidence: 0.64,
+                suggestions: [
+                    'Add specific metrics to measure success',
+                    'Set a target completion date',
+                    'Break down into smaller milestones'
+                ]
+            };
+        }
+
+        function displaySMARTAnalysis(analysis) {
+            const panel = document.getElementById('smartCriteriaPanel');
+            const grid = document.getElementById('criteriaGrid');
+            
+            // Clear existing content
+            grid.innerHTML = '';
+            
+            // Create criteria items
+            const criteriaNames = {
+                specific: 'Specific',
+                measurable: 'Measurable',
+                achievable: 'Achievable',
+                relevant: 'Relevant',
+                timeBound: 'Time-bound'
+            };
+            
+            Object.entries(analysis.smartCriteria).forEach(([key, criteria]) => {
+                const confidenceClass = criteria.confidence >= 0.7 ? 'high-confidence' : 
+                                      criteria.confidence >= 0.4 ? 'medium-confidence' : 'low-confidence';
+                
+                const criteriaItem = document.createElement('div');
+                criteriaItem.className = `criteria-item ${confidenceClass} fade-in`;
+                criteriaItem.innerHTML = `
+                    <div class="criteria-title">
+                        <span>${criteriaNames[key]}</span>
+                        <span class="confidence-badge">${Math.round(criteria.confidence * 100)}%</span>
+                    </div>
+                    <div class="criteria-value">${criteria.value}</div>
+                    ${criteria.missing.length > 0 ? 
+                        `<div class="criteria-missing">${criteria.missing[0]}</div>` : 
+                        '<div style="color: var(--success-color); font-size: var(--font-size-sm);">✓ Well defined</div>'
+                    }
+                `;
+                grid.appendChild(criteriaItem);
+            });
+            
+            // Show the panel
+            panel.style.display = 'block';
+            panel.classList.add('fade-in');
+            
+            // Store analysis in state
+            uiState.smartCriteria = analysis;
+        }
+
+        function updateProgress(step) {
+            uiState.currentStep = step;
+            
+            // Update step indicators
+            const indicators = document.querySelectorAll('.step-indicator');
+            const progressFill = document.querySelector('.progress-fill');
+            
+            indicators.forEach((indicator, index) => {
+                if (index < step - 1) {
+                    indicator.classList.add('completed');
+                    indicator.classList.remove('active');
+                } else if (index === step - 1) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('completed');
+                } else {
+                    indicator.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update progress bar
+            progressFill.style.width = `${(step - 1) * 25}%`;
+        }
+
+        function refineGoal() {
+            // In a real implementation, this would start an interactive refinement process
+            alert('Interactive refinement coming soon! This would guide you through improving each SMART criterion.');
+        }
+
+        function startOver() {
+            // Reset the form
+            document.getElementById('goalInput').value = '';
+            updateCharacterCount();
+            document.getElementById('smartCriteriaPanel').style.display = 'none';
+            updateProgress(1);
+            uiState.goalText = '';
+            uiState.smartCriteria = null;
+        }
+
+        function showMoreExamples() {
+            // In a real implementation, this would show domain-specific examples
+            alert('More personalized examples based on your interests coming soon!');
+        }
+    </script>
+</body>
+</html>

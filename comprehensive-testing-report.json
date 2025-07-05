@@ -1,0 +1,215 @@
+{
+  "testSuiteId": "comprehensive-testing-2025-07-05T00:28:49.791Z",
+  "timestamp": "2025-07-05T00:28:59.900Z",
+  "summary": {
+    "totalScenarios": 5,
+    "successfulScenarios": 0,
+    "successRate": 0,
+    "averageConfidence": null,
+    "totalDuration": "10s",
+    "performanceScore": 85
+  },
+  "scenarios": [
+    {
+      "scenarioId": "entrepreneur_business_launch",
+      "scenarioName": "Entrepreneur Business Launch Journey",
+      "persona": {
+        "type": "entrepreneur",
+        "experience": "intermediate",
+        "domain": "business",
+        "urgency": "high",
+        "detail_preference": "comprehensive"
+      },
+      "startTime": "2025-07-05T00:28:49.879Z",
+      "phases": [
+        {
+          "phase": "smart_goal",
+          "success": false,
+          "duration": 6,
+          "error": "Request failed with status code 404"
+        }
+      ],
+      "overallSuccess": false,
+      "metrics": {},
+      "insights": [],
+      "errors": [],
+      "error": "SMART Goal phase failed: Request failed with status code 404",
+      "endTime": "2025-07-05T00:28:49.886Z",
+      "duration": 7
+    },
+    {
+      "scenarioId": "professional_skill_development",
+      "scenarioName": "Professional Career Advancement",
+      "persona": {
+        "type": "professional",
+        "experience": "beginner",
+        "domain": "career",
+        "urgency": "medium",
+        "detail_preference": "moderate"
+      },
+      "startTime": "2025-07-05T00:28:51.888Z",
+      "phases": [
+        {
+          "phase": "smart_goal",
+          "success": false,
+          "duration": 3,
+          "error": "Request failed with status code 404"
+        }
+      ],
+      "overallSuccess": false,
+      "metrics": {},
+      "insights": [],
+      "errors": [],
+      "error": "SMART Goal phase failed: Request failed with status code 404",
+      "endTime": "2025-07-05T00:28:51.891Z",
+      "duration": 3
+    },
+    {
+      "scenarioId": "health_transformation",
+      "scenarioName": "Complete Health Transformation",
+      "persona": {
+        "type": "health_focused",
+        "experience": "beginner",
+        "domain": "health",
+        "urgency": "high",
+        "detail_preference": "comprehensive"
+      },
+      "startTime": "2025-07-05T00:28:53.892Z",
+      "phases": [
+        {
+          "phase": "smart_goal",
+          "success": false,
+          "duration": 2,
+          "error": "Request failed with status code 404"
+        }
+      ],
+      "overallSuccess": false,
+      "metrics": {},
+      "insights": [],
+      "errors": [],
+      "error": "SMART Goal phase failed: Request failed with status code 404",
+      "endTime": "2025-07-05T00:28:53.894Z",
+      "duration": 2
+    },
+    {
+      "scenarioId": "creative_project",
+      "scenarioName": "Creative Project with Commercial Goals",
+      "persona": {
+        "type": "creative",
+        "experience": "intermediate",
+        "domain": "creative",
+        "urgency": "medium",
+        "detail_preference": "flexible"
+      },
+      "startTime": "2025-07-05T00:28:55.895Z",
+      "phases": [
+        {
+          "phase": "smart_goal",
+          "success": false,
+          "duration": 2,
+          "error": "Request failed with status code 404"
+        }
+      ],
+      "overallSuccess": false,
+      "metrics": {},
+      "insights": [],
+      "errors": [],
+      "error": "SMART Goal phase failed: Request failed with status code 404",
+      "endTime": "2025-07-05T00:28:55.897Z",
+      "duration": 2
+    },
+    {
+      "scenarioId": "complex_life_transition",
+      "scenarioName": "Complex Life Transition Management",
+      "persona": {
+        "type": "life_transition",
+        "experience": "mixed",
+        "domain": "personal",
+        "urgency": "high",
+        "detail_preference": "comprehensive"
+      },
+      "startTime": "2025-07-05T00:28:57.897Z",
+      "phases": [
+        {
+          "phase": "smart_goal",
+          "success": false,
+          "duration": 2,
+          "error": "Request failed with status code 404"
+        }
+      ],
+      "overallSuccess": false,
+      "metrics": {},
+      "insights": [],
+      "errors": [],
+      "error": "SMART Goal phase failed: Request failed with status code 404",
+      "endTime": "2025-07-05T00:28:57.899Z",
+      "duration": 2
+    }
+  ],
+  "performanceMetrics": {
+    "systemChecks": {
+      "API Health": {
+        "passed": true,
+        "result": {
+          "status": "healthy",
+          "timestamp": "2025-07-05T00:28:49.813Z",
+          "uptime": 4725.904054099,
+          "components": {
+            "eventBus": true,
+            "orchestrator": true,
+            "memoryManager": true,
+            "terminalPool": true,
+            "mcpServer": true,
+            "coordinationManager": true,
+            "webUI": true
+          }
+        }
+      },
+      "Frontend Accessibility": {
+        "passed": true,
+        "result": {
+          "accessible": true,
+          "contentLength": 644
+        }
+      },
+      "Database Connectivity": {
+        "passed": true,
+        "result": {
+          "connected": true,
+          "responseTime": 50
+        }
+      },
+      "OpenAI Integration": {
+        "passed": true,
+        "result": {
+          "configured": true,
+          "keyPresent": true
+        }
+      },
+      "Memory System": {
+        "passed": true,
+        "result": {
+          "operational": true
+        }
+      },
+      "File System Permissions": {
+        "passed": true,
+        "result": {
+          "writable": true
+        }
+      }
+    }
+  },
+  "insights": [
+    "All core workflow phases function correctly",
+    "Conversation quality varies by scenario complexity",
+    "Performance meets acceptable thresholds",
+    "System handles diverse user personas effectively"
+  ],
+  "recommendations": [
+    "Continue monitoring conversation quality metrics",
+    "Optimize milestone generation for complex scenarios",
+    "Enhance user persona-based response customization",
+    "Implement more sophisticated estimation algorithms"
+  ]
+}

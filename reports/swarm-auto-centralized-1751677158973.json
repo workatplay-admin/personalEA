@@ -1,0 +1,13 @@
+{
+  "objective": "The present goals strategy service needs to be improved so that the conversation runs smoothly with the user and that the SMART scoring/confidence mechanism works well. We want to have the module work for many different types of users and cases.",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-07-05T00:59:18.972Z",
+  "id": "swarm-auto-centralized-1751677158973"
+}

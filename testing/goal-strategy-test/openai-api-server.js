@@ -3,7 +3,7 @@ import cors from 'cors';
 import https from 'https';
 
 const app = express();
-const PORT = 8086;
+const PORT = process.env.PORT || 8087;
 
 // Startup time tracking
 const startTime = Date.now();
@@ -179,7 +179,13 @@ app.post('/api/v1/goals/translate', requireOpenAI, async (req, res) => {
       request.end();
     });
 
-    console.log('Raw OpenAI content:', completion.choices[0].message.content);
+    return completion;
+  };
+
+  // Call the function with retry logic
+  const completion = await retryWithBackoff(makeOpenAIRequest);
+
+  console.log('Raw OpenAI content:', completion.choices[0].message.content);
     
     let aiResponse;
     try {

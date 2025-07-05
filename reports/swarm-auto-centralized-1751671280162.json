@@ -1,0 +1,13 @@
+{
+  "objective": "Reviwe the user testing deployment procedure and execute to test the goal strategy service. make sure browser based automated user testing is complete. remember we have a valid openai API key in .env for testing too ",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-07-04T23:21:20.161Z",
+  "id": "swarm-auto-centralized-1751671280162"
+}

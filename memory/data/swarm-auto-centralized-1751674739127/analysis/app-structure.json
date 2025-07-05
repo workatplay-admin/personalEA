@@ -1,0 +1,32 @@
+{
+  "appName": "PersonalEA (Personal Executive Assistant)",
+  "type": "Microservices-based AI Assistant System",
+  "architecture": "API-first microservices architecture",
+  "mainServices": {
+    "goalStrategyService": {
+      "port": 8085,
+      "description": "Sophisticated 8-step goal-setting and strategic planning workflow",
+      "framework": "Express.js with TypeScript",
+      "database": "PostgreSQL with Prisma ORM",
+      "cache": "Redis",
+      "aiIntegration": "OpenAI GPT-4"
+    },
+    "emailProcessingService": {
+      "port": 3001,
+      "description": "Email integration and processing service",
+      "optionalIntegrations": ["Gmail API"]
+    },
+    "frontend": {
+      "ports": [5173, 5174],
+      "framework": "React with Vite",
+      "ui": "Tailwind CSS",
+      "state": "React hooks"
+    }
+  },
+  "workspaceStructure": {
+    "services": ["goal-strategy", "email-processing"],
+    "testing": ["goal-strategy-test", "conversation-quality", "e2e"],
+    "documentation": ["API specs in OpenAPI format"],
+    "config": ["Environment-based configuration with .env files"]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "mainConfigFiles": {
+    "environment": {
+      "production": ".env",
+      "example": ".env.example",
+      "staging": ".env.staging.example",
+      "user": ".env.user.example",
+      "test": "testing/goal-strategy-test/.env"
+    },
+    "appConfig": {
+      "default": "config/default.json",
+      "goalService": "services/goal-strategy/src/config/environment.ts",
+      "emailService": "services/email-processing/src/config/environment.ts"
+    },
+    "buildConfig": {
+      "root": "package.json",
+      "goalService": "services/goal-strategy/package.json",
+      "frontend": "testing/goal-strategy-test/package.json",
+      "typescript": ["tsconfig.json", "services/goal-strategy/tsconfig.json"],
+      "vite": ["vite.config.ts", "vite.config.production.ts"],
+      "playwright": ["playwright.config.ts", "playwright.config.production.ts"],
+      "jest": ["jest.config.js", "services/goal-strategy/jest.config.js"]
+    }
+  },
+  "requiredEnvVars": [
+    "OPENAI_API_KEY",
+    "JWT_SECRET",
+    "SESSION_SECRET",
+    "EMAIL_ENCRYPTION_KEY",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "POSTGRES_PASSWORD",
+    "REDIS_PASSWORD"
+  ],
+  "featureFlags": [
+    "FEATURE_AI_GOAL_TRANSLATION",
+    "FEATURE_MILESTONE_GENERATION",
+    "FEATURE_WBS_AUTOMATION",
+    "FEATURE_DEPENDENCY_MAPPING",
+    "FEATURE_ESTIMATION_ENGINE",
+    "FEATURE_CALENDAR_INTEGRATION",
+    "FEATURE_CAPACITY_MANAGEMENT"
+  ]
+}

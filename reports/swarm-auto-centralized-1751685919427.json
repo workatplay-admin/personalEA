@@ -1,0 +1,13 @@
+{
+  "objective": "you are continual unable to fix the issue. It is still broken as it was. So your testing is horribly flawed as well. I do not want you to fix the issue, but I want you to independlty arhcitect a system for Helping a user properly convert their goals into SMART goals. We want to have a very conversational expereince with an LLM. We want to leverage the LLMs conversational ablities to make the experience flow and enjoyable. We do \nnot want the LLM to be too verbose,  but we dont want to get in the way of it. We want to ensure the conversations is fluid from one question to the next. So the LLM needs to keep track of our conversation. From that conversation we want to make sure the LLM hels the user make strong SMART goals. SO it will ask the user for details to make the goal strong. It will then store the final smart goal, and then proceed to help the user break it down into into milestones, and then actionaable tasks to achieve those milestones with time estimates whcih will be placed into the users calendar. For now I just want to focus on the goal refinement - so they are strong SMART goals. I want this expereince to be very conversational. I could set up a custom GPT with openAI if that helps\nand there is a way to access it via openAPI. Bit only if it helps. I want you to architect the system that are in line with the go\nals of this project that is simpler than what we have now, and can be quickly deployed to a staging site with a CICD and Browser b\nased automated user testing. I would like this architecture to be well researched and not over engineered or architected. Once thi\ns is done we will take further action so do not build it yet.",
+  "strategy": "auto",
+  "mode": "centralized",
+  "maxAgents": 5,
+  "timeout": 60,
+  "parallel": false,
+  "monitor": false,
+  "output": "json",
+  "outputDir": "./reports",
+  "timestamp": "2025-07-05T03:25:19.427Z",
+  "id": "swarm-auto-centralized-1751685919427"
+}

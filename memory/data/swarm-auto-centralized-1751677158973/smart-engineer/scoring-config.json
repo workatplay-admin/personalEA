@@ -1,0 +1,152 @@
+{
+  "algorithm": {
+    "name": "Enhanced SMART Scoring",
+    "version": "2.0.0",
+    "author": "SMART Algorithm Engineer",
+    "created": "2025-01-05",
+    "description": "Advanced SMART goal scoring with pattern detection and confidence calculation"
+  },
+  "weights": {
+    "components": {
+      "specific": 0.25,
+      "measurable": 0.25,
+      "achievable": 0.20,
+      "relevant": 0.15,
+      "timeBound": 0.15
+    },
+    "specific_subcomponents": {
+      "what": 0.30,
+      "who": 0.20,
+      "where": 0.15,
+      "why": 0.20,
+      "how": 0.15
+    },
+    "confidence_factors": {
+      "dataQuality": 0.25,
+      "completeness": 0.30,
+      "clarity": 0.25,
+      "consistency": 0.20
+    }
+  },
+  "thresholds": {
+    "high_confidence": 0.8,
+    "medium_confidence": 0.6,
+    "low_confidence": 0.4,
+    "high_score": 0.7,
+    "medium_score": 0.5,
+    "low_score": 0.3,
+    "component_present": 0.6,
+    "critical_gap": 0.4
+  },
+  "complexity_scoring": {
+    "factors": {
+      "length": { "simple": 100, "moderate": 200, "complex": 400 },
+      "components": { "simple": 5, "moderate": 10, "complex": 15 },
+      "dependencies": { "weight": 1 },
+      "stakeholders": { "weight": 1 },
+      "risk_level": { "high": 1 },
+      "duration": { "threshold_months": 6, "weight": 1 }
+    },
+    "levels": {
+      "simple": { "max_score": 2 },
+      "moderate": { "max_score": 4 },
+      "complex": { "max_score": 6 },
+      "highly_complex": { "min_score": 7 }
+    }
+  },
+  "patterns": {
+    "categories": [
+      "timeframe",
+      "metrics",
+      "specificity",
+      "feasibility",
+      "relevance"
+    ],
+    "extraction_rules": {
+      "numeric_values": {
+        "with_units": true,
+        "normalize_currency": true,
+        "extract_ranges": true
+      },
+      "time_parsing": {
+        "formats": ["ISO", "US", "EU", "relative", "named_periods"],
+        "implicit_detection": true
+      },
+      "context_awareness": {
+        "domain_specific": true,
+        "previous_goals": true,
+        "user_background": true
+      }
+    }
+  },
+  "feedback_templates": {
+    "missing_components": {
+      "specific": {
+        "what": "What specific action will you take to achieve this goal?",
+        "who": "Who will be involved or affected by this goal?",
+        "where": "Where or in what context will this happen?",
+        "why": "Why is this goal important?",
+        "how": "How will you achieve this goal?"
+      },
+      "measurable": {
+        "metrics": "What specific metrics or KPIs will you track?",
+        "baseline": "What is your current baseline or starting point?",
+        "target": "What is your specific target or desired outcome?"
+      },
+      "achievable": {
+        "resources": "What resources do you have or need for this goal?",
+        "constraints": "Are there any constraints or challenges to consider?",
+        "skills": "Do you have the necessary skills and experience?"
+      },
+      "relevant": {
+        "alignment": "How does this goal align with your broader objectives?",
+        "impact": "What impact will achieving this goal have?",
+        "timing": "Why is this the right time to pursue this goal?"
+      },
+      "timeBound": {
+        "deadline": "What is your target completion date?",
+        "milestones": "What are the key milestones along the way?",
+        "duration": "How long do you expect this to take?"
+      }
+    },
+    "improvement_suggestions": {
+      "low_score": "Focus on adding more specific details to strengthen this component",
+      "medium_score": "Good foundation - refine with additional clarity",
+      "high_score": "Well-defined - consider minor enhancements for perfection"
+    }
+  },
+  "domain_categories": {
+    "Professional Development": {
+      "keywords": ["career", "professional", "skill", "certification", "training", "learn"],
+      "typical_metrics": ["certifications earned", "skills acquired", "courses completed"],
+      "typical_duration": "3-12 months"
+    },
+    "Business/Revenue": {
+      "keywords": ["revenue", "sales", "profit", "business", "customer", "market"],
+      "typical_metrics": ["revenue growth %", "customer count", "market share", "ROI"],
+      "typical_duration": "3-18 months"
+    },
+    "Health/Fitness": {
+      "keywords": ["health", "fitness", "weight", "exercise", "diet", "wellness"],
+      "typical_metrics": ["weight", "body fat %", "workout frequency", "calories"],
+      "typical_duration": "1-6 months"
+    },
+    "Financial": {
+      "keywords": ["save", "invest", "money", "budget", "financial", "income"],
+      "typical_metrics": ["savings amount", "investment returns", "debt reduction"],
+      "typical_duration": "6-24 months"
+    },
+    "Technology": {
+      "keywords": ["software", "app", "system", "technology", "digital", "code"],
+      "typical_metrics": ["features delivered", "bugs fixed", "uptime %", "users"],
+      "typical_duration": "1-12 months"
+    }
+  },
+  "integration": {
+    "compatible_with": ["smart-goal-processor.ts", "smart-goal-processor-v2.ts"],
+    "api_version": "1.0",
+    "async_processing": true,
+    "batch_support": true,
+    "caching_enabled": false
+  }
+}
